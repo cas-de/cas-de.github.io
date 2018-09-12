@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Anleitung</title>
+  <style>
+body{
+  margin-top: 2em;
+  margin-left: 16%;
+  margin-bottom: 10em;
+  max-width: 40em;
+  font-family: "DejaVu Sans", "Verdana", sans-serif;
+  color: #404034;
+  line-height: 1.4em;
+}
+@media(max-width: 56em){
+  body{margin-left: 10%; margin-right: 4%;}
+}
+@media(max-width: 42em){
+  body{margin-left: 6%; margin-right: 4%;}
+}
+@media(max-width: 26em){
+  body{margin-left: 2%; margin-right: 1%; line-height: 1.2em;}
+  ol, ul{padding-left: 2em;}
+}
+h1,h2,h3,h4{color: #463c20;}
+
+a{color: #20506a; text-decoration: none;}
+a:hover{color: #102a40; text-decoration: underline;}
+pre, code{
+  font-family: "FreeMono", "Courier New", monospace;
+  color: #403020;
+}
+table.bt{border-collapse: collapse;}
+table.bt td, table.bt th{
+  border: 1px solid #babab2;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+  text-align: left;
+  vertical-align: top;
+}
+table.bt td{
+  background-color: #f0f0ff;
+}
+table.bt th{
+  background-color: #dae0f0;
+}
+.indent {
+  margin-left: 1.6em;
+}
+dl.input dt{
+  font-weight: bold;
+  font-family: "FreeMono", "Courier New", monospace;
+}
+dl.input dd{
+  margin-bottom: 1em;
+}
+  </style>
+</head>
+<body>
+
+<br>
+<h2>Anleitung zum Funktionenplotter</h2>
+<h3>Inhaltsverzeichnis</h3>
+<ol>
+<li><a href="#syntax">Syntax</a>
+<li><a href="#higher-order">Operationen höherer Ordnung</a>
+<li><a href="#constants">Konstanten</a>
+<li><a href="#elementary-special">Spezielle elementare Funktionen</a>
+<li><a href="#exp">Exponentiation und Logarithmen</a>
+<li><a href="#trigonometric">Winkelfunktionen und verwandte Funktionen</a>
+<li><a href="#gamma">Gamma-Funktion und verwandte Funktionen</a>
+<li><a href="#antiderivatives">Integralfunktionen</a>
+<li><a href="#ei">Elliptische Integrale und verwandte Funktionen</a>
+<li><a href="#polynomial-functions">Polynomfunktionen</a>
+<li><a href="#utility-functions">Hilfsfunktionen</a>
+<li><a href="#input-examples">Eingabe-Beispiele</a>
+</ol>
+
+<h3 id="syntax">Syntax</h3>
+<table class="bt">
+<tr>
+<th>Syntax
+<th>Mathematik
+<th>Erklärung
+<tr>
+<td><code>a+b,&nbsp;a-b</code>
+<td>a+b, a&minus;b
+<td>Addition, subtraction.
+<tr>
+<td><code>a*b, a/b</code>
+<td>a&sdot;b, a/b
+<td>Multiplication, division.
+<tr>
+<td><code>a^n</code>
+<td>a<sup>n</sup>
+<td>Exponentiation.
+<tr>
+<td><code>n!</code>
+<td>n!
+<td>Factorial.
+<tr>
+<td><code>abs(x)</code>
+<td>|x|
+<td>Absolute value.
+<tr>
+<td><code>a:=b</code>
+<td>a:=b
+<td>Assignment.
+<tr>
+<td><code>f(x):=2x</code>
+<td>f(x):=2x
+<td>Function definition.
+<tr>
+<td><code>f(x,y):=x*y</code>
+<td>f(x,y):=x&sdot;y
+<td>Function definition.
+<tr>
+<td><code>x.2x</code>
+<td>x&nbsp;&#8614;&nbsp;2x
+<td>Lambda expression.
+<tr>
+<td><code>(x,y).x*y</code>
+<td>(x,y)&nbsp;&#8614;&nbsp;x&sdot;y
+<td>Lambda expression.
+<tr>
+<td><code>f'(a)</code>
+<td>f'(a)
+<td>Derivative of f at a.
+<tr>
+<td><code>f''(a)</code>
+<td>f''(a)
+<td>Second derivative of f at a.
+<tr>
+<td><code>if(a,x,y)</code>
+<td>x if a else y
+<td>Conditional expression.
+<tr>
+<td><code>a&amp;b</code>
+<td>a&and;b
+<td>Conjunction: a and b.
+<tr>
+<td><code>a|b</code>
+<td>a&or;b
+<td>Disjunction: a or b.
+<tr>
+<td><code>a&lt;b,&nbsp;a&gt;b</code>
+<td>a&lt;b, a&gt;b
+<td>Comparison.
+<tr>
+<td><code>a&lt;=b,&nbsp;a&gt;=b</code>
+<td>a&le;b, a&ge;b
+<td>Comparison.
+</table>
+
+<br>
+<h3 id="higher-order">Operationen höherer Ordnung</h3>
+<table class="bt">
+<tr>
+<th>Funktion
+<th>Mathematik
+<th>Erklärung
+<tr>
+<td><code>diff(x.f(x),a)</code>
+<td>df(x)/dx|<sub>x=a</sub>
+<td>Derivative of f at a.
+<tr>
+<td><code>diff(x.f(x),a,n)</code>
+<td>(d/dx)<sup>n</sup>&nbsp;f(x)|<sub>x=a</sub>
+<td>The n-th derivative of f at a.
+<tr>
+<td><code>sum(a,b,k.f(k))</code>
+<td>&sum;<sub>k&in;[a,b]</sub>&nbsp;f(k)
+<td>Sum.
+<tr>
+<td><code>prod(a,b,k.f(k))</code>
+<td>&prod;<sub>k&in;[a,b]</sub>&nbsp;f(k)
+<td>Product.
+<tr>
+<td><code>int(a,b,x.f(x))</code>
+<td>&int;<sub>[a,b]</sub>&nbsp;f(x)&nbsp;dx
+<td>Definite integral.
+<tr>
+<td><code>inv(f,x,a,b)</code>
+<td>(f|<sub>[a,b]</sub>)<sup>&minus;1</sup>(x)
+<td>Inverse function of f restricted to [a,b].
+<tr>
+<td><code>pow(f,n,x)</code>
+<td>f<sup>n</sup>(x)
+<td>The n-th iterate of f.
+</table>
+
+<br>
+<h3 id="constants">Konstanten</h3>
+<table class="bt">
+<tr>
+<th>Konstante
+<th>Erklärung
+<tr>
+<td><code>pi</code>
+<td>Half length of the unit circle.
+<tr>
+<td><code>tau</code>
+<td>Length of the unit circle.
+<tr>
+<td><code>e</code>
+<td>Base of the natural logarithm.
+<tr>
+<td><code>deg</code>
+<td>Degree unit: <code>tau/360</code>.
+<tr>
+<td><code>gon</code>
+<td>Gradian unit: <code>tau/400</code>.
+<tr>
+<td><code>gc</code>
+<td>Euler-Mascheroni constant (gamma constant).
+<tr>
+<td><code>nan</code>
+<td>Not a number.
+</table>
+
+<br>
+<h3 id="elementary-special">Spezielle elementare Funktionen</h3>
+<table class="bt">
+<tr>
+<th>Funktion
+<th>Erklärung
+<tr>
+<td><code>abs(x)</code>
+<td>Absolute value.
+<tr>
+<td><code>sgn(x)</code>
+<td>Signum.
+<tr>
+<td><code>floor(x)</code>
+<td>Rounded towards minus infinity.
+<tr>
+<td><code>ceil(x)</code>
+<td>Rounded towards plus infinity.
+<tr>
+<td><code>rd(x)</code>
+<td>Rounded towards zero.
+<tr>
+<td><code>frac(x)</code>
+<td>Fractional part.
+<tr>
+<td><code>div(x,y)</code>
+<td>Floor division.
+<tr>
+<td><code>mod(x,y)</code>
+<td>Floor division remainder.
+<tr>
+<td><code>diveuc(x,y)</code>
+<td>Euclidean division.
+<tr>
+<td><code>modeuc(x,y)</code>
+<td>Euclidean division remainder.
+<tr>
+<td><code>divtrunc(x,y)</code>
+<td>Truncating division.
+<tr>
+<td><code>modtrunc(x,y)</code>
+<td>Truncating division remainder.
+<tr>
+<td><code>max(x,y)</code>
+<td>Maximum.
+<tr>
+<td><code>min(x,y)</code>
+<td>Minimum.
+<tr>
+<td><code>hypot(x,y)</code>
+<td>Hypotenuse length: <code>sqrt(x^2+y^2)</code>.
+<tr>
+<td><code>angle(x,y)</code>
+<td>Phase angle of coordinate vector (x,y).
+</table>
+
+<br>
+<h3 id="exp">Exponentiation und Logarithmen</h3>
+<table class="bt">
+<tr>
+<th>Funktion
+<th>Erklärung
+<tr>
+<td><code>exp(x)</code>
+<td>Natural exponential function.
+<tr>
+<td><code>ln(x)</code>
+<td>Natural logarithm.
+<tr>
+<td><code>lg(x)</code>
+<td>Common logarithm.
+<tr>
+<td><code>ld(x)</code>
+<td>Binary logarithm.
+<tr>
+<td><code>lb(x)</code>
+<td>Binary logarithm.
+<tr>
+<td><code>log(x,b)
+<td>Logarithm to base b.
+<tr>
+<td><code>sqrt(x)</code>
+<td>Square root.
+<tr>
+<td><code>root(n,x)</code>
+<td>n-th root.
+<tr>
+<td><code>W(x)</code>
+<td>Lambert W function, upper branch.
+<tr>
+<td><code>Wm1(x)</code>
+<td>Lambert W function, lower branch.
+</table>
+
+<br>
+<h3 id="trigonometric">Winkelfunktionen und verwandte Funktionen</h3>
+<table class="bt">
+<tr>
+<th>Funktion
+<th>Erklärung
+<tr>
+<td><code>sin(x),&nbsp;cos(x),&nbsp;tan(x),
+  <br>sec(x),&nbsp;csc(x),&nbsp;cot(x)</code>
+<td>Trigonometric functions.
+<tr>
+<td><code>asin(x), acos(x),
+  <br>atan(x), acot(x)</code>
+<td>Inverse trigonometric functions.
+<tr>
+<td><code>sinh(x), cosh(x),
+  <br>tanh(x), coth(x)</code>
+<td>Hyperbolic functions.
+<tr>
+<td><code>asinh(x), acosh(x),
+  <br>atanh(x), acoth(x)</code>
+<td>Inverse hyperbolic functions.
+<tr>
+<td><code>sinc(x)</code>
+<td>Cardinal sine: <code>sin(pi*x)/(pi*x)</code>.
+</table>
+
+<br>
+<h3 id="gamma">Gamma-Function und verwandte Funktionen</h3>
+<table class="bt">
+<tr>
+<th>Funktion
+<th>Erklärung
+<tr>
+<td><code>gamma(x)</code>
+<td>Gamma function &Gamma;(x).
+<tr>
+<td><code>fac(x)</code>
+<td>Factorial function, i.e. <code>gamma(x+1)</code>.
+<tr>
+<td><code>gamma(a,x)</code>
+<td>Lower incomplete gamma function &gamma;(a,x).
+<tr>
+<td><code>Gamma(a,x)</code>
+<td>Upper incomplete gamma function &Gamma;(a,x).
+<tr>
+<td><code>erf(x)</code>
+<td>Error function.
+<tr>
+<td><code>psi(x)</code>
+<td>Digamma function &psi;(x).
+<tr>
+<td><code>psi(n,x)</code>
+<td>Polygamma function &psi;<sub>n</sub>(x).
+<tr>
+<td><code>zeta(x)</code>
+<td>Zeta function &zeta;(x).
+</table>
+
+<br>
+<h3 id="antiderivatives">Integralfunktionen</h3>
+<table class="bt">
+<tr>
+<th>Function
+<th>Explanation
+<tr>
+<td><code>Ei(x)</code>
+<td>Exponential integral.
+<tr>
+<td><code>En(n,x)</code>
+<td>Exponential integral E<sub>n</sub>(x).
+<tr>
+<td><code>li(x)</code>
+<td>Integral logarithm.
+<tr>
+<td><code>Li(x)</code>
+<td>Integral logarithm with offset <code>li(2)</code>.
+</table>
+
+<br>
+<h3 id="ei">Elliptische Integrale und verwandte Funktionen</h3>
+<table class="bt">
+<tr>
+<th>Funktion
+<th>Erklärung
+<tr>
+<td><code>agm(x,y)</code>
+<td>Arithmetic-geometric mean.
+<tr>
+<td><code>E(m)</code>
+<td>Complete elliptic integral E(m), m=k<sup>2</sup>.
+<tr>
+<td><code>K(m)</code>
+<td>Complete elliptic integral K(m), m=k<sup>2</sup>.
+<tr>
+<td><code>E(phi,m)</code>
+<td>Elliptic integral E(&phi;,m), m=k<sup>2</sup>.
+<tr>
+<td><code>F(phi,m)</code>
+<td>Elliptic integral F(&phi;,m), m=k<sup>2</sup>.
+<tr>
+<td><code>Pi(phi,n,m)</code>
+<td>Elliptic integral &Pi;(&phi;,n,m), m=k<sup>2</sup>.
+<tr>
+<td><code>RF(x,y,z)</code>
+<td>Carlson symmetric form R<sub>F</sub>(x,y,z).
+<tr>
+<td><code>RJ(x,y,z,p)</code>
+<td>Carlson symmetric form R<sub>J</sub>(x,y,z,p).
+<tr>
+<td><code>RC(x,y)</code>
+<td>Carlson symmetric form R<sub>F</sub>(x,y,y).
+<tr>
+<td><code>RD(x,y,z)</code>
+<td>Carlson symmetric form R<sub>J</sub>(x,y,z,z).
+</table>
+
+<br>
+<h3 id="polynomial-functions">Polynomfunktionen</h3>
+<table class="bt">
+<tr>
+<th>Funktion
+<th>Erklärung
+<tr>
+<td><code>PP(n,0,x)</code>
+<td>Legendre polynomial P<sub>n</sub>(x).
+<tr>
+<td><code>PP(n,a,x)</code>
+<td>Associated legendre function P<sub>n,a</sub>(x).
+<tr>
+<td><code>PL(n,0,x)</code>
+<td>Laguerre polynomial L<sub>n</sub>(x).
+<tr>
+<td><code>PL(n,a,x)</code>
+<td>Associated Laguerre polynomial L<sub>n,a</sub>(x).
+<tr>
+<td><code>PH(n,x)</code>
+<td>Hermite polynomial H<sub>n</sub>(x).
+<tr>
+<td><code>PT(n,x)</code>
+<td>Chebyshev polynomial T<sub>n</sub>(x).
+<tr>
+<td><code>PU(n,x)</code>
+<td>Chebyshev polynomial U<sub>n</sub>(x).
+</table>
+
+<br>
+<h3 id="utility-functions">Hilfsfunktionen</h3>
+<table class="bt">
+<tr>
+<th>Funktion
+<th>Erklärung
+<tr>
+<td><code>rand()</code>
+<td>Random number from interval [0,1].
+<tr>
+<td><code>rand(a,b)</code>
+<td>Random number from interval [a,b].
+<tr>
+<td><code>rand(a)</code>
+<td>Randomly pick an element from list a.
+<tr>
+<td><code>rand(a:b)</code>
+<td>Randomly pick an element from [a,a+1,a+2,...,b].
+<tr>
+<td><code>rand(a:b:d)</code>
+<td>Randomly pick an element from [a,a+d,a+2d,...,b].
+<tr>
+<td><code>af(x0,y0,x1,y1)</code>
+<td>The affine function through (x<sub>0</sub>,&nbsp;y<sub>0</sub>)
+  and (x<sub>1</sub>,&nbsp;y<sub>1</sub>).
+<br>Example: <code>f:=af(2,1,6,2),f(x)</code>.
+<tr>
+<td><code>tg(f,a,x)</code>
+<td>Tangent line <code>f(a)+f'(a)*(x-a)</code>.
+<tr>
+<td><code>sc(f,a,b,x)</code>
+<td>Secant line <code>f(a)+(f(b)-f(a))/(b-a)*(x-a)</code>.
+<tr>
+<td><code>clamp(x,a,b)</code>
+<td>The same as <code>min(max(x,a),b)</code>.
+<tr>
+<td><code>roots(f)</code>
+<td>Try to find the zeroes of f(x) for x&in;[&minus;100,100].
+<tr>
+<td><code>roots(f,a,b)</code>
+<td>Try to find the zeroes of f(x) for x&in;[a,b].
+<tr>
+<td><code>map(f,a)</code>
+<td>Apply f to every element of list a.
+<br>Example: <code>map(x.2x,1:10)</code>.
+<tr>
+<td><code>filter(p,a)</code>
+<td>The elements x in a that fulfill the predicate p.
+<br>Example: <code>filter(k.mod(k,2)=1,1:10)<code>.
+</table>
+
+<br>
+<h3 id="input-examples">Eingabe-Beispiele</h3>
+<dl class="input">
+<dt><a href="plot.htm?sin(x)">sin(x)</a>
+<dd>An explicit function.
+
+<dt><a href="plot.htm?sin(x);scale(0.1),P(pi,0)"
+>sin(x);scale(0.1),P(pi,0)</a>
+<dd>Draw a function at position <code>P(x,y)</code>
+and <code>scale(dx,dy=dx)</code>.
+
+<dt><a href="plot.htm?sin(x);;scale(0.1),P(pi,0)"
+>sin(x);;scale(0.1),P(pi,0)</a>
+<dd>Everything after two semicolons is applied only once
+and then removed.
+
+<dt><a href="plot.htm?sin(x),cos(x),tan(x)">sin(x),cos(x),tan(x)</a>
+<dd>Many functions.
+
+<dt><a href="plot.htm?x^2-y^2=1">x^2-x^2=1</a>
+<dd>An implicit function.
+
+<dt><a href="plot.htm?x^2-y^2=1,x,-x">x^2-x^2=1,x,-x</a>
+<dd>An implicit function and asymptotes.
+
+<dt><a href="plot.htm?f(x):=ln(x),f(x),f%27(x)"
+>f(x):=ln(x),f(x),f'(x)</a>
+<dd>A function and its derivative.
+
+<dt><a href="plot.htm?f(x):=sin(x),a:=2,f(x),f(a)+f%27(a)*(x-a)"
+>f(x):=sin(x),a:=2,f(x),f(a)+f'(a)*(x-a)</a>
+<dd>Tangent line to a function.
+
+<dt><a href="plot.htm?exp(x),sum(0,4,k.x^k/fac(k))"
+>exp(x),sum(0,4,k.x^k/fac(k))</a>
+<dd>Partial sum of the exponential series.
+
+<dt><a href="plot.htm?int(0,10,t.t^(x-1)*exp(-t))"
+>int(0,10,t.t^(x-1)*exp(-t))</a>
+<dd>Gamma function via parameter integral.
+
+<dt><a href="plot.htm?%5bcos(t),sin(2t)/2%5d"
+>[cos(t),sin(2t)/2]</a>
+<dd>A parametric curve.
+
+<dt><a href="plot.htm?t0:=0,t1:=10pi,%5bt/10*cos(t),t/10*sin(t)%5d"
+>t0:=0,t1:=10pi,[t/10*cos(t),t/10*sin(t)]</a>
+<dd>A parametric curve for given parameter domain.
+
+<dt><a href="plot.htm?r(t):=sin(5t)+4,%5br(t)*cos(t),r(t)*sin(t)%5d"
+>r(t):=sin(5t)+4,[r(t)*cos(t),r(t)*sin(t)]</a>
+<dd>A star.
+</dl>
+
+</body>
+</html>
+

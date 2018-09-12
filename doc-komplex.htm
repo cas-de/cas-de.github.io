@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Function grapher manual</title>
+  <style>
+body{
+  margin-top: 2em;
+  margin-left: 16%;
+  margin-bottom: 10em;
+  max-width: 40em;
+  font-family: "DejaVu Sans", "Verdana", sans-serif;
+  color: #404034;
+  line-height: 1.4em;
+}
+@media(max-width: 56em){
+  body{margin-left: 10%; margin-right: 4%;}
+}
+@media(max-width: 42em){
+  body{margin-left: 6%; margin-right: 4%;}
+}
+@media(max-width: 26em){
+  body{margin-left: 2%; margin-right: 1%; line-height: 1.2em;}
+  ol, ul{padding-left: 2em;}
+}
+h1,h2,h3,h4{color: #463c20;}
+
+a{color: #20506a; text-decoration: none;}
+a:hover{color: #102a40; text-decoration: underline;}
+pre, code{
+  font-family: "FreeMono", "Courier New", monospace;
+  color: #403020;
+}
+table.bt{border-collapse: collapse;}
+table.bt td, table.bt th{
+  border: 1px solid #babab2;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+  text-align: left;
+  vertical-align: top;
+}
+table.bt td{
+  background-color: #f0f0ff;
+}
+table.bt th{
+  background-color: #dae0f0;
+}
+.indent {
+  margin-left: 1.6em;
+}
+dl.input dt{
+  font-weight: bold;
+  font-family: "FreeMono", "Courier New", monospace;
+}
+dl.input dd{
+  margin-bottom: 1em;
+}
+  </style>
+</head>
+<body>
+
+<br>
+<h2>Complex function grapher manual</h2>
+<h3>Table of contents</h3>
+<ol>
+<li><a href="#syntax">Syntax</a>
+<li><a href="#higher-order">Higher order operations</a>
+<li><a href="#constants">Constants</a>
+<li><a href="#elementary-special">Elementary special functions</a>
+<li><a href="#exp">Exponentiation and logarithms</a>
+<li><a href="#trigonometric">Trigonometric functions and related</a>
+<li><a href="#gamma">Gamma function and related</a>
+<li><a href="#input-examples">Input examples</a>
+</ol>
+
+<h3 id="syntax">Syntax</h3>
+<table class="bt">
+<tr>
+<th>Syntax
+<th>Math
+<th>Explanation
+<tr>
+<td><code>a+b,&nbsp;a-b</code>
+<td>a+b, a&minus;b
+<td>Addition, subtraction.
+<tr>
+<td><code>a*b, a/b</code>
+<td>a&sdot;b, a/b
+<td>Multiplication, division.
+<tr>
+<td><code>a^n</code>
+<td>a<sup>n</sup>
+<td>Exponentiation.
+<tr>
+<td><code>n!</code>
+<td>n!
+<td>Factorial.
+<tr>
+<td><code>abs(z)</code>
+<td>|z|
+<td>Absolute value.
+<tr>
+<td><code>a:=b</code>
+<td>a:=b
+<td>Assignment.
+<tr>
+<td><code>f(z):=2z</code>
+<td>f(z):=2z
+<td>Function definition.
+<tr>
+<td><code>f(x,y):=x*y</code>
+<td>f(x,y):=x&sdot;y
+<td>Function definition.
+<tr>
+<td><code>z.2z</code>
+<td>z&nbsp;&#8614;&nbsp;2z
+<td>Lambda expression.
+<tr>
+<td><code>(x,y).x*y</code>
+<td>(x,y)&nbsp;&#8614;&nbsp;x&sdot;y
+<td>Lambda expression.
+<tr>
+<td><code>f'(a)</code>
+<td>f'(a)
+<td>Complex derivative of f at a.
+<tr>
+<td><code>f''(a)</code>
+<td>f''(a)
+<td>Second derivative of f at a.
+<tr>
+<td><code>if(a,x,y)</code>
+<td>x if a else y
+<td>Conditional expression.
+<tr>
+<td><code>a&amp;b</code>
+<td>a&and;b
+<td>Conjunction: a and b.
+<tr>
+<td><code>a|b</code>
+<td>a&or;b
+<td>Disjunction: a or b.
+<tr>
+<td><code>a&lt;b,&nbsp;a&gt;b</code>
+<td>a&lt;b, a&gt;b
+<td>Comparison.
+<tr>
+<td><code>a&lt;=b,&nbsp;a&gt;=b</code>
+<td>a&le;b, a&ge;b
+<td>Comparison.
+</table>
+
+<br>
+<h3 id="higher-order">Higher order operations</h3>
+<table class="bt">
+<tr>
+<th>Function
+<th>Math
+<th>Explanation
+<tr>
+<td><code>diff(z.f(z),a)</code>
+<td>df(z)/dz|<sub>z=a</sub>
+<td>Complex derivative of f at a.
+<tr>
+<td><code>diff(z.f(z),a,n)</code>
+<td>(d/dz)<sup>n</sup>&nbsp;f(z)|<sub>z=a</sub>
+<td>The n-th derivative of f at a.
+<tr>
+<td><code>sum(a,b,k.f(k))</code>
+<td>&sum;<sub>k&in;[a,b]</sub>&nbsp;f(k)
+<td>Sum.
+<tr>
+<td><code>prod(a,b,k.f(k))</code>
+<td>&prod;<sub>k&in;[a,b]</sub>&nbsp;f(k)
+<td>Product.
+<tr>
+<td><code>int([a,b],z.f(z))</code>
+<td>&int;<sub>&gamma;</sub>&nbsp;f(z)&nbsp;dz
+<td>Path integral, &gamma;=line segment [a,b].
+<tr>
+<td><code>int([a,b,c],z.f(z))</code>
+<td>&int;<sub>&gamma;</sub>&nbsp;f(z)&nbsp;dz
+<td>Path integral, &gamma;=[a,b]&oplus;[b,c].
+<tr>
+<td><code>int(p,z.f(z))</code>
+<td>&int;<sub>&gamma;</sub>&nbsp;f(z)&nbsp;dz
+<td>Path integral, &gamma;=[p<sub>0</sub>,p<sub>1</sub>]&oplus;[p<sub>1</sub>,p<sub>2</sub>]&oplus;&hellip;
+<tr>
+<td><code>pow(f,n,z)</code>
+<td>f<sup>n</sup>(z)
+<td>The n-th iterate of f.
+</table>
+
+<br>
+<h3 id="constants">Constants</h3>
+<table class="bt">
+<tr>
+<th>Constant
+<th>Explanation
+<tr>
+<td><code>pi</code>
+<td>Half length of the unit circle.
+<tr>
+<td><code>tau</code>
+<td>Length of the unit circle.
+<tr>
+<td><code>e</code>
+<td>Base of the natural logarithm.
+<tr>
+<td><code>deg</code>
+<td>Degree unit: <code>tau/360</code>.
+<tr>
+<td><code>gon</code>
+<td>Gradian unit: <code>tau/400</code>.
+<tr>
+<td><code>gc</code>
+<td>Euler-Mascheroni constant (gamma constant).
+<tr>
+<td><code>nan</code>
+<td>Not a number.
+</table>
+
+<br>
+<h3 id="elementary-special">Elementary special functions</h3>
+<table class="bt">
+<tr>
+<th>Function
+<th>Explanation
+<tr>
+<td><code>abs(z)</code>
+<td>Absolute value.
+<tr>
+<td><code>sgn(z)</code>
+<td>Signum, i.e. <code>abs(z)/z</code>.
+<tr>
+<td><code>floor(z)</code>
+<td>Re,Im: rounded towards minus infinity.
+<tr>
+<td><code>ceil(z)</code>
+<td>Re,Im: rounded towards plus infinity.
+<tr>
+<td><code>rd(z)</code>
+<td>Re,Im: rounded towards zero.
+<tr>
+<td><code>frac(z)</code>
+<td>Re,Im: fractional part.
+<!--
+<tr>
+<td><code>div(x,y)</code>
+<td>Re,Im: floor division.
+<tr>
+<td><code>mod(x,y)</code>
+<td>Re,Im: floor division remainder.
+<tr>
+<td><code>diveuc(x,y)</code>
+<td>Re,Im: Euclidean division.
+<tr>
+<td><code>modeuc(x,y)</code>
+<td>Re,Im: Euclidean division remainder.
+<tr>
+<td><code>divtrunc(x,y)</code>
+<td>Re,Im: truncating division.
+<tr>
+<td><code>modtrunc(x,y)</code>
+<td>Re,Im: truncating division remainder.
+<tr>
+<td><code>max(x,y)</code>
+<td>Re,Im: Maximum.
+<tr>
+<td><code>min(x,y)</code>
+<td>Re,Im: Minimum.
+-->
+</table>
+
+<br>
+<h3 id="exp">Exponentiation and logarithms</h3>
+<table class="bt">
+<tr>
+<th>Function
+<th>Explanation
+<tr>
+<td><code>exp(z)</code>
+<td>Natural exponential function.
+<tr>
+<td><code>ln(z)</code>
+<td>Natural logarithm.
+<tr>
+<td><code>lg(z)</code>
+<td>Common logarithm.
+<tr>
+<td><code>ld(z)</code>
+<td>Binary logarithm.
+<tr>
+<td><code>lb(z)</code>
+<td>Binary logarithm.
+<tr>
+<td><code>log(z,b)
+<td>Logarithm to base b.
+<tr>
+<td><code>sqrt(z)</code>
+<td>Square root.
+<tr>
+<td><code>root(n,z)</code>
+<td>n-th root.
+</table>
+
+<br>
+<h3 id="trigonometric">Trigonometric functions and related</h3>
+<table class="bt">
+<tr>
+<th>Function
+<th>Explanation
+<tr>
+<td><code>sin(z),&nbsp;cos(z),&nbsp;tan(z),
+  <br>sec(z),&nbsp;csc(z),&nbsp;cot(z)</code>
+<td>Trigonometric functions.
+<tr>
+<td><code>asin(z), acos(z),
+  <br>atan(z), acot(z)</code>
+<td>Inverse trigonometric functions.
+<tr>
+<td><code>sinh(z), cosh(z),
+  <br>tanh(z), coth(z)</code>
+<td>Hyperbolic functions.
+<tr>
+<td><code>asinh(z), acosh(z),
+  <br>atanh(z), acoth(z)</code>
+<td>Inverse hyperbolic functions.
+<tr>
+<td><code>sinc(z)</code>
+<td>Cardinal sine: <code>sin(pi*z)/(pi*z)</code>.
+</table>
+
+<br>
+<h3 id="gamma">Gamma function and related</h3>
+<table class="bt">
+<tr>
+<th>Function
+<th>Explanation
+<tr>
+<td><code>gamma(z)</code>
+<td>Gamma function &Gamma;(z).
+<tr>
+<td><code>fac(z)</code>
+<td>Factorial function, i.e. <code>gamma(z+1)</code>.
+<!--
+<tr>
+<td><code>gamma(a,z)</code>
+<td>Lower incomplete gamma function &gamma;(a,z).
+<tr>
+<td><code>Gamma(a,z)</code>
+<td>Upper incomplete gamma function &Gamma;(a,z).
+<tr>
+<td><code>erf(z)</code>
+<td>Error function.
+<tr>
+<td><code>psi(z)</code>
+<td>Digamma function &psi;(x).
+<tr>
+<td><code>psi(n,z)</code>
+<td>Polygamma function &psi;<sub>n</sub>(x).
+<tr>
+<td><code>zeta(z)</code>
+<td>Zeta function &zeta;(x).
+-->
+</table>
+
+<br>
+<h3 id="utility-functions">Utility functions</h3>
+<table class="bt">
+<tr>
+<th>Function
+<th>Explanation
+<tr>
+<td><code>rand()</code>
+<td>Random number from interval [0,1].
+<tr>
+<td><code>rand(a,b)</code>
+<td>Random number from interval [a,b].
+<tr>
+<td><code>rand(a)</code>
+<td>Randomly pick an element from list a.
+<tr>
+<td><code>rand(a:b)</code>
+<td>Randomly pick an element from [a,a+1,a+2,...,b].
+<tr>
+<td><code>rand(a:b:d)</code>
+<td>Randomly pick an element from [a,a+d,a+2d,...,b].
+<tr>
+<td><code>map(f,a)</code>
+<td>Apply f to every element of list a.
+<br>Example: <code>map(x.2x,1:10)</code>.
+<tr>
+<td><code>filter(p,a)</code>
+<td>The elements x in a that fulfill the predicate p.
+<br>Example: <code>filter(k.mod(k,2)=1,1:10)<code>.
+</table>
+
+<br>
+<h3 id="input-examples">Input examples</h3>
+<dl class="input">
+<dt><a href="cplot.htm?sin(z)">sin(z)</a>
+<dd>A complex function.
+
+<dt><a href="cplot.htm?sin(z);colorfn(3)">sin(z);colorfn(3)</a>
+<dd>A complex function, different coloring method.
+</dl>
+
+</body>
+</html>
+
