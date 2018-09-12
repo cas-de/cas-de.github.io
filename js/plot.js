@@ -707,7 +707,7 @@ function str(x){
     if(Array.isArray(x)){
         return "["+x.map(str).join(", ")+"]";
     }else if(x instanceof Function){
-        return "a function";
+        return "eine Funktion";
     }else if(x.hasOwnProperty("re")){
         var sep = x.im<0? "": "+";
         return [str(x.re),sep,str(x.im),"i"].join("");
@@ -735,7 +735,7 @@ function syntax_error(i,text){
     var t = i.a[i.index];
     var s = ["&nbsp;&nbsp;",i.s,"<br>&nbsp;&nbsp;",
         repeat("&nbsp;",t[3])+"<b>^</b>", "<br>",
-        "Syntax error: ",text
+        "Syntaxfehler: ",text
     ].join("");
     throw new Err(s);
 }
@@ -860,7 +860,7 @@ function atom(i){
             i.index++;
             return x;
         }else{
-            syntax_error(i,"expected ')'.");
+            syntax_error(i,"')' wurde erwartet.");
         }
     }else if(t[0] == Symbol && t[1]=='['){
         i.index++;
@@ -869,7 +869,7 @@ function atom(i){
     }else if(t[0] == Symbol && t[1]=='|'){
         return lambda_expression(i);
     }else{
-        syntax_error(i,"expected an operand.");
+        syntax_error(i,"ein Operand wurde erwartet.");
     }
 }
 
@@ -888,7 +888,7 @@ function application_list(i,a,bracket){
         }else if(t[0]==Symbol && t[1]==','){
             i.index++;
         }else{
-            syntax_error(i,"expected ',' or '"+bracket+"'.");
+            syntax_error(i,"',' oder '"+bracket+"' wurde erwartet.");
         }
     }
 }
@@ -900,7 +900,7 @@ function index_operation(i,x){
         i.index++;
         return ["index",x,y];
     }else{
-        syntax_error(i,"expected ']'.");
+        syntax_error(i,"']' wurde erwartet.");
     }
 }
 
@@ -1118,7 +1118,7 @@ function parse(a,s){
     var x = expression_list(i,"block");
     var t = i.a[i.index];
     if(t[0] != SymbolTerminator){
-        syntax_error(i,"unexpected symbol: '"+t[1]+"'.");
+        syntax_error(i,"unerwartetes Symbol: '"+t[1]+"'.");
     }
     return x;
 }
@@ -1194,10 +1194,10 @@ var number_op_table = {
 function type_test(t,type){
     if(type!=undefined && number_op_table.hasOwnProperty(type)){
         if(typeof ftab[t]=="function"){
-            throw new Err(["Error: operator '",type,
-                "' takes numbers, but&nbsp;'",t,
-                "' is&nbsp;a function.<br><br>",
-                "Did you mean '",t,"(x)' instead of just '",t,
+            throw new Err(["Fehler: Operator '",type,
+                "' benötigt Zahlen, aber&nbsp;'",t,
+                "' ist&nbsp;eine Funktion.<br><br>",
+                "Meintest du '",t,"(x)' anstelle von '",t,
                 "'?"].join("")
             );
         }
@@ -1220,7 +1220,7 @@ function compile_expression(a,t,context,type){
             load_ftab_extension();
             throw new Repeat();
         }else{
-            throw new Err("Error: undefined variable: '"+t+"'.");
+            throw new Err("Fehler: undefinierte Variable: '"+t+"'.");
         }
     }else if(Array.isArray(t)){
         var op = t[0];
@@ -2013,13 +2013,13 @@ function from_ode(gx,t){
     var p = ftab["p"];
     if(!ftab.hasOwnProperty("p") || !Array.isArray(p)){
         throw new Err(
-            "Please append initial values as follows:<br><br>"+
+            "Bitte gib das Anfangswertproblem wie folgt an:<br><br>"+
             "p:=[x0,y(x0),y'(x0),y''(x0),...]<br><br>"+
-            "for example:<br><br>"+
+            "z.B.:<br><br>"+
             "y''=-y; p:=[0,0,1]")
     }
     if(p.length<order+1){
-        throw new Err("Error: p is too short.");
+        throw new Err("Fehler: p is zu kurz.");
     }else{
         p = p.slice(0,order+1);
     }
