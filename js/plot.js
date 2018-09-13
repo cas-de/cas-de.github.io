@@ -1960,26 +1960,45 @@ function pli(x0,d,y){
     };
 }
 
-function euler_unilateral(f,h,N,x0,y0){
+function add_scaled(n,v,x,a,y){
+    for(var i=0; i<n; i++){
+        v[i] = x[i]+a*y[i];
+    }
+    return v;
+}
+
+function runge_kutta_unilateral(f,h,N,x0,y0){
+    var n = y0.length;
+    var m = n-1;
+    var F = function(v,x,y){
+        for(var i=0; i<m; i++) v[i] = y[i+1];
+        v[m] = f(x,y);
+    };
     var x = x0;
-    var y = y0.slice(0);
-    var m = y.length;
+    var y = y0.slice();
+    var yt = y.slice();
+    var k1 = y.slice();
+    var k2 = y.slice();
+    var k3 = y.slice();
+    var k4 = y.slice();
     var a = [y[0]];
     for(var k=1; k<=N; k++){
-        var hf = h*f(x,y);
-        for(var i=0; i<=m-2; i++){
-            y[i] = y[i]+h*y[i+1];
+        F(k1,x,y);
+        F(k2,x+0.5*h,add_scaled(n,yt,y,0.5*h,k1));
+        F(k3,x+0.5*h,add_scaled(n,yt,y,0.5*h,k2));
+        F(k4,x+h,add_scaled(n,yt,y,h,k3));
+        for(var i=0; i<n; i++){
+            y[i] = y[i]+h/6*(k1[i]+2*(k2[i]+k3[i])+k4[i]);
         }
-        y[m-1] = y[m-1]+hf;
         x = x0+k*h;
         a.push(y[0]);
     }
     return pli(x0,h,a);
 }
 
-function euler(f,h,wm,wp,x0,y0){
-    var gm = euler_unilateral(f,-h,wm/h,x0,y0);
-    var gp = euler_unilateral(f,h,wp/h,x0,y0);
+function runge_kutta(f,h,wm,wp,x0,y0){
+    var gm = runge_kutta_unilateral(f,-h,wm/h,x0,y0);
+    var gp = runge_kutta_unilateral(f,h,wp/h,x0,y0);
     return function(x){return x<x0?gm(x):gp(x);};
 }
 
@@ -2025,8 +2044,7 @@ function from_ode(gx,t){
     }
     var wm = Math.abs(p[0]+gx.px0/gx.mx/ax);
     var wp = Math.abs(p[0]-(gx.w-gx.px0)/gx.mx/ax);
-    var h = 0.0001;
-    var fv = euler(f,h,wm,wp,p[0],p.slice(1));
+    var fv = runge_kutta(f,0.001,wm,wp,p[0],p.slice(1));
     if(v!=="y") ftab[v]=fv;
     return fv;
 }
