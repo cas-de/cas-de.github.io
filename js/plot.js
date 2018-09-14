@@ -4,8 +4,9 @@
 var graphics;
 var ax=1;
 var ay=1;
-var xscale = {index: 10000};
-var yscale = {index: 10000};
+var index0 = 10000;
+var xscale = {index: index0};
+var yscale = {index: index0};
 var hud_display = false;
 var GAMMA = 0.57721566490153286;
 var dark = false;
@@ -2248,8 +2249,8 @@ function set_scale(dx,dy){
     ax = 1/dx;
     ay = 1/dy;
     set_pos(graphics,t);
-    xscale.index = 10000+Math.round(3*lg(ax));
-    yscale.index = 10000+Math.round(3*lg(ay));
+    xscale.index = index0+Math.round(3*lg(ax));
+    yscale.index = index0+Math.round(3*lg(ay));
     return [dx,dy];
 }
 
@@ -2405,7 +2406,10 @@ function link(){
     var s = document.getElementById("inputf").value;
     var out = document.getElementById("calc-out");
     var url = window.location.href.split("?")[0];
-    var scale = ax==1?"":";;scale("+1/ax+")";
+    var scale = (xscale.index==yscale.index?
+        (xscale.index==index0?"":";;scale("+1/ax+")"):
+        ";;scale("+1/ax+","+1/ay+")"
+    );
     out.innerHTML = "<p style='font-size: 80%'>"+url+"?"+encode_query(s+scale);
 }
 
