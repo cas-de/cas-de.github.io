@@ -2384,6 +2384,31 @@ function query(href){
     }
 }
 
+var encode_tab = {
+  " ": "20", "#": "23", "'": "27", "[": "5b", "]": "5d", "^": "5e",
+  "\"": "22", "<": "3c", ">": "3e", "|": "6c"
+};
+
+function encode_query(s){
+    var a = [];
+    for(var i=0; i<s.length; i++){
+        if(encode_tab.hasOwnProperty(s[i])){
+            a.push("%"+encode_tab[s[i]]);
+        }else{
+            a.push(s[i]);
+        }
+    }
+    return a.join("");
+}
+
+function link(){
+    var s = document.getElementById("inputf").value;
+    var out = document.getElementById("calc-out");
+    var url = window.location.href.split("?")[0];
+    var scale = ax==1?"":";;scale("+1/ax+")";
+    out.innerHTML = "<p style='font-size: 80%'>"+url+"?"+encode_query(s+scale);
+}
+
 async function update_on_resize(){
     await sleep(2000);
     if(graphics.w!=window.innerWidth || graphics.h!=window.innerHeight){
