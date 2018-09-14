@@ -2150,13 +2150,12 @@ function eval_statements(s){
 function process_statements(a){
     if(a.length>1){
         if(a.length>2){
-            eval_statements(a[2]);
             var inputf = document.getElementById("inputf");
             inputf.value = a[0];
             if(a[1].length>0) inputf.value += ";"+a[1];
         }
-        if(a[1].length>0){
-            eval_statements(a[1]);
+        for(var i=1; i<a.length; i++){
+            if(a[i].length>0) eval_statements(a[i]);
         }
     }
 }
