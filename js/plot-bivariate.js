@@ -1,6 +1,11 @@
 
 "use strict";
 
+ftab["u0"] = 0;
+ftab["u1"] = 2*Math.PI;
+ftab["v0"] = 0;
+ftab["v1"] = Math.PI;
+
 var plot_refresh = false;
 
 function refresh(gx){
@@ -214,19 +219,94 @@ function plot_sf(gx,f,d,alpha){
     labels(gx,proj,ax);
 }
 
+function plot_psf(gx,f,d,alpha){
+    if(d==undefined) d=0.5;
+    var t,u,v,p00,p01,p10,p11;
+    var p0,p1,p2,p3;
+    var context = gx.context;
+    var proj = new_projection(gx.phi,gx.theta);
+    var c = Math.cos(gx.phi);
+    var s = Math.sin(gx.phi);
+    var px0 = Math.floor(gx.w/2);
+    var py0 = Math.floor(gx.h/2);
+    var mx = ax*get_mx(gx);
+
+    var rd = Math.round;
+    var du = 0.25*d;
+    var dv = 0.25*d;
+    var wx = 10/ax;
+    var wy = wx;
+    var u0 = ftab["u0"];
+    var u1 = ftab["u1"];
+    var v0 = ftab["v0"];
+    var v1 = ftab["v1"];
+
+    var a = [];
+    for(u = u0; u<u1; u+=du){
+        for(v = v0; v<v1; v+=dv){
+            p00 = f(u,v);
+            p01 = f(u,v+dv);
+            p11 = f(u+du,v+dv);
+            p10 = f(u+du,v);
+            p0 = proj(p00[0],p00[1],p00[2]);
+            p1 = proj(p01[0],p01[1],p01[2]);
+            p2 = proj(p11[0],p11[1],p11[2]);
+            p3 = proj(p10[0],p10[1],p10[2]);
+            a.push([s*p00[1]-c*p00[0],p0,p1,p2,p3,p00[2]]);
+        }
+    }
+    a.sort(function(x,y){
+        return x[0]<y[0];
+    });
+    context.lineWidth = 1;
+    context.fillStyle = "#d0d0d0b0";
+    context.strokeStyle = "#40404020";
+    for(var i=0; i<a.length; i++){
+        t = a[i];
+        p0 = t[1]; p1 = t[2]; p2 = t[3]; p3 = t[4];
+        context.fillStyle = colorfn2(0.5+0.2*t[5],alpha);
+        context.beginPath();
+        context.moveTo(rd(px0+mx*p0[0]),rd(py0-mx*p0[1]));
+        context.lineTo(rd(px0+mx*p1[0]),rd(py0-mx*p1[1]));
+        context.lineTo(rd(px0+mx*p2[0]),rd(py0-mx*p2[1]));
+        context.lineTo(rd(px0+mx*p3[0]),rd(py0-mx*p3[1]));
+        context.fill();
+        context.stroke();
+    }
+
+    context.strokeStyle = "#00000060";
+    context.fillStyle = "#000000a0";
+    context.lineWidth = 4;
+    draw_line(context,proj,px0,py0,mx,-wx,-wx,0,wx,-wx,0);
+    draw_line(context,proj,px0,py0,mx,-wx,-wx,0,-wx,wx,0);
+    draw_line(context,proj,px0,py0,mx,-wx,-wx,0,-wx,-wx,wx);
+    context.lineWidth = 2;
+    labels(gx,proj,ax);
+}
+
 function index_to_alpha(index){
     if(index==0) return 240;
     else return 100;
 }
 
 function plot_node(gx,t,index){
-    var f = compile(t,["x","y"]);
     var alpha = index_to_alpha(index);
-    if(plot_refresh){
-        plot_sf(gx,f,1,alpha);
-        plot_refresh = false;
+    if(Array.isArray(t) && t[0]==="[]"){
+        var f = compile(t,["u","v"]);
+        if(plot_refresh){
+            plot_psf(gx,f,1,alpha);
+            plot_refresh = false;
+        }else{
+            plot_psf(gx,f,0.5,alpha);
+        }
     }else{
-        plot_sf(gx,f,0.5,alpha);
+        var f = compile(t,["x","y"]);
+        if(plot_refresh){
+            plot_sf(gx,f,1,alpha);
+            plot_refresh = false;
+        }else{
+            plot_sf(gx,f,0.5,alpha);
+        }
     }
 }
 
