@@ -75,7 +75,8 @@ var ftab = {
     RF: RF, RC: RC, RJ: RJ, RD: RD,
     P: set_position, scale: set_scale,
     zeroes: zeroes, roots: zeroes,
-    map: map, filter: filter, freq: set_freq
+    map: map, filter: filter, freq: set_freq,
+    img: plot_img
 };
 
 function load_async(URL,callback){
@@ -708,7 +709,9 @@ function str(x){
     if(Array.isArray(x)){
         return "["+x.map(str).join(", ")+"]";
     }else if(x instanceof Function){
-        return "eine Funktion";
+        return "a function";
+    }else if(typeof x == "string"){
+        return x;
     }else if(x.hasOwnProperty("re")){
         var sep = x.im<0? "": "+";
         return [str(x.re),sep,str(x.im),"i"].join("");
@@ -1798,25 +1801,37 @@ async function vplot(gx,f,d,cond,color){
 }
 
 async function plot_async(gx,f,color){
-    fplot(gx,f,0.01,false,color);
-    while(busy){await sleep(40);}
-    await sleep(40);
-    fplot(gx,f,0.001,true,color);
-    fplot(gx,f,0.0001,true,color);
+    if(gx.sync_mode==true){
+        fplot(gx,f,0.0002,false,color);
+    }else{
+        fplot(gx,f,0.01,false,color);
+        while(busy){await sleep(40);}
+        await sleep(40);
+        fplot(gx,f,0.001,true,color);
+        fplot(gx,f,0.0001,true,color);
+    }
 }
 
 async function plot_zero_set_async(gx,f,color){
-    plot_zero_set(gx,f,10,false,color);
-    while(busy){await sleep(40);}
-    await sleep(40);
-    plot_zero_set(gx,f,400,true,color);
+    if(gx.sync_mode==true){
+        plot_zero_set(gx,f,400,false,color);
+    }else{
+        plot_zero_set(gx,f,10,false,color);
+        while(busy){await sleep(40);}
+        await sleep(40);
+        plot_zero_set(gx,f,400,true,color);
+    }
 }
 
 async function vplot_async(gx,f,color){
-    vplot(gx,f,0.01,false,color);
-    while(busy){await sleep(40);}
-    await sleep(40);
-    vplot(gx,f,0.001,true,color);
+    if(gx.sync_mode==true){
+        vplot(gx,f,0.001,false,color);
+    }else{
+        vplot(gx,f,0.01,false,color);
+        while(busy){await sleep(40);}
+        await sleep(40);
+        vplot(gx,f,0.001,true,color);
+    }
 }
 
 function hsl_to_rgb(H,S,L){
@@ -2417,6 +2432,36 @@ async function update_on_resize(){
     if(graphics.w!=window.innerWidth || graphics.h!=window.innerHeight){
         main();
     }
+}
+
+function plot_img(w,h){
+    if(w==undefined) w = 360;
+    if(h==undefined) h = Math.round(w/1.5);
+    var canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    var gx = init(canvas,w,h);
+    new_point(gx);
+    gx.sync_mode = true;
+
+    var t = get_pos(graphics);
+    set_pos(gx,t);
+
+    clear_system(gx);
+    flush(gx);
+    var last_gx = graphics;
+    graphics = gx;
+    update(gx);
+    graphics = last_gx;
+    var s = canvas.toDataURL("image/png");
+    var img = "<img align=\"top\" src=\""+s+"\"/>";
+    return img;
+}
+
+function calc_img(){
+    var input = document.getElementById("input-calc");
+    input.value = "img(540,360)";
+    calc();
 }
 
 window.onload = function(){

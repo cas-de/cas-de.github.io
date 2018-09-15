@@ -316,8 +316,8 @@ function plot(gx){
     process_statements(a);
     pid_stack = [];
 
-    gx.context.clearRect(0,0,gx.w,gx.h);
-
+    clear(gx,gx.color_bg);
+    flush(gx);
     if(input.length>0){
         var t = ast(a[0]);
         if(Array.isArray(t) && t[0]==="block"){
@@ -338,6 +338,28 @@ function plot(gx){
     }
 }
 
+function plot_img(w,h){
+    if(w==undefined) w = 360;
+    if(h==undefined) h = Math.round(w/1.5);
+    var canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    var gx = init(canvas,w,h);
+    new_point(gx);
+    gx.sync_mode = true;
+    gx.phi = graphics.phi;
+    gx.theta = graphics.theta;
+
+    var last_gx = graphics;
+    graphics = gx;
+    update(gx);
+    graphics = last_gx;
+    var s = canvas.toDataURL("image/png");
+    var img = "<img align=\"top\" src=\""+s+"\"/>";
+    return img;
+}
+ftab["img"] = plot_img;
+
 function main(){
     var gx = new_system_xyz(graphics);
     graphics = gx;
@@ -350,4 +372,5 @@ window.onload = function(){
     query(window.location.href);
     main();
 };
+
 
