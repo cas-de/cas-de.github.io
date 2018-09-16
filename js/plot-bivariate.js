@@ -355,6 +355,19 @@ function plot_node(gx,t,index){
     }
 }
 
+function plot_node_relief(gx,t,index){
+    var fc = ccompile(t,["z"]);
+    var f = function(x,y){
+        return fc({re: x, im: y}).re;
+    };
+    if(plot_refresh){
+        plot_sf(gx,f,1,1);
+        plot_refresh = false;
+    }else{
+        plot_sf(gx,f,0.25,4);
+    }
+}
+
 function plot(gx){
     var input = get_value("inputf").trim();
     var a = input.split(";");
