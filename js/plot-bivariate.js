@@ -1,6 +1,7 @@
 
 "use strict";
 
+ftab["w"] = 10;
 ftab["u0"] = 0;
 ftab["u1"] = 2*Math.PI;
 ftab["v0"] = 0;
@@ -88,16 +89,16 @@ function colorfn2(t,a){
     return y;
 }
 
-function draw_line(context,proj,px0,py0,mx,x0,y0,z0,x1,y1,z1){
+function draw_line(context,proj,x0,y0,z0,x1,y1,z1){
     var t0 = proj(x0,y0,z0);
     var t1 = proj(x1,y1,z1);
     context.beginPath();
-    context.moveTo(Math.round(px0+mx*t0[0]),Math.round(py0-mx*t0[1]));
-    context.lineTo(Math.round(px0+mx*t1[0]),Math.round(py0-mx*t1[1]));
+    context.moveTo(t0[0],t0[1]);
+    context.lineTo(t1[0],t1[1]);
     context.stroke();
 }
 
-function new_projection(phi,theta){
+function new_projection(phi,theta,px0,py0,mx){
     var c = Math.cos(phi);
     var s = Math.sin(phi);
     var ct = Math.cos(theta);
@@ -109,20 +110,20 @@ function new_projection(phi,theta){
         x = 0.5*(1+ct)*xt+0.5*(1-ct)*yt+q*st*z;
         y = 0.5*(1-ct)*xt+0.5*(1+ct)*yt+q*st*z;
         z = ct*z-q*st*xt-q*st*yt;
-        return [y-x,z-0.5*x-0.5*y];
+        return [px0+mx*(y-x),py0-mx*(z-0.5*x-0.5*y)];
     };
 }
 
-function new_puts(context,proj,px0,py0,mx){
+function new_puts(context,proj,m){
     return function(s,x,y,z){
-        var p = proj(x,y,z);
-        context.fillText(s,px0+mx*p[0],py0-mx*p[1]);
+        var p = proj(m*x,m*y,m*z);
+        context.fillText(s,p[0],p[1]);
     };
 }
 
-function new_draw_line(context,proj,px0,py0,mx){
+function new_draw_line(context,proj,m){
     return function(x0,y0,z0,x1,y1,z1){
-        draw_line(context,proj,px0,py0,mx,x0,y0,z0,x1,y1,z1);
+        draw_line(context,proj,m*x0,m*y0,m*z0,m*x1,m*y1,m*z1);
     }
 }
 
@@ -137,8 +138,8 @@ function labels(gx,proj){
     var s;
     context.textAlign = "center";
     var mx = get_mx(gx);
-    var puts = new_puts(context,proj,px0,py0,mx);
-    var line = new_draw_line(context,proj,px0,py0,mx);
+    var puts = new_puts(context,proj,1/ax);
+    var line = new_draw_line(context,proj,1/ax);
     for(var x=-8; x<=8; x+=2){
         s = float_str(x/ax);
         puts(s,x,-11,-0.5);
@@ -158,26 +159,115 @@ function labels(gx,proj){
     puts("y",-11,10,-0.5);
 }
 
-function plot_sf(gx,f,d,alpha){
+function normalize(v){
+    var r = Math.sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2]);
+    return [v[0]/r,v[1]/r,v[2]/r];
+}
+
+function rot(phi,v){
+    var c = Math.cos(phi);
+    var s = Math.sin(phi);
+    return [c*v[0]-s*v[1],s*v[0]+c*v[1],v[2]];
+}
+
+function new_light_source(phi,w){
+    var f = interpolate_color([0.5,0.7,0.7],[1,0.9,0.7]);
+    w = normalize(rot(0.5*Math.PI-phi,w));
+    return function(v,a){
+        var vv = v[0]*v[0]+v[1]*v[1]+v[2]*v[2];
+        var s = (v[0]*w[0]+v[1]*w[1]+v[2]*w[2])/Math.sqrt(vv);
+        return f(0.5*s+0.5,a);
+        // var c = hsl_to_rgb(3.3,0.5,Math.abs(s/4+3/5));
+        // return rgba_to_hex(Math.round(255*c[0]),Math.round(255*c[1]),Math.round(255*c[2]),a);
+    };
+}
+
+function flush_tile_buffer(gx,alpha){
+    var a = gx.tile_buffer;
+    var context = gx.context;
+    var t,p0,p1,p2,p3;
+
+    a.sort(function(x,y){
+        return x[0]<y[0];
+    });
+
+    var colorfn = new_light_source(gx.phi,[1,0,0.8]);
+
+    context.lineWidth = 1;
+    context.fillStyle = "#d0d0d0b0";
+    var line_color = "#00000040";
+    var color;
+    for(var i=0; i<a.length; i++){
+        t = a[i];
+        p0 = t[1]; p1 = t[2]; p2 = t[3]; p3 = t[4];
+        // color = colorfn2(0.5+0.2*t[5],alpha);
+        color = colorfn(t[8],alpha);
+        context.fillStyle = color;
+        context.beginPath();
+        context.moveTo(p0[0],p0[1]);
+        context.lineTo(p1[0],p1[1]);
+        context.lineTo(p2[0],p2[1]);
+        context.lineTo(p3[0],p3[1]);
+        context.fill();
+
+        if(t[6]){
+            context.lineWidth = 1.4;
+            context.strokeStyle = line_color;
+        }else{
+            context.lineWidth = 1;
+            context.strokeStyle = color;
+        }
+        context.beginPath();
+        context.moveTo(p0[0],p0[1]);
+        context.lineTo(p1[0],p1[1]);
+        context.stroke();
+
+        if(t[7]){
+            context.lineWidth = 1.4;
+            context.strokeStyle = line_color;
+        }else{
+            context.lineWidth = 1;
+            context.strokeStyle = color;
+        }
+        context.beginPath();
+        context.moveTo(p1[0],p1[1]);
+        context.lineTo(p2[0],p2[1]);
+        context.stroke();
+    }
+}
+
+function system_xyz(gx,proj,wx){
+    var context = gx.context;
+    var proj = gx.proj;
+    context.strokeStyle = "#00000060";
+    context.fillStyle = "#000000a0";
+    context.lineWidth = 4;
+    wx = 10/ax;
+    draw_line(context,proj,-wx,-wx,0,wx,-wx,0);
+    draw_line(context,proj,-wx,-wx,0,-wx,wx,0);
+    draw_line(context,proj,-wx,-wx,0,-wx,-wx,wx);
+    context.lineWidth = 2;
+    labels(gx,proj,ax);
+}
+
+function plot_sf(gx,f,d,step){
     if(d==undefined) d=0.5;
-    var t,x,y,z00,z01,z10,z11;
+    var x,y,z00,z01,z10,z11,v;
     var p0,p1,p2,p3;
     var context = gx.context;
-    var proj = new_projection(gx.phi,gx.theta);
+    var proj = gx.proj;
     var c = Math.cos(gx.phi);
     var s = Math.sin(gx.phi);
-    var px0 = Math.floor(gx.w/2);
-    var py0 = Math.floor(gx.h/2);
-    var mx = ax*get_mx(gx);
 
-    var rd = Math.round;
     var dx = d/ax;
     var dy = d/ax;
-    var wx = 10/ax;
+    var wx = ftab["w"]/ax;
     var wy = wx;
 
-    var a = [];
+    var a = gx.tile_buffer;
+    var kx = 0;
     for(x = -wx; x<wx; x+=dx){
+        var ky = 0;
         for(y = -wy; y<wy; y+=dy){
             z00 = f(x,y);
             z01 = f(x,y+dy);
@@ -187,51 +277,28 @@ function plot_sf(gx,f,d,alpha){
             p1 = proj(x,y+dy,z01);
             p2 = proj(x+dx,y+dy,z11);
             p3 = proj(x+dx,y,z10);
-            a.push([s*y-c*x,p0,p1,p2,p3,z00]);
+            v = [dy*(z00-z10),dx*(z00-z01),dx*dy];
+            a.push([s*y-c*x,p0,p1,p2,p3,z00,
+                kx%step==0,ky%step==0,v]);
+            ky++;
         }
+        kx++;
     }
-    a.sort(function(x,y){
-        return x[0]<y[0];
-    });
-    context.lineWidth = 1;
-    context.fillStyle = "#d0d0d0b0";
-    context.strokeStyle = "#40404020";
-    for(var i=0; i<a.length; i++){
-        t = a[i];
-        p0 = t[1]; p1 = t[2]; p2 = t[3]; p3 = t[4];
-        context.fillStyle = colorfn2(0.5+0.2*t[5],alpha);
-        context.beginPath();
-        context.moveTo(rd(px0+mx*p0[0]),rd(py0-mx*p0[1]));
-        context.lineTo(rd(px0+mx*p1[0]),rd(py0-mx*p1[1]));
-        context.lineTo(rd(px0+mx*p2[0]),rd(py0-mx*p2[1]));
-        context.lineTo(rd(px0+mx*p3[0]),rd(py0-mx*p3[1]));
-        context.fill();
-        context.stroke();
-    }
-
-    context.strokeStyle = "#00000060";
-    context.fillStyle = "#000000a0";
-    context.lineWidth = 4;
-    draw_line(context,proj,px0,py0,mx,-wx,-wx,0,wx,-wx,0);
-    draw_line(context,proj,px0,py0,mx,-wx,-wx,0,-wx,wx,0);
-    draw_line(context,proj,px0,py0,mx,-wx,-wx,0,-wx,-wx,wx);
-    context.lineWidth = 2;
-    labels(gx,proj,ax);
 }
 
-function plot_psf(gx,f,d,alpha){
+function vector_product(vx,vy,vz,wx,wy,wz){
+    return [vy*wz-vz*wy, vz*wx-vx*wz, vx*wy-vy*wx];
+}
+
+function plot_psf(gx,f,d,step){
     if(d==undefined) d=0.5;
-    var t,u,v,p00,p01,p10,p11;
+    var u,v,p00,p01,p10,p11,e;
     var p0,p1,p2,p3;
     var context = gx.context;
-    var proj = new_projection(gx.phi,gx.theta);
+    var proj = gx.proj;
     var c = Math.cos(gx.phi);
     var s = Math.sin(gx.phi);
-    var px0 = Math.floor(gx.w/2);
-    var py0 = Math.floor(gx.h/2);
-    var mx = ax*get_mx(gx);
 
-    var rd = Math.round;
     var du = 0.25*d;
     var dv = 0.25*d;
     var wx = 10/ax;
@@ -241,8 +308,10 @@ function plot_psf(gx,f,d,alpha){
     var v0 = ftab["v0"];
     var v1 = ftab["v1"];
 
-    var a = [];
+    var a = gx.tile_buffer;
+    var ku=0;
     for(u = u0; u<u1; u+=du){
+        var kv=1;
         for(v = v0; v<v1; v+=dv){
             p00 = f(u,v);
             p01 = f(u,v+dv);
@@ -252,60 +321,36 @@ function plot_psf(gx,f,d,alpha){
             p1 = proj(p01[0],p01[1],p01[2]);
             p2 = proj(p11[0],p11[1],p11[2]);
             p3 = proj(p10[0],p10[1],p10[2]);
-            a.push([s*p00[1]-c*p00[0],p0,p1,p2,p3,p00[2]]);
+
+            e = vector_product(
+                p10[0]-p00[0],p10[1]-p00[1],p10[2]-p00[2],
+                p01[0]-p00[0],p01[1]-p00[1],p01[2]-p00[2]
+            );
+
+            a.push([s*p00[1]-c*p00[0],p0,p1,p2,p3,p00[2],
+                ku%step==0,kv%step==0,e]);
+            kv++;
         }
+        ku++;
     }
-    a.sort(function(x,y){
-        return x[0]<y[0];
-    });
-    context.lineWidth = 1;
-    context.fillStyle = "#d0d0d0b0";
-    context.strokeStyle = "#40404020";
-    for(var i=0; i<a.length; i++){
-        t = a[i];
-        p0 = t[1]; p1 = t[2]; p2 = t[3]; p3 = t[4];
-        context.fillStyle = colorfn2(0.5+0.2*t[5],alpha);
-        context.beginPath();
-        context.moveTo(rd(px0+mx*p0[0]),rd(py0-mx*p0[1]));
-        context.lineTo(rd(px0+mx*p1[0]),rd(py0-mx*p1[1]));
-        context.lineTo(rd(px0+mx*p2[0]),rd(py0-mx*p2[1]));
-        context.lineTo(rd(px0+mx*p3[0]),rd(py0-mx*p3[1]));
-        context.fill();
-        context.stroke();
-    }
-
-    context.strokeStyle = "#00000060";
-    context.fillStyle = "#000000a0";
-    context.lineWidth = 4;
-    draw_line(context,proj,px0,py0,mx,-wx,-wx,0,wx,-wx,0);
-    draw_line(context,proj,px0,py0,mx,-wx,-wx,0,-wx,wx,0);
-    draw_line(context,proj,px0,py0,mx,-wx,-wx,0,-wx,-wx,wx);
-    context.lineWidth = 2;
-    labels(gx,proj,ax);
-}
-
-function index_to_alpha(index){
-    if(index==0) return 240;
-    else return 100;
 }
 
 function plot_node(gx,t,index){
-    var alpha = index_to_alpha(index);
     if(Array.isArray(t) && t[0]==="[]"){
         var f = compile(t,["u","v"]);
         if(plot_refresh){
-            plot_psf(gx,f,1,alpha);
+            plot_psf(gx,f,1,1);
             plot_refresh = false;
         }else{
-            plot_psf(gx,f,0.5,alpha);
+            plot_psf(gx,f,0.5,2);
         }
     }else{
         var f = compile(t,["x","y"]);
         if(plot_refresh){
-            plot_sf(gx,f,1,alpha);
+            plot_sf(gx,f,1,1);
             plot_refresh = false;
         }else{
-            plot_sf(gx,f,0.5,alpha);
+            plot_sf(gx,f,0.25,4);
         }
     }
 }
@@ -318,6 +363,13 @@ function plot(gx){
 
     clear(gx,gx.color_bg);
     flush(gx);
+
+    var mx = ax*get_mx(gx);
+    gx.px0 = Math.floor(gx.w/2);
+    gx.py0 = Math.floor(gx.h/2);
+    gx.proj = new_projection(gx.phi,gx.theta,gx.px0,gx.py0,mx);
+    gx.tile_buffer = [];
+    
     if(input.length>0){
         var t = ast(a[0]);
         if(Array.isArray(t) && t[0]==="block"){
@@ -336,6 +388,9 @@ function plot(gx){
             }
         }
     }
+
+    flush_tile_buffer(gx,240);
+    system_xyz(gx,10/ax);
 }
 
 function plot_img(w,h){
@@ -354,7 +409,7 @@ function plot_img(w,h){
     graphics = gx;
     update(gx);
     graphics = last_gx;
-    var s = canvas.toDataURL("image/png");
+    var s = canvas.toDataURL("image/jpeg");
     var img = "<img align=\"top\" src=\""+s+"\"/>";
     return img;
 }
@@ -372,5 +427,4 @@ window.onload = function(){
     query(window.location.href);
     main();
 };
-
 
