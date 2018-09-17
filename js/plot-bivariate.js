@@ -6,6 +6,10 @@ ftab["u0"] = 0;
 ftab["u1"] = 2*Math.PI;
 ftab["v0"] = 0;
 ftab["v1"] = Math.PI;
+ftab["d"] = set_distance;
+
+var new_proj = new_proj_parallel;
+var proj_distance = 100;
 
 var plot_refresh = false;
 
@@ -13,6 +17,9 @@ function refresh(gx){
     plot_refresh = true;
     update(gx);
 }
+
+var theta_max = Math.atan(Math.sqrt(2));
+var theta_min = theta_max-Math.PI;
 
 function mouse_move_handler(e){
     if(e.buttons==1){
@@ -22,7 +29,7 @@ function mouse_move_handler(e){
         var dx = e.clientX-clientXp;
         var dy = e.clientY-clientYp;
         gx.phi += 0.004*dx;
-        gx.theta = clamp(gx.theta+0.004*dy,-0.45*Math.PI,0.304086*Math.PI);
+        gx.theta = clamp(gx.theta+0.004*dy,theta_min,theta_max);
         clientXp = e.clientX;
         clientYp = e.clientY;
         refresh(gx);
@@ -98,20 +105,90 @@ function draw_line(context,proj,x0,y0,z0,x1,y1,z1){
     context.stroke();
 }
 
-function new_projection(phi,theta,px0,py0,mx){
-    var c = Math.cos(phi);
-    var s = Math.sin(phi);
-    var ct = Math.cos(theta);
-    var st = Math.sin(theta);
-    var q = 1/Math.sqrt(2);
+function mul_matrix_matrix(A,B){
+    var m = A.length;
+    var n = B[0].length;
+    var p = A[0].length;
+    var C = [];
+    for(var i=0; i<m; i++){
+        var v = [];
+        for(var j=0; j<n; j++){
+            var y = 0;
+            for(var k=0; k<p; k++){y += A[i][k]*B[k][j];}
+            v.push(y);
+        }
+        C.push(v);
+    }
+    return C;
+}
+
+function matrix_mul(){
+    var Y = arguments[0];
+    for(var i=1; i<arguments.length; i++){
+        Y = mul_matrix_matrix(Y,arguments[i]);
+    }
+    return Y;
+}
+
+function matrix_Rx(t){
+    return [
+        [1,0,0],
+        [0, Math.cos(t),Math.sin(t)],
+        [0,-Math.sin(t),Math.cos(t)]
+    ];
+}
+
+function matrix_Rz(t){
+    return [
+        [Math.cos(t),-Math.sin(t),0],
+        [Math.sin(t), Math.cos(t),0],
+        [0,0,1]
+    ];
+}
+
+var gxt;
+var gyt;
+
+function new_proj_parallel(phi,theta,px0,py0,mx){
+    var pi = Math.PI;
+    var Rz = matrix_Rz(phi);
+    var Rx = matrix_Rx(theta);
+    var A = matrix_mul(matrix_Rz(-pi/4),Rx,matrix_Rz(pi/4),Rz);
     return function(x,y,z){
-        var xt = c*x-s*y;
-        var yt = s*x+c*y;
-        x = 0.5*(1+ct)*xt+0.5*(1-ct)*yt+q*st*z;
-        y = 0.5*(1-ct)*xt+0.5*(1+ct)*yt+q*st*z;
-        z = ct*z-q*st*xt-q*st*yt;
-        return [px0+mx*(y-x),py0-mx*(z-0.5*x-0.5*y)];
+        var xt = A[0][0]*x+A[0][1]*y+A[0][2]*z;
+        var yt = A[1][0]*x+A[1][1]*y+A[1][2]*z;
+        var zt = A[2][0]*x+A[2][1]*y+A[2][2]*z;
+        gxt = xt; gyt = yt;
+        return [px0+mx*(yt-xt),py0-mx*(zt-0.5*xt-0.5*yt)];
     };
+}
+
+function new_proj_perspective(phi,theta,px0,py0,mx){
+    var pi = Math.PI;
+    var Rz = matrix_Rz(phi+pi/4);
+    var Rx = matrix_Rx(theta+pi/6);
+    var A = matrix_mul(Rx,Rz);
+    var r = proj_distance/ax;
+    return function(x,y,z){
+        var xt = A[0][0]*x+A[0][1]*y+A[0][2]*z;
+        var yt = A[1][0]*x+A[1][1]*y+A[1][2]*z;
+        var zt = A[2][0]*x+A[2][1]*y+A[2][2]*z;
+        gxt=yt; gyt=0;
+        return [px0+mx*(-xt*r/(r-yt)),py0-mx*(zt*r/(r-yt))];
+    };
+}
+
+function set_distance(x){
+    if(x==0){
+        new_proj = new_proj_parallel;
+        theta_max = Math.atan(Math.sqrt(2));
+    }else{
+        new_proj = new_proj_perspective;
+        proj_distance = x;
+        theta_max = Math.PI/2-Math.PI/6;
+    }
+    theta_min = theta_max-Math.PI;
+    return x;
 }
 
 function new_puts(context,proj,m){
@@ -326,8 +403,7 @@ function plot_psf(gx,f,d,step){
                 p10[0]-p00[0],p10[1]-p00[1],p10[2]-p00[2],
                 p01[0]-p00[0],p01[1]-p00[1],p01[2]-p00[2]
             );
-
-            a.push([s*p00[1]-c*p00[0],p0,p1,p2,p3,p00[2],
+            a.push([-gxt-gyt,p0,p1,p2,p3,p00[2],
                 ku%step==0,kv%step==0,e]);
             kv++;
         }
@@ -380,7 +456,7 @@ function plot(gx){
     var mx = ax*get_mx(gx);
     gx.px0 = Math.floor(gx.w/2);
     gx.py0 = Math.floor(gx.h/2);
-    gx.proj = new_projection(gx.phi,gx.theta,gx.px0,gx.py0,mx);
+    gx.proj = new_proj(gx.phi,gx.theta,gx.px0,gx.py0,mx);
     gx.tile_buffer = [];
     
     if(input.length>0){
