@@ -522,7 +522,11 @@ function ccompile_expression(a,t,context){
             }
             a.push(")");
         }else if(cglobal_ftab.hasOwnProperty(op)){
-            ccompile_application(a,cglobal_ftab[op],t,context);
+            if(op==="^" && typeof t[1]=="string" && t[2]===2){
+                ccompile_application(a,"cmul",["*",t[1],t[1]],context);
+            }else{
+                ccompile_application(a,cglobal_ftab[op],t,context);
+            }
         }else{
             ccompile_expression(a,op,context);
             ccompile_application(a,"",t,context);
