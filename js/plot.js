@@ -2416,7 +2416,7 @@ function encode_query(s){
     return a.join("");
 }
 
-function link(){
+function link(position){
     var s = document.getElementById("inputf").value;
     var out = document.getElementById("calc-out");
     var url = window.location.href.split("?")[0];
@@ -2424,7 +2424,15 @@ function link(){
         (xscale.index==index0?"":";;scale("+1/ax+")"):
         ";;scale("+1/ax+","+1/ay+")"
     );
-    out.innerHTML = "<p style='font-size: 80%'>"+url+"?"+encode_query(s+scale);
+    var pos = "";
+    if(position){
+        var t = get_pos(graphics);
+        var n = Math.max(0,1+Math.round(Math.log(ax)));
+        t[0] = t[0].toFixed(n);
+        t[1] = t[1].toFixed(n);
+        pos = (scale==""?";;":",")+"P("+t[0]+","+t[1]+")";
+    }
+    out.innerHTML = "<p style='font-size: 80%'>"+url+"?"+encode_query(s+scale+pos);
 }
 
 async function update_on_resize(){
