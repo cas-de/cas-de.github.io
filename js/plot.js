@@ -1588,6 +1588,10 @@ function strip_zeroes(s){
     return s.slice(0,k+1);
 }
 
+function ftos_strip(x,m){
+    return strip_zeroes(ftos(x,m,1));
+}
+
 function labels(gx){
     var context = gx.context;
     var w = gx.w;

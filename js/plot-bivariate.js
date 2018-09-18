@@ -220,17 +220,17 @@ function labels(gx,proj){
     var puts = new_puts(context,proj,1/ax);
     var line = new_draw_line(context,proj,1/ax);
     for(var x=-8; x<=8; x+=2){
-        s = float_str(x/ax);
+        s = ftos_strip(x/ax,ax);
         puts(s,x,-11,-0.5);
         line(x,-10,0,x,-10.4,0);
     }
     for(var y=-8; y<=8; y+=2){
-        s = float_str(y/ax);
+        s = ftos_strip(y/ax,ax);
         puts(s,-11,y,-0.5);
         line(-10,y,0,-10.4,y,0);
     }
     for(var z=2; z<10; z+=2){
-        s = float_str(z/ax);
+        s = ftos_strip(z/ax,ax);
         puts(s,-10.5,-10.5,z);
         line(-10,-10,z,-10.2,-10.2,z);
     }
