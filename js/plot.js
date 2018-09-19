@@ -2450,8 +2450,8 @@ function link(position){
         ";;scale("+1/ax+","+1/ay+")"
     );
     var pos = "";
-    if(position){
-        var t = get_pos(graphics);
+    var t = graphics.pos;
+    if(position && (t[0]!=0 || t[1]!=0)){
         var n = Math.max(0,1+Math.round(Math.log(ax)));
         t[0] = t[0].toFixed(n);
         t[1] = t[1].toFixed(n);
