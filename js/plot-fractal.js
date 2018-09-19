@@ -5,17 +5,48 @@ var tau = 2*Math.PI;
 cftab["z0"] = function(c){return {re:0,im:0};};
 cftab["N"] = {re:200,im:0};
 cftab["n"] = {re:1,im:0};
+cftab["ctab"] = [[1,1,1], [1,0.8,0], [0,0.2,0.6]];
+cftab["r"] = {re:10,im:0};
+ftab["sys"] = sys;
+var submit = submit_grid_on;
+
+function submit_grid_off(gx){
+    system(gx,false,0.02,0.2);
+    flush(gx);
+    labels(gx);
+}
+
+function submit_grid_on(gx){
+    system(gx,true,0.02,0.2);
+    flush(gx);
+    labels(gx);
+}
+
+function sys(n){
+    if(n==0){
+        submit = flush;
+    }else if(n==1){
+        submit = submit_grid_off;
+    }else{
+        submit = submit_grid_on;
+    }
+}
 
 function index_color(t,i){
     return hsl_to_rgb_u8(0,0.0,0.75+0.25*Math.cos(i/20));
 }
 
+function float_re(x){
+    return typeof x=="object"?x.re:x;
+}
+
 function new_index_color(color_array){
-    var d = 1/color_array.length;
-    color_array.push(color_array[0]);
-    var ar = color_array.map(function(t){return t[0];});
-    var ag = color_array.map(function(t){return t[1];});
-    var ab = color_array.map(function(t){return t[2];});
+    var a = color_array.slice();
+    var d = 1/a.length;
+    a.push(a[0]);
+    var ar = a.map(function(t){return float_re(t[0]);});
+    var ag = a.map(function(t){return float_re(t[1]);});
+    var ab = a.map(function(t){return float_re(t[2]);});
     var fr = pli(0,d,ar);
     var fg = pli(0,d,ag);
     var fb = pli(0,d,ab);
@@ -31,10 +62,7 @@ function new_index_color(color_array){
 function new_calc_rect(gx,f,z0,mx,r2,pset,N,n){
     var px0 = gx.px0;
     var py0 = gx.py0;
-    
-    var index_color = new_index_color([
-        [1,1,1], [1,0.8,0], [0,0.2,0.6]
-    ]);
+    var index_color = new_index_color(cftab["ctab"]);
     var buffer = [0,0,0];
     var black = [0,0,0];
     var sample_count = Math.round(cftab["n"].re);
@@ -147,7 +175,7 @@ async function plot_fractal_tree(gx,f,n,cond){
     var mx = gx.mx;
     var z0 = cftab["z0"];
     var N = Math.round(cftab["N"].re);
-    var r2 = 100;
+    var r2 = Math.pow(cftab["r"].re,2);
     var W = gx.w;
     var H = gx.h;
     var pid = {};
@@ -166,10 +194,7 @@ async function plot_fractal_tree(gx,f,n,cond){
             if(cancel(pid,index,pid_stack)) return;
         }
     }
-
-    system(gx,true,0.02,0.2);
-    flush(gx);
-    labels(gx);
+    submit(gx);
     busy = false;
 }
 
@@ -187,7 +212,7 @@ async function plot_fractal(gx,f,n,cond){
     var py0 = gx.py0;
     var k = 0;
     var i;
-    var r2 = 4;
+    var r2 = Math.pow(cftab["r"].re,2);
     var N = Math.round(cftab["N"].re);
     var z0 = cftab["z0"];
 
@@ -219,9 +244,7 @@ async function plot_fractal(gx,f,n,cond){
         if(cancel(pid,index,pid_stack)) return;
     }
 
-    system(gx,true,0.02,0.2);
-    flush(gx);
-    labels(gx);
+    sumibt(gx);
     busy = false;
 }
 
