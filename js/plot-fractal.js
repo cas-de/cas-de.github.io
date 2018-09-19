@@ -59,6 +59,13 @@ function new_index_color(color_array){
     }
 }
 
+function sink(color,x,a){
+    var r = Math.min(1,a*(1-x));
+    color[0] = Math.floor(r*color[0]);
+    color[1] = Math.floor(r*color[1]);
+    color[2] = Math.floor(r*color[2]);
+}
+
 function new_calc_rect(gx,f,z0,mx,r2,pset,N,n){
     var px0 = gx.px0;
     var py0 = gx.py0;
@@ -68,10 +75,16 @@ function new_calc_rect(gx,f,z0,mx,r2,pset,N,n){
     var sample_count = Math.round(cftab["n"].re);
     var d = 2*n/(mx*ax);
     var offset = 0.5*d;
+    var M = N-20;
+    var a_sink = 0.06*N;
+    var color;
+    var Ax = 1/(mx*ax);
+    var Ay = -1/(mx*ay);
+
     if(sample_count>1){
         return function(px,py){
-            var x = (px-px0)/(mx*ax);
-            var y = -(py-py0)/(mx*ay);
+            var x = Ax*(px-px0);
+            var y = Ay*(py-py0);
             var all = 1;
             var sum = 0;
             for(var k=0; k<sample_count; k++){
@@ -94,22 +107,27 @@ function new_calc_rect(gx,f,z0,mx,r2,pset,N,n){
                 rect(pset,black,px,py,n,n);
                 return 1;
             }else{
-                rect(pset,index_color(buffer,sum/sample_count),px,py,n,n);
+                i = sum/sample_count;
+                color = index_color(buffer,i);
+                if(i>M){sink(color,i/N,a_sink);}
+                rect(pset,color,px,py,n,n);
                 return 0;
             }
         };
     }
     
     return function(px,py){
-        var x = (px-px0)/(mx*ax);
-        var y = -(py-py0)/(mx*ay);
+        var x = Ax*(px-px0);
+        var y = Ay*(py-py0);
         var c = {re: x, im: y};
         var z = z0(c);
         var i = 0;
         while(true){
             z = f(z,c);
             if(z.re*z.re+z.im*z.im>r2){
-                rect(pset,index_color(buffer,i),px,py,n,n);
+                color = index_color(buffer,i);
+                if(i>M){sink(color,i/N,a_sink);}
+                rect(pset,color,px,py,n,n);
                 return 0;
             }else if(i==N){
                 rect(pset,black,px,py,n,n);
