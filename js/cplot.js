@@ -135,6 +135,23 @@ function cpow(a,b){
     }
 }
 
+function cpow2(z){
+    return {re: z.re*z.re-z.im*z.im, im: 2*z.re*z.im};
+}
+
+function cpown(z,n){
+    var y = z;
+    n--;
+    while(n>0){
+        if(n%2==0){
+            n/=2; z = cpow2(z);
+        }else{
+            n--; y = cmul(y,z);
+        }
+    }
+    return y;
+}
+
 function csqrt(z){
     return cexp(cmulr(cln(z),0.5));
 }
@@ -522,8 +539,19 @@ function ccompile_expression(a,t,context){
             }
             a.push(")");
         }else if(cglobal_ftab.hasOwnProperty(op)){
-            if(op==="^" && typeof t[1]=="string" && t[2]===2){
-                ccompile_application(a,"cmul",["*",t[1],t[1]],context);
+            var n = t[2];
+            if(op==="^" && typeof n=="number" &&
+                Number.isInteger(n) && n>0 && n<40
+            ){
+                if(n==1){
+                    ccompile_expression(a,t[1],context);
+                }else if(n==2){
+                    ccompile_application(a,"cpow2",["",t[1]],context);
+                }else{
+                    a.push("cpown(");
+                    ccompile_expression(a,t[1],context);
+                    a.push(","+n+")");
+                }
             }else{
                 ccompile_application(a,cglobal_ftab[op],t,context);
             }

@@ -216,6 +216,7 @@ async function plot_fractal_tree(gx,f,n,cond){
     busy = false;
 }
 
+/*
 async function plot_fractal(gx,f,n,cond){
     var pid = {};
     var index = pid_stack.length;
@@ -262,11 +263,10 @@ async function plot_fractal(gx,f,n,cond){
         if(cancel(pid,index,pid_stack)) return;
     }
 
-    sumibt(gx);
+    submit(gx);
     busy = false;
 }
 
-/*
 async function plot_fractal_async(gx,f){
     if(gx.sync_mode==true){
         plot_fractal(gx,f,1,false);

@@ -42,7 +42,7 @@ var diff = diffh(0.001);
 var diff_operator = diffh_curry(0.001);
 
 var ftab = {
-    pi: Math.PI, tau: 2*Math.PI, e: Math.E, nan: NaN,
+    pi: Math.PI, tau: 2*Math.PI, e: Math.E, nan: NaN, inf: Infinity,
     deg: Math.PI/180, grad: Math.PI/180, gon: Math.PI/200,
     gc: GAMMA, angle: angle, t0: 0, t1: 2*Math.PI,
     abs: Math.abs, sgn: Math.sign, sign: Math.sign,
@@ -709,9 +709,17 @@ function str(x){
     if(Array.isArray(x)){
         return "["+x.map(str).join(", ")+"]";
     }else if(x instanceof Function){
-        return "a function";
+        return "eine Funktion";
     }else if(typeof x == "string"){
         return x;
+    }else if(typeof x == "number"){
+        if(Number.isFinite(x)){
+            return x.toString().toUpperCase();
+        }else if(Number.isNaN(x)){
+            return "nan";
+        }else{
+            return x.toString().toLowerCase();
+        }
     }else if(x.hasOwnProperty("re")){
         var sep = x.im<0? "": "+";
         return [str(x.re),sep,str(x.im),"i"].join("");
@@ -785,12 +793,18 @@ function scan(s){
             a.push([SymbolIdentifier,id,line,col0]);
         }else if(isdigit(s[i])){
             var col0 = col;
-            var number = "";
-            while(i<n && (isdigit(s[i]) || s[i]=='.')){
-                number += s[i];
-                i++; col++;
+            var j = i;
+            while(i<n){
+                if(isdigit(s[i]) || s[i]=='.'){
+                    i++; col++;
+                }else if(s[i]=='E'){
+                    i++; col++;
+                    if(i<n && (s[i]=='+' || s[i]=='-')){i++; col++;}
+                }else{
+                    break;
+                }
             }
-            a.push([SymbolNumber,number,line,col0]);
+            a.push([SymbolNumber,s.slice(j,i),line,col0]);
         }else if(isspace(s[i])){
             if(s[i]=='\n'){line++; col=0;}
             else {col++;}
@@ -2441,13 +2455,17 @@ function encode_query(s){
     return a.join("");
 }
 
+function upper_str(x){
+    return x.toString().toUpperCase();
+}
+
 function link(position){
     var s = document.getElementById("inputf").value;
     var out = document.getElementById("calc-out");
     var url = window.location.href.split("?")[0];
     var scale = (xscale.index==yscale.index?
-        (xscale.index==index0?"":";;scale("+1/ax+")"):
-        ";;scale("+1/ax+","+1/ay+")"
+        (xscale.index==index0?"":";;scale("+upper_str(1/ax)+")"):
+        ";;scale("+upper_str(1/ax)+","+upper_str(1/ay)+")"
     );
     var pos = "";
     var t = graphics.pos;
