@@ -5,8 +5,8 @@
   <title>plot</title>
   <script src = "js/plot.js"></script>
   <script src = "js/plot-complex.js"></script>
-  <script src = "js/newton-fractal.js"></script>
-  <link rel="stylesheet" href="css/ui-dark.css">
+  <script src = "js/plot-net.js"></script>
+  <link rel="stylesheet" href="css/ui.css">
 </head>
 <body>
 
@@ -22,7 +22,7 @@
 <input type="button" value="&minus;" onclick="xyscale_dec()">
 <br>
 <input type="text" id="inputf"
-onkeyup="keys(event);" value="z-f(z)/f'(z); f(z):=z^3-1">
+onkeyup="keys(event);" value="z">
 
 <br>
 <div id="out" class="mono">
@@ -36,8 +36,8 @@ onkeyup="keys(event);" value="z-f(z)/f'(z); f(z):=z^3-1">
 <input type="button" value="Bild" onclick="calc_img()">
 &nbsp;<a href="doc-komplex.htm">Hilfe</a>
 <br><br>
-<input type="button" value="calculate" onclick="calc()">
-<input type="text" id="input-calc" onkeyup="keys_calc(event);">
+<input type="button" value="calculate" onclick="ccalc()">
+<input type="text" id="input-calc" onkeyup="keys_ccalc(event);">
 <div id="calc-out" class="mono"></div>
 </div>
 </table>
