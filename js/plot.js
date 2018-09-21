@@ -139,7 +139,7 @@ function af(x0,y0,x1,y1){
 function sc(f,a,b,x){return f(a)+(f(b)-f(a))/(b-a)*(x-a);}
 function tg(f,a,x){return f(a)+diff(f,a)*(x-a);}
 function res(f,x,a,b){return a<=x && x<=b? f(x): NaN;}
-function map(f,a){return a.map(f);}
+function map(f,a){return a.map(function(x){return f(x);});}
 function filter(f,a){return a.filter(f);}
 
 function sum(a,b,f){
