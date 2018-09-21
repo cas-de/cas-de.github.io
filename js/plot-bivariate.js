@@ -2,12 +2,16 @@
 "use strict";
 
 ftab["w"] = 10;
+ftab["alpha"] = 0.94;
 ftab["u0"] = 0;
 ftab["u1"] = 2*Math.PI;
 ftab["v0"] = 0;
 ftab["v1"] = Math.PI;
 ftab["d"] = set_distance;
-ftab["alpha"] = 0.94;
+ftab["tile"] = 1;
+ftab["mesh"] = 1;
+
+var pftab = ftab;
 
 var new_proj = new_proj_parallel;
 var proj_distance = 100;
@@ -17,6 +21,10 @@ var plot_refresh = false;
 function refresh(gx){
     plot_refresh = true;
     update(gx);
+}
+
+function float_re(x){
+    return typeof x=="object"?x.re:x;
 }
 
 var theta_max = Math.atan(Math.sqrt(2));
@@ -347,7 +355,7 @@ function plot_sf(gx,f,d,step){
 
     var dx = d/ax;
     var dy = d/ax;
-    var wx = ftab["w"]/ax;
+    var wx = float_re(pftab["w"])/ax;
     var wy = wx;
 
     var a = gx.tile_buffer;
@@ -421,13 +429,15 @@ function plot_psf(gx,f,d,step){
 }
 
 function plot_node(gx,t,index){
+    var m = ftab["tile"];
+    var mesh = ftab["mesh"];
     if(Array.isArray(t) && t[0]==="[]"){
         var f = compile(t,["u","v"]);
         if(plot_refresh){
             plot_psf(gx,f,1,1);
             plot_refresh = false;
         }else{
-            plot_psf(gx,f,0.5,2);
+            plot_psf(gx,f,m*mesh*0.5,2/m);
         }
     }else{
         var f = compile(t,["x","y"]);
@@ -435,7 +445,7 @@ function plot_node(gx,t,index){
             plot_sf(gx,f,1,1);
             plot_refresh = false;
         }else{
-            plot_sf(gx,f,0.25,4);
+            plot_sf(gx,f,m*mesh*0.25,4/m);
         }
     }
 }
@@ -445,11 +455,13 @@ function plot_node_relief(gx,t,index){
     var f = function(x,y){
         return fc({re: x, im: y}).re;
     };
+    pftab = cftab;
+    var m = cftab["tile"].re;
     if(plot_refresh){
         plot_sf(gx,f,1,1);
         plot_refresh = false;
     }else{
-        plot_sf(gx,f,0.25,4);
+        plot_sf(gx,f,m*0.25,4/m);
     }
 }
 
@@ -487,7 +499,7 @@ function plot(gx){
         }
     }
 
-    var alpha = Math.round(ftab["alpha"]*255);
+    var alpha = Math.round(float_re(pftab["alpha"])*255);
     flush_tile_buffer(gx,alpha);
     system_xyz(gx,10/ax);
 }
