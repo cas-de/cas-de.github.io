@@ -80,16 +80,22 @@ function rgba_to_hex(r,g,b,a) {
     ].join("");
 }
 
-function interpolate_color(c1,c2){
-    return function(t,a){
-        var R = clamp(Math.round(255*((1-t)*c1[0]+t*c2[0])),0,255);
-        var G = clamp(Math.round(255*((1-t)*c1[1]+t*c2[1])),0,255);
-        var B = clamp(Math.round(255*((1-t)*c1[2]+t*c2[2])),0,255);
+function new_color_gradient(color_array){
+    var a = color_array.slice();
+    var d = 1/(a.length-1);
+    var ar = a.map(function(t){return t[0];});
+    var ag = a.map(function(t){return t[1];});
+    var ab = a.map(function(t){return t[2];});
+    var fr = pli(0,d,ar);
+    var fg = pli(0,d,ag);
+    var fb = pli(0,d,ab);
+    return function(x,a){
+        var R = Math.floor(255*fr(x));
+        var G = Math.floor(255*fg(x));
+        var B = Math.floor(255*fb(x));
         return rgba_to_hex(R,G,B,a);
     };
 }
-
-var colorfn1 = interpolate_color([0.6,0.6,1],[1,0.6,0.6]);
 
 function colorfn2(t,a){
     var c = hsl_to_rgb(4/3*Math.PI*(1-clamp(t,0,1)),1,0.6);
@@ -250,14 +256,15 @@ function rot(phi,v){
 }
 
 function new_light_source(phi,w){
-    var f = interpolate_color([0.5,0.7,0.7],[1,0.9,0.7]);
+    var f = new_color_gradient([
+        [0.4,0.7,0.64],[0.4,0.7,0.62],[0.5,0.7,0.6],
+        [0.8,0.7,0.4],[1,0.76,0],[1,0.96,0.5]
+    ]);
     w = normalize(rot(0.5*Math.PI-phi,w));
     return function(v,a){
         var vv = v[0]*v[0]+v[1]*v[1]+v[2]*v[2];
         var s = (v[0]*w[0]+v[1]*w[1]+v[2]*w[2])/Math.sqrt(vv);
         return f(0.5*s+0.5,a);
-        // var c = hsl_to_rgb(3.3,0.5,Math.abs(s/4+3/5));
-        // return rgba_to_hex(Math.round(255*c[0]),Math.round(255*c[1]),Math.round(255*c[2]),a);
     };
 }
 
