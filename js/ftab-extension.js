@@ -170,11 +170,46 @@ function psi(x,y){
     }
 }
 
+function ipp(a){
+    if(arguments.length>1){
+        a = arguments;
+    }
+    var i,j,d=[];
+    var n = a.length;
+    for(i=0; i<n; i++){
+        d.push(a[i][1]);
+    }
+    for(i=1; i<n; i++){
+        for(j=n-1; j>=i; j--){
+            d[j] = (d[j]-d[j-1])/(a[j][0]-a[j-i][0]);
+        }
+    }
+    return function(x){
+        var y = d[n-1];
+        for(var i=n-2; i>=0; i--){
+            y = d[i]+(x-a[i][0])*y;
+        }
+        return y;
+    };
+}
+
+function table(f,a){
+    var b = ["<table class='bt'><tr><th>x<th>y"];
+    for(var i=0; i<a.length; i++){
+        b.push("<tr><td style='text-align: right'>");
+        b.push(str(a[i]));
+        b.push("<td style='text-align: right'>");
+        b.push(str(f(a[i])));
+    }
+    b.push("</table>");
+    return b.join("");
+}
+
 var ftab_extension = {
   PT: ChebyshevT, PU: ChebyshevU, PH: Hermite, 
   PP: Legendre, PL: Laguerre, bc: bc,
   psi: psi, digamma: digamma,
-  zeta: zeta
+  zeta: zeta, table: table, ipp: ipp
 };
 
 

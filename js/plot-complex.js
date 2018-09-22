@@ -5,7 +5,8 @@ var cdiff = cdiffh(0.001);
 
 var cglobal_ftab = {
 "+": "cadd", "-": "csub", "*": "cmul", "/": "cdiv",
-"^": "cpow", "~": "cneg", "=": "ceq",
+"^": "cpow", "~": "cneg", "=": "ceq", "&": "cand", "|": "cor",
+"<": "clt", ">": "cgt", "<=": "cle", ">=": "cge",
 abs: "ccabs", arg: "ccarg", sgn: "csgn", conj: "conj",
 re: "cre", im: "cim", Re: "cre", Im: "cim",
 floor: "cfloor", ceil: "cceil", rd: "crd", frac: "cfrac",
@@ -33,6 +34,13 @@ ftab["colorfn"] = colorfn;
 function complex(x,y){
     return {re: x, im: y};
 }
+
+function clt(a,b){return {re: a.re<b.re?1:0,im:0};}
+function cgt(a,b){return {re: a.re>b.re?1:0,im:0};}
+function cle(a,b){return {re: a.re<=b.re?1:0,im:0};}
+function cge(a,b){return {re: a.re>=b.re?1:0,im:0};}
+function cand(a,b){return{re: a.re&b.re?1:0,im:0};}
+function cor(a,b){return {re: a.re|b.re?1:0,im:0};}
 
 function conj(z){
     return {re: z.re, im: -z.im};
@@ -476,11 +484,6 @@ function ccompile_assignment(a,t,context){
     context.local[t[1]] = true;
 }
 
-var coperator_table = {
-    "<": "<", ">": ">", "<=": "<=", ">=": ">=",
-    "&": "&&", "|": "||"
-};
-
 function ccompile_expression(a,t,context){
     if(typeof t == "number"){
         a.push("{re:");
@@ -507,12 +510,6 @@ function ccompile_expression(a,t,context){
         if(Array.isArray(op)){
             ccompile_expression(a,op,context);
             ccompile_application(a,"",t,context);
-        }else if(coperator_table.hasOwnProperty(op)){
-            a.push("(");
-            ccompile_expression(a,t[1],context);
-            a.push(coperator_table[op]);
-            ccompile_expression(a,t[2],context);
-            a.push(")");
         }else if(op=="fn"){
             ccompile_lambda_expression(a,t[1],t[2],context);
         }else if(op=="[]"){
@@ -527,13 +524,13 @@ function ccompile_expression(a,t,context){
             ccompile_expression(a,t[2],context);
             a.push("]");
         }else if(op=="if"){
-            a.push("(");
+            a.push("((");
             ccompile_expression(a,t[1],context);
-            a.push("?");
+            a.push(").re==1?");
             ccompile_expression(a,t[2],context);
             a.push(":");
             if(t.length<4){
-                a.push("NaN");
+                a.push("{re:NaN,im:NaN}");
             }else{
                 ccompile_expression(a,t[3],context);
             }

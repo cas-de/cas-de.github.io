@@ -56,3 +56,22 @@ canvas.main-canvas{
 .hud a:hover{
   color: #ffffff;
 }
+
+table.bt {
+  border-collapse: collapse;
+}
+table.bt td, table.bt th{
+  border: 2px solid #a0a0a0;
+  background-color: #ffffff;
+  color: #404040;
+  padding-left: 6px;
+  padding-right: 6px;
+  font-size: 80%;
+}
+
+table.bt th{
+  background-color: #204060;
+  color: #f0f0f0;
+}
+
+
