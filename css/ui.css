@@ -34,9 +34,6 @@ canvas.main-canvas{
   z-index: -1;
 }
 
-.menu{
-}
-
 .mono{
   font-family: "DejaVu Sans Mono", monospace;
 }
@@ -49,6 +46,8 @@ canvas.main-canvas{
   padding: 1em;
   color: #ffffff;
   min-height: 8em;
+  max-height: 74vh;
+  overflow: auto;
 }
 
 .hud a{
