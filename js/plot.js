@@ -88,8 +88,8 @@ function load_async(URL,callback){
    head.appendChild(s);
 }
 
-function load_ftab_extension(){
-    load_async("js/ftab-extension.js",async function(){
+function load_ftab_extension(ftab,path){
+    load_async(path,async function(){
         var t = ftab_extension;
         var a = Object.keys(t);
         for(var i=0; i<a.length; i++){
@@ -1254,7 +1254,7 @@ function compile_expression(a,t,context,type){
             a.push(t);
         }else if(!ftab_extension_loaded){
             async_continuation = "await";
-            load_ftab_extension();
+            load_ftab_extension(ftab,"js/ftab-extension.js");
             throw new Repeat();
         }else{
             throw new Err("Fehler: undefinierte Variable: '"+t+"'.");

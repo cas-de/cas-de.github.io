@@ -500,7 +500,7 @@ function ccompile_expression(a,t,context){
             a.push(cglobal_ftab[t]);
         }else if(!ftab_extension_loaded){
             async_continuation = "await";
-            load_ftab_extension();
+            load_ftab_extension(cglobal_ftab,"js/cftab-extension.js");
             throw new Repeat();
         }else{
             throw new Err("Error: undefined variable: '"+t+"'.");
