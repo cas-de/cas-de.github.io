@@ -296,7 +296,7 @@ function new_light_source(phi,w){
     };
 }
 
-function flush_tile_buffer(gx,alpha){
+function flush_tile_buffer(gx,alpha,lw){
     var a = gx.tile_buffer;
     var context = gx.context;
     var t,p0,p1,p2,p3;
@@ -309,7 +309,7 @@ function flush_tile_buffer(gx,alpha){
 
     context.lineWidth = 1;
     context.fillStyle = "#d0d0d0b0";
-    var line_color = "#00000040";
+    var line_color = "#0000004a";
     var color;
     for(var i=0; i<a.length; i++){
         t = a[i];
@@ -325,7 +325,7 @@ function flush_tile_buffer(gx,alpha){
         context.fill();
 
         if(t[6]){
-            context.lineWidth = 1.4;
+            context.lineWidth = lw;
             context.strokeStyle = line_color;
         }else{
             context.lineWidth = 1;
@@ -337,7 +337,7 @@ function flush_tile_buffer(gx,alpha){
         context.stroke();
 
         if(t[7]){
-            context.lineWidth = 1.4;
+            context.lineWidth = lw;
             context.strokeStyle = line_color;
         }else{
             context.lineWidth = 1;
@@ -386,7 +386,7 @@ function plot_sf(gx,f,d,xstep,ystep){
     var a = gx.tile_buffer;
     var kx = 0;
     for(x = x0; x<x1; x+=dx){
-        var ky = 0;
+        var ky = 1;
         for(y = y0; y<y1; y+=dy){
             z00 = f(x,y);
             z01 = f(x,y+dy);
@@ -522,8 +522,9 @@ function plot(gx){
         }
     }
 
+    var lw = gtile<0.4?(gtile<0.15?2.4:1.8):1.4;
     var alpha = Math.round(float_re(pftab["alpha"])*255);
-    flush_tile_buffer(gx,alpha);
+    flush_tile_buffer(gx,alpha,lw);
     system_xyz(gx,10/ax);
 }
 
