@@ -219,7 +219,28 @@ function cCi(x){
     }
 }
 
+function cE1(z){
+    var miz = {re: z.im, im: -z.re};
+    var y = csubr(cSi(miz),0.5*Math.PI)
+    return csub({re: -y.im, im: y.re},cCi(miz));
+}
+
+function cEi(z){
+    var iz = {re: -z.im, im: z.re};
+    var y = crsub(0.5*Math.PI,cSi(iz));
+    return cadd({re: -y.im, im: y.re},cCi(iz))
+}
+
+function cli(z){
+    return cEi(cln(z));
+}
+
+function cLi(z){
+    var w = cEi(cln(z));
+    return {re: w.re-1.04516378011749278484, im: w.im};
+}
+
 var ftab_extension = {
-    Si: "cSi", Ci: "cCi"
+    Si: "cSi", Ci: "cCi", E1: "cE1", Ei: "cEi", li: "cli", Li: "cLi"
 };
 
