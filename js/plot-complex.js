@@ -356,7 +356,7 @@ function cdiffh(h){
     };
 }
 
-var g32 = [
+var GL32 = [
 [-0.9972638618494816, 0.007018610009470141],
 [-0.9856115115452684, 0.01627439473090563],
 [-0.9647622555875064, 0.02539206530926208],
@@ -391,22 +391,27 @@ var g32 = [
 [ 0.9972638618494816, 0.007018610009470141]
 ];
 
-function cgauss(f,a,b,n){
-    var h = (b-a)/n;
-    var p = 0.5*h;
-    var s = {re: 0, im: 0};
-    var N = g32.length;
-    var i,j,sj,q;
-    for(j=0; j<n; j++){
-        q = p+a+j*h;
-        sj = {re: 0, im: 0};
-        for(i=0; i<N; i++){
-            sj = cadd(sj,cmulr(f(p*g32[i][0]+q),g32[i][1]));
+function new_cgauss(g){
+    return function cgauss(f,a,b,n){
+        var m,s,sj,h,i,j,p,q,q0;
+        m = g.length;
+        h = (b-a)/n;
+        p = 0.5*h;
+        q0 = p+a;
+        s = {re: 0, im: 0};
+        for(j=0; j<n; j++){
+            q = q0+j*h;
+            sj = {re: 0, im: 0};
+            for(i=0; i<m; i++){
+                sj = cadd(sj,cmulr(f(p*g[i][0]+q),g[i][1]));
+            }
+            s = cadd(s,cmulr(sj,p));
         }
-        s = cadd(s,cmulr(sj,p));
-    }
-    return s;
+        return s;
+    };
 }
+
+var cgauss = new_cgauss(GL32);
 
 function cint(p,f,n){
     if(n==undefined) {n=1} else {n=Math.round(n.re)};

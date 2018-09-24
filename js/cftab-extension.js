@@ -189,7 +189,7 @@ function cSi(x){
     }
     if(x.re<5 && Math.abs(x.im)<6){
         return cmulr(cSi4(x),s);
-    }else if(x.re>6 || Math.abs(x.im)>60){
+    }else if(x.re>10 || Math.abs(x.im)>60){
         return cmulr(csub(crsub(0.5*Math.PI,cmul(chf(x),ccos(x))),cmul(chg(x),csin(x))),s);
     }else{
         return cmulr(cint([{re:0,im:0},x],csi),s);
@@ -203,7 +203,7 @@ function cci(z){
 function cCip(x){
     if(cabs(x)<5){
         return cCi4(x);
-    }else if(x.re>8 || Math.abs(x.im)>30){
+    }else if(x.re>10 || Math.abs(x.im)>60){
         return csub(cmul(chf(x),csin(x)),cmul(chg(x),ccos(x)));
     }else{
         return caddr(cadd(cln(x),cint([{re:0,im:0},x],cci)),GAMMA);
@@ -212,23 +212,42 @@ function cCip(x){
 
 function cCi(x){
     if(x.re<0){
-        var spi = x.im<=0?-Math.PI:Math.PI;
-        return cadd({re:0,im:spi},cCip({re: -x.re, im: -x.im}));
+        var w = cCip({re: -x.re, im: -x.im});
+        var spi = x.im<=0?Math.PI:-Math.PI;
+        return {re: w.re, im: w.im-spi};
     }else{
         return cCip(x);
     }
 }
 
+function cCi90(x){
+    if(x.re<0){
+        var w = cCip({re: -x.re, im: -x.im});
+        return {re: w.re, im: w.im-Math.PI};
+    }else{
+        return cCip(x);
+    }
+}
+
+function cCin(z){
+    return csub(caddr(cln(z),GAMMA),cCi(z));
+}
+
 function cE1(z){
     var miz = {re: z.im, im: -z.re};
-    var y = csubr(cSi(miz),0.5*Math.PI)
-    return csub({re: -y.im, im: y.re},cCi(miz));
+    var y = csubr(cSi(miz),0.5*Math.PI);
+    return csub({re: -y.im, im: y.re},cCi90(miz));
 }
 
 function cEi(z){
     var iz = {re: -z.im, im: z.re};
     var y = crsub(0.5*Math.PI,cSi(iz));
-    return cadd({re: -y.im, im: y.re},cCi(iz))
+    var w = cadd({re: -y.im, im: y.re},cCi90(iz));
+    return {re:w.re,im:0};
+}
+
+function cEin(z){
+    return cadd(caddr(cln(z),GAMMA),cE1(z));
 }
 
 function cli(z){
@@ -241,6 +260,7 @@ function cLi(z){
 }
 
 var ftab_extension = {
-    Si: "cSi", Ci: "cCi", E1: "cE1", Ei: "cEi", li: "cli", Li: "cLi"
+    Si: "cSi", Ci: "cCi", Ci90: "cCi90", Cin: "cCin",
+    E1: "cE1", Ei: "cEi", Ein: "cEin", li: "cli", Li: "cLi"
 };
 
