@@ -1800,9 +1800,9 @@ async function fplot(gx,f,d,cond,color){
     busy = false;
 }
 
-function bisection_fast(state,f,a,b){
+function bisection_fast(N,state,f,a,b){
     var m;
-    for(var k=0; k<10; k++){
+    for(var k=0; k<N; k++){
         m = 0.5*(a+b);
         if(f(m)<0==state) a=m; else b=m;
     }
@@ -1825,6 +1825,7 @@ async function plot_zero_set(gx,f,n,cond,color){
 
     var state;
     var d = n/gx.mx/ax;
+    var N = n==1?14:10;
     var k=0;
 
     for(py=0; py<H; py+=1){
@@ -1836,7 +1837,7 @@ async function plot_zero_set(gx,f,n,cond,color){
             if(z!=state){
                 if(state!=undefined){
                     var g = function(x){return f(x,y);};
-                    var x0 = bisection_fast(state,g,x-d,x+d);
+                    var x0 = bisection_fast(N,state,g,x-d,x+d);
                     if(Math.abs(f(x0,y))<0.1){
                         gx.spoint(color,ax*x0,ay*y);
                     }
@@ -1859,7 +1860,7 @@ async function plot_zero_set(gx,f,n,cond,color){
             if(z!=state){
                 if(state!=undefined){
                     var g = function(y){return f(x,y);};
-                    var y0 = bisection_fast(!state,g,y-d,y+d);
+                    var y0 = bisection_fast(N,!state,g,y-d,y+d);
                     if(Math.abs(f(x,y0))<0.1){
                         gx.spoint(color,ax*x,ay*y0);
                     }
