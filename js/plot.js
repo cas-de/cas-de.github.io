@@ -1800,25 +1800,49 @@ async function fplot(gx,f,d,cond,color){
     busy = false;
 }
 
+function bisection_fast(state,f,a,b){
+    var m;
+    for(var k=0; k<10; k++){
+        m = 0.5*(a+b);
+        if(f(m)<0==state) a=m; else b=m;
+    }
+    return m;
+}
+
 async function plot_zero_set(gx,f,n,cond,color){
     var pid = {};
     var index = pid_stack.length;
     pid_stack.push(pid);
     busy = true;
-    var wx = 0.5*gx.w/gx.mx/ax;
-    var wy = 0.5*gx.h/gx.mx/ay;
-    var x0 = (0.5*gx.w-gx.px0)/gx.mx/ax;
-    var y0 = -(0.5*gx.h-gx.py0)/gx.mx/ay;
-    var xa = x0-wx;
-    var xb = x0+wx;
-    var ya = y0-wy;
-    var yb = y0+wy;
-    var d = 0.01/ax;
+
+    var W = gx.w;
+    var H = gx.h;
+    var px,py,x,y,z;
+    var px0 = gx.px0;
+    var py0 = gx.py0;
+    var Ax = 1/gx.mx/ax;
+    var Ay = -1/gx.mx/ay;
+
+    var state;
+    var d = n/gx.mx/ax;
     var k=0;
-    for(var x=xa; x<xb; x+=d){
-        var a = zeroes_bisection(function(y){return f(x,y);},ya,yb,n);
-        for(var i=0; i<a.length; i++){
-            gx.spoint(color,ax*x,ay*a[i]);
+
+    for(py=0; py<H; py+=1){
+        state = undefined;
+        for(px=0; px<W; px+=n){
+            x = Ax*(px-px0);
+            y = Ay*(py-py0);
+            z = f(x,y)<0;
+            if(z!=state){
+                if(state!=undefined){
+                    var g = function(x){return f(x,y);};
+                    var x0 = bisection_fast(state,g,x-d,x+d);
+                    if(Math.abs(f(x0,y))<1){
+                        gx.spoint(color,ax*x0,ay*y);
+                    }
+                }
+                state = z;
+            }
         }
         if(cond && k%100==0){
             await sleep(20);
@@ -1826,10 +1850,22 @@ async function plot_zero_set(gx,f,n,cond,color){
         if(cancel(pid,index,pid_stack)) return;
         k++;
     }
-    for(var y=ya; y<yb; y+=d){
-        var a = zeroes_bisection(function(x){return f(x,y);},xa,xb,n);
-        for(var i=0; i<a.length; i++){
-            gx.spoint(color,ax*a[i],ay*y);
+    for(px=0; px<W; px+=1){
+        state = undefined;
+        for(py=0; py<H; py+=n){
+            x = Ax*(px-px0);
+            y = Ay*(py-py0);
+            z = f(x,y)<0;
+            if(z!=state){
+                if(state!=undefined){
+                    var g = function(y){return f(x,y);};
+                    var y0 = bisection_fast(!state,g,y-d,y+d);
+                    if(Math.abs(f(x,y0))<1){
+                        gx.spoint(color,ax*x,ay*y0);
+                    }
+                }
+                state = z;
+            }
         }
         if(cond && k%100==0){
             await sleep(20);
@@ -1881,12 +1917,12 @@ async function plot_async(gx,f,color){
 
 async function plot_zero_set_async(gx,f,color){
     if(gx.sync_mode==true){
-        plot_zero_set(gx,f,400,false,color);
+        plot_zero_set(gx,f,1,false,color);
     }else{
-        plot_zero_set(gx,f,10,false,color);
+        plot_zero_set(gx,f,4,false,color);
         while(busy){await sleep(40);}
         await sleep(40);
-        plot_zero_set(gx,f,400,true,color);
+        plot_zero_set(gx,f,1,true,color);
     }
 }
 
