@@ -1837,7 +1837,7 @@ async function plot_zero_set(gx,f,n,cond,color){
                 if(state!=undefined){
                     var g = function(x){return f(x,y);};
                     var x0 = bisection_fast(state,g,x-d,x+d);
-                    if(Math.abs(f(x0,y))<1){
+                    if(Math.abs(f(x0,y))<0.1){
                         gx.spoint(color,ax*x0,ay*y);
                     }
                 }
@@ -1860,7 +1860,7 @@ async function plot_zero_set(gx,f,n,cond,color){
                 if(state!=undefined){
                     var g = function(y){return f(x,y);};
                     var y0 = bisection_fast(!state,g,y-d,y+d);
-                    if(Math.abs(f(x,y0))<1){
+                    if(Math.abs(f(x,y0))<0.1){
                         gx.spoint(color,ax*x,ay*y0);
                     }
                 }
