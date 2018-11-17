@@ -1809,7 +1809,7 @@ function bisection_fast(N,state,f,a,b){
     return m;
 }
 
-async function plot_zero_set(gx,f,n,cond,color){
+async function plot_zero_set(gx,f,n,N,cond,color){
     var pid = {};
     var index = pid_stack.length;
     pid_stack.push(pid);
@@ -1825,7 +1825,6 @@ async function plot_zero_set(gx,f,n,cond,color){
 
     var state;
     var d = n/gx.mx/ax;
-    var N = n==1?14:10;
     var k=0;
 
     for(py=0; py<H; py+=1){
@@ -1918,12 +1917,12 @@ async function plot_async(gx,f,color){
 
 async function plot_zero_set_async(gx,f,color){
     if(gx.sync_mode==true){
-        plot_zero_set(gx,f,1,false,color);
+        plot_zero_set(gx,f,1,14,false,color);
     }else{
-        plot_zero_set(gx,f,4,false,color);
+        plot_zero_set(gx,f,4,10,false,color);
         while(busy){await sleep(40);}
         await sleep(40);
-        plot_zero_set(gx,f,1,true,color);
+        plot_zero_set(gx,f,1,14,true,color);
     }
 }
 
