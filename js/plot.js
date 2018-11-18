@@ -1427,8 +1427,15 @@ function new_point(gx){
         pseta_median(color,x,y+1,a);
         pseta_median(color,x+1,y+1,a);
     }
+    // var fade = function(x){
+    //     return Math.exp(-0.4*x*x*x);
+    // };
+    // Approximation:
     var fade = function(x){
-        return Math.exp(-0.4*x*x*x);
+        var t = x+0.128*x*x;
+        var y = 13.8/(t*t*t+13.8);
+        var y2 = y*y;
+        return y2*y2;
     };
     var psetdiff = function(color,rx,ry,px,py){
         var dx = Math.abs(px-rx);
@@ -1820,11 +1827,12 @@ async function plot_zero_set(gx,f,n,N,cond,color){
     var px,py,x,y,z;
     var px0 = gx.px0;
     var py0 = gx.py0;
-    var Ax = 1/gx.mx/ax;
-    var Ay = -1/gx.mx/ay;
+    var Ax = 1/(gx.mx*ax);
+    var Ay = -1/(gx.mx*ay);
 
     var state;
-    var d = n/gx.mx/ax;
+    var dx = n/(gx.mx*ax);
+    var dy = n/(gx.mx*ay);
     var k=0;
 
     for(py=0; py<H; py+=1){
@@ -1836,7 +1844,7 @@ async function plot_zero_set(gx,f,n,N,cond,color){
             if(z!=state){
                 if(state!=undefined){
                     var g = function(x){return f(x,y);};
-                    var x0 = bisection_fast(N,state,g,x-d,x+d);
+                    var x0 = bisection_fast(N,state,g,x-dx,x+dx);
                     if(Math.abs(f(x0,y))<0.1){
                         gx.spoint(color,ax*x0,ay*y);
                     }
@@ -1859,7 +1867,7 @@ async function plot_zero_set(gx,f,n,N,cond,color){
             if(z!=state){
                 if(state!=undefined){
                     var g = function(y){return f(x,y);};
-                    var y0 = bisection_fast(N,!state,g,y-d,y+d);
+                    var y0 = bisection_fast(N,!state,g,y-dy,y+dy);
                     if(Math.abs(f(x,y0))<0.1){
                         gx.spoint(color,ax*x,ay*y0);
                     }
