@@ -167,7 +167,7 @@ function plot_implicit_sf(gx,f,d,xstep,ystep){
             p01[0]-p00[0],p01[1]-p00[1],p01[2]-p00[2]
         );
 
-        tile_buffer.push([s*p00[1]-c*p00[0],p0,p1,p2,p3,p00[2],
+        tile_buffer.push([TILE,s*p00[1]-c*p00[0],p0,p1,p2,p3,p00[2],
             mesh_cond(kx/xstep),mesh_cond(ky/ystep),v]);
     }
 }

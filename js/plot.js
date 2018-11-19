@@ -76,8 +76,12 @@ var ftab = {
     P: set_position, scale: set_scale,
     zeroes: zeroes, roots: zeroes,
     map: map, filter: filter, freq: set_freq,
-    img: plot_img
+    img: plot_img, vec: identity
 };
+
+function identity(x){
+    return x;
+}
 
 function load_async(URL,callback){
    var head = document.getElementsByTagName("head")[0];
@@ -1509,6 +1513,7 @@ function new_point(gx){
     gx.pset4 = pset4;
     gx.point = point;
     gx.spoint = spoint;
+    gx.fpsets = fpsets;
     gx.hline = hline;
     gx.vline = vline;
     gx.hspine = hspine;
@@ -2227,6 +2232,9 @@ function plot_node(gx,t,color){
         }
     }else if(Array.isArray(t) && t[0]==="[]"){
         f = compile(t,["t"]);
+        vplot_async(gx,f,color);
+    }else if(Array.isArray(t) && t[0]==="vec"){
+        f = compile(t[1],["t"]);
         vplot_async(gx,f,color);
     }else if(Array.isArray(t) && bool_result_ops.hasOwnProperty(t[0])){
         f = compile(t,["x","y"]);

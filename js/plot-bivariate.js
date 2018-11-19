@@ -12,6 +12,10 @@ ftab["mesh"] = set_mesh;
 ftab["tile"] = set_tile;
 ftab["alpha"] = 0.94;
 
+var TILE = 0;
+var LINE = 1;
+var LINE_SHADOW = 2;
+
 function set_w(wx,wy){
     if(wy==undefined) wy=wx;
     grx = Array.isArray(wx)?wx:[-wx,wx];
@@ -296,13 +300,28 @@ function new_light_source(phi,w){
     };
 }
 
+function buffer_draw_line(context,t){
+    var p0 = t[2];
+    var p1 = t[3];
+    if(t[0]==LINE){
+        context.strokeStyle = "#002080";
+    }else{
+        context.strokeStyle = "#a0a0a0";
+    }
+    context.lineWidth = 2;
+    context.beginPath();
+    context.moveTo(p0[0],p0[1]);
+    context.lineTo(p1[0],p1[1]);
+    context.stroke();
+}
+
 function flush_tile_buffer(gx,alpha,lw){
     var a = gx.tile_buffer;
     var context = gx.context;
     var t,p0,p1,p2,p3;
 
     a.sort(function(x,y){
-        return x[0]<y[0];
+        return x[1]<y[1];
     });
 
     var colorfn = new_light_source(gx.phi,[1,0,0.8]);
@@ -313,9 +332,13 @@ function flush_tile_buffer(gx,alpha,lw){
     var color;
     for(var i=0; i<a.length; i++){
         t = a[i];
-        p0 = t[1]; p1 = t[2]; p2 = t[3]; p3 = t[4];
-        // color = colorfn2(0.5+0.2*t[5],alpha);
-        color = colorfn(t[8],alpha);
+        if(t[0]!=TILE){
+            buffer_draw_line(context,t);
+            continue;
+        }
+        p0 = t[2]; p1 = t[3]; p2 = t[4]; p3 = t[5];
+        // color = colorfn2(0.5+0.2*t[6],alpha);
+        color = colorfn(t[9],alpha);
         context.fillStyle = color;
         context.beginPath();
         context.moveTo(p0[0],p0[1]);
@@ -324,7 +347,7 @@ function flush_tile_buffer(gx,alpha,lw){
         context.lineTo(p3[0],p3[1]);
         context.fill();
 
-        if(t[6]){
+        if(t[7]){
             context.lineWidth = lw;
             context.strokeStyle = line_color;
         }else{
@@ -336,7 +359,7 @@ function flush_tile_buffer(gx,alpha,lw){
         context.lineTo(p1[0],p1[1]);
         context.stroke();
 
-        if(t[7]){
+        if(t[8]){
             context.lineWidth = lw;
             context.strokeStyle = line_color;
         }else{
@@ -397,7 +420,7 @@ function plot_sf(gx,f,d,xstep,ystep){
             p2 = proj(x+dx,y+dy,z11);
             p3 = proj(x+dx,y,z10);
             v = [dy*(z00-z10),dx*(z00-z01),dx*dy];
-            a.push([s*y-c*x,p0,p1,p2,p3,z00,
+            a.push([TILE,s*y-c*x,p0,p1,p2,p3,z00,
                 mesh_cond(kx/xstep),mesh_cond(ky/ystep),v]);
             ky++;
         }
@@ -444,7 +467,7 @@ function plot_psf(gx,f,d,ustep,vstep){
                 p10[0]-p00[0],p10[1]-p00[1],p10[2]-p00[2],
                 p01[0]-p00[0],p01[1]-p00[1],p01[2]-p00[2]
             );
-            a.push([-gxt-gyt,p0,p1,p2,p3,p00[2],
+            a.push([TILE,-gxt-gyt,p0,p1,p2,p3,p00[2],
                 mesh_cond(ku/ustep),mesh_cond(kv/vstep),e]);
             kv++;
         }
@@ -452,15 +475,46 @@ function plot_psf(gx,f,d,ustep,vstep){
     }
 }
 
+function plot_curve(gx,f){
+    var proj = gx.proj;
+    var a = gx.tile_buffer;
+    var t0 = ftab["t0"];
+    var t1 = ftab["t1"];
+    var p1 = undefined;
+    for(var t=t0; t<t1; t+=0.01){
+        var v = f(t);
+        var p0 = proj(v[0],v[1],v[2]);
+        if(p1!=undefined){
+            a.push([LINE,-1000,p0,p1]);
+        }
+        p1 = p0;
+    }
+    p1 = undefined;
+    for(var t=t0; t<t1; t+=0.01){
+        var v = f(t);
+        var p0 = proj(v[0],v[1],0);
+        if(p1!=undefined){
+            a.push([LINE_SHADOW,1000,p0,p1]);
+        }
+        p1 = p0;
+    }
+}
+
 function plot_node(gx,t,index){
     var m = gtile;
-    if(Array.isArray(t) && t[0]==="[]"){
-        var f = compile(t,["u","v"]);
-        if(plot_refresh){
-            plot_psf(gx,f,1,1,1);
-            plot_refresh = false;
+    if(Array.isArray(t) && (t[0]==="[]" || t[0]==="vec")){
+        if(t[0]==="vec") t = t[1];
+        if(contains_variable(t,"t")){
+            var f = compile(t,["t"]);
+            plot_curve(gx,f);
         }else{
-            plot_psf(gx,f,m*0.5,gstep[0]*2/m,gstep[1]*2/m);
+            var f = compile(t,["u","v"]);
+            if(plot_refresh){
+                plot_psf(gx,f,1,1,1);
+                plot_refresh = false;
+            }else{
+                plot_psf(gx,f,m*0.5,gstep[0]*2/m,gstep[1]*2/m);
+            }
         }
     }else{
         var f = compile(t,["x","y"]);

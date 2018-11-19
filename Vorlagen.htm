@@ -71,8 +71,12 @@
   >Kreis</a>.
 <li><a href="plot.htm?%5bcos(t),sin(2t)/2%5d;;scale(0.5)"
   >Lemniskate von Gerono</a>.
+<li><a href="plot.htm?%5bt*cos(pi*t),t*sin(pi*t)%5d;t0:=0,t1:=4"
+  >Spirale</a>.
 <li><a href="plot.htm?%5bint(0,t,t.cos(t%5e2)),int(0,t,t.sin(t%5e2))%5d;t0:=-10,t1:=10;;scale(0.2)"
   >Klothoide</a>.
+<li><a href="plot-bivariat.htm?%5bcos(t),sin(t),t%5d;;scale(0.5)"
+  >Helix</a>.
 </ul>
 
 <br>
@@ -108,6 +112,8 @@
   >Eine bivariate Funktion</a> in Zentralprojektion.
 <li><a href="plot-bivariat.htm?sin(10/x)sin(10/y);tile(0.2)"
   >Kleinere Kachelauflösung. Nimmt etwas Rechenzeit in Anspruch</a>.
+<li><a href="plot-bivariat.htm?f(x,y),%5ba(t),b(t),f(a(t),b(t))%5d;t0:=0,t1:=4,f(x,y):=sin(x)*sin(y),a(t):=t*cos(pi*t),b(t):=t*sin(pi*t);;scale(0.5)"
+  >Eine Kurve auf eine Fläche heben</a>.
 </ul>
 
 <br>
@@ -119,15 +125,17 @@
   >Torus</a>.
 <li><a href="plot-bivariat.htm?%5ba*cos(u)sin(v),a*sin(u)sin(v),a*(cos(v)+ln(tan(v/2)))+b*u%5d;a:=4,b:=0.8,u1:=4pi,v0:=0.1,v1:=1"
   >Dini-Fläche</a>.
+<li><a href="plot-bivariat.htm?f(u,v):=%5b(R+r*cos(v))cos(u),(R+r*cos(v))sin(u),r*sin(v)%5d,vec(f(u,v)),vec(f(cos(t),sin(2t)+1));R:=4,r:=2,v1:=2pi"
+  >Kurve auf Torus</a>.
 </ul>
 
 <br>
 <h3 id="Implizite-Flaechen">Implizite Flächen</h3>
 <ul>
-<li><a href="plot-implizit.htm?x%5e2+y%5e2+z%5e2=1;;scale(0.2)">Kugel</a>
-<li><a href="plot-implizit.htm?x%5e2+y%5e2-z%5e2=1;;scale(0.2)">Hyperboloid</a>
+<li><a href="plot-implizit.htm?x%5e2+y%5e2+z%5e2=1;;scale(0.2)">Kugel</a>.
+<li><a href="plot-implizit.htm?x%5e2+y%5e2-z%5e2=1;;scale(0.2)">Hyperboloid</a>.
 <li><a href="plot-implizit.htm?(x%5e2+y%5e2+z%5e2+R%5e2-r%5e2)%5e2=4R%5e2*(x%5e2+y%5e2);%20R:=4,r:=2,w(14);;scale(0.5)"
-  >Torus</a>
+  >Torus</a>.
 </ul>
 
 <br>
