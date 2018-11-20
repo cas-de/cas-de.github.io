@@ -19,11 +19,41 @@ input{font-size: 90%;}
   body{font-size: 120%;}
 }
 
+input[type=button]{
+  background-image: linear-gradient(#ffffff,#ebebea);
+  border: 1px solid #bababa;
+  border-radius: 5px;
+  padding-bottom: 4px;
+  padding-top: 4px;
+  margin-bottom: 4px;
+  margin-top: 1px;
+  padding-left: 13px;
+  padding-right: 13px;
+  margin-left: 1px;
+  margin-right: 1px;
+}
+
+input[type=button]:active{
+  background-image: linear-gradient(#d0d0d0,#f0f0f0);
+}
+
+input[type=button]::-moz-focus-inner {
+  border: 0;
+}
+
+input[type=button]:focus{
+  outline: none;
+}
+
 #inputf{
   background-color: #fafaffea;
   border: 2px solid #00004080;
   border-radius: 8px;
   padding-left: 6px;
+}
+
+#inputf:focus{
+  outline: none;
 }
 
 canvas.main-canvas{
@@ -51,10 +81,10 @@ canvas.main-canvas{
 }
 
 .hud a{
-  color: #e0e0a0;
+  color: #fafafa;
 }
 .hud a:hover{
-  color: #ffffff;
+  color: #a0d0e0;
 }
 
 table.bt {

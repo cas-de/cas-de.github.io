@@ -321,7 +321,7 @@ function flush_tile_buffer(gx,alpha,lw){
     var t,p0,p1,p2,p3;
 
     a.sort(function(x,y){
-        return x[1]<y[1];
+        return y[1]-x[1];
     });
 
     var colorfn = new_light_source(gx.phi,[1,0,0.8]);
@@ -380,9 +380,17 @@ function system_xyz(gx,proj,wx){
     context.fillStyle = "#000000a0";
     context.lineWidth = 4;
     wx = 10/ax;
-    draw_line(context,proj,-wx,-wx,0,wx,-wx,0);
-    draw_line(context,proj,-wx,-wx,0,-wx,wx,0);
-    draw_line(context,proj,-wx,-wx,0,-wx,-wx,wx);
+
+    // The lines are split into parts so that only the nearest
+    // parts are affected when proj returns NaN.
+    var h = 2*wx/10;
+    for(var k=0; k<10; k++){
+        draw_line(context,proj,k*h-wx,-wx,0,(k+1)*h-wx,-wx,0);
+        draw_line(context,proj,-wx,k*h-wx,0,-wx,(k+1)*h-wx,0);
+    }
+    for(var k=0; k<5; k++){
+        draw_line(context,proj,-wx,-wx,k*h,-wx,-wx,(k+1)*h);
+    }
     context.lineWidth = 2;
     labels(gx,proj,ax);
 }
