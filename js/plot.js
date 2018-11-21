@@ -726,7 +726,7 @@ function lambertwm1(x){
 }
 
 function isalpha(s){
-    return /^[a-z]+$/i.test(s);
+    return /^[a-zäöü]+$/i.test(s);
 }
 
 function isdigit(s){
@@ -797,6 +797,10 @@ var superscript = {
     '\u2079': "9"
 };
 
+var keyword_tab = {
+    "for": "for", "in": "in"
+};
+
 var Symbol = 0;
 var SymbolIdentifier = 1;
 var SymbolNumber = 2;
@@ -816,13 +820,17 @@ function scan(s){
                 id += s[i];
                 i++; col++;
             }
-            if(a.length>0){
-                var last = a[a.length-1];
-                if(last[0]==SymbolNumber || (last[0]==Symbol && last[1]==')')){
-                    a.push([Symbol,"*",line,col0]);
+            if(keyword_tab.hasOwnProperty(id)){
+                a.push([Symbol,keyword_tab[id],line,col0]);
+            }else{
+                if(a.length>0){
+                    var last = a[a.length-1];
+                    if(last[0]==SymbolNumber || (last[0]==Symbol && last[1]==')')){
+                        a.push([Symbol,"*",line,col0]);
+                    }
                 }
+                a.push([SymbolIdentifier,id,line,col0]);
             }
-            a.push([SymbolIdentifier,id,line,col0]);
         }else if(isdigit(s[i])){
             var col0 = col;
             var j = i;
@@ -1089,7 +1097,8 @@ function comparison(i){
         var t = i.a[i.index];
         if(t[0]==Symbol && (
            t[1]=="<"  || t[1]==">" || t[1]=="<=" ||
-           t[1]==">=" || t[1]=="=" || t[1]=="!="
+           t[1]==">=" || t[1]=="=" || t[1]=="!=" ||
+           t[1]=="in"
         )){
             i.index++;
             var y = range_expression(i);
@@ -1129,8 +1138,20 @@ function disjunction(i){
     }
 }
 
+function for_expression(i){
+    var x = disjunction(i);
+    var t = i.a[i.index];
+    if(t[0]==Symbol && t[1]=="for"){
+        i.index++;
+        var y = disjunction(i);
+        return ["for",x,y];
+    }else{
+        return x;
+    }
+}
+
 function expression(i){
-    return disjunction(i);
+    return for_expression(i);
 }
 
 function assignment(i){
@@ -1271,7 +1292,7 @@ function type_test(t,type){
 
 function compile_expression(a,t,context,type){
     if(typeof t == "number"){
-        a.push(t);
+        a.push(t<0?("("+t+")"):t);
     }else if(typeof t == "string"){
         if(t in context.local){
             if(type=="app" && context.local[t]=="number"){
@@ -2212,13 +2233,39 @@ function contains_variable(t,v){
     }
 }
 
+function substitute(t,v,value){
+    if(Array.isArray(t)){
+        var a = [];
+        for(var i=0; i<t.length; i++){
+            a.push(substitute(t[i],v,value));
+        }
+        return a;
+    }else if(t===v){
+        return value;
+    }else{
+        return t;
+    }
+}
+
+function node_loop(callback,gx,t,color){
+    var v = t[2][1];
+    var a = compile(t[2][2],[])();
+    var node = t[1];
+    for(var i=0; i<a.length; i++){
+        t = substitute(node,v,a[i]);
+        callback(gx,t,color);
+    }
+}
+
 var bool_result_ops = {
     "<":0, ">":0, "<=":0, ">=":0, "&":0, "|":0
 };
 
 function plot_node(gx,t,color){
     var f;
-    if(Array.isArray(t) && t[0]==="="){
+    if(Array.isArray(t) && t[0]==="for"){
+        node_loop(plot_node,gx,t,color);
+    }else if(Array.isArray(t) && t[0]==="="){
         if(Array.isArray(t[1]) && t[1][0]==="D"){
             f = from_ode(gx,t);
             plot_async(gx,f,color);

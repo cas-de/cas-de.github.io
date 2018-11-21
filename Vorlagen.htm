@@ -43,7 +43,7 @@
   >Eine Integralfunktion</a>.
 <li><a href="plot.htm?int(0,10,t.t%5e(x-1)*e%5e(-t))"
   >Die Gammafunktion als Parameterintegral</a>.
-<li><a href="plot.htm?(a:=rand(-4:4),x%5ea)"
+<li><a href="plot.htm?x%5en%20for%20n%20in%20-4:4"
   >Eine Schar von Funktionen</a>.
 <li><a href="plot.htm?if(x%3c1,0,x-1)"
   >Eine Fallunterscheidung</a>.
@@ -60,23 +60,29 @@
   >Eine implizite Funktion</a>.
 <li><a href="plot.htm?x%5e2-y%5e2=1,y=x,y=-x"
   >Eine implizite Funktion mit Asymptoten</a>.
+<li><a href="plot.htm?abs(x)%5en+abs(y)%5en=1%20for%20n%20in%20%5b1/2,1,2,4%5d"
+  >Eine Schar von impliziten Funktionen</a>.
 <li><a href="plot.htm?x%5e2+(y/x)%5e2=1;;scale(0.5)"
-  >Lemniskate von Gerono</a>.
+  >Die Lemniskate von Gerono</a>.
 </ul>
 
 <br>
 <h3 id="Parameterkurven">Parameterkurven</h3>
 <ul>
 <li><a href="plot.htm?%5bcos(t),sin(t)%5d"
-  >Kreis</a>.
+  >Der Kreis</a>.
 <li><a href="plot.htm?%5bcos(t),sin(2t)/2%5d;;scale(0.5)"
-  >Lemniskate von Gerono</a>.
+  >Die Lemniskate von Gerono</a>.
 <li><a href="plot.htm?%5bt*cos(pi*t),t*sin(pi*t)%5d;t0:=0,t1:=4"
-  >Spirale</a>.
+  >Eine Spirale</a>.
 <li><a href="plot.htm?%5bint(0,t,t.cos(t%5e2)),int(0,t,t.sin(t%5e2))%5d;t0:=-10,t1:=10;;scale(0.2)"
-  >Klothoide</a>.
+  >Eine Klothoide</a>.
 <li><a href="plot-bivariat.htm?%5bcos(t),sin(t),t%5d;;scale(0.5)"
-  >Helix</a>.
+  >Eine Helix</a>.
+<li><a href="plot.htm?%5bcos(t)+cos(2pi/m*n),sin(t)+sin(2pi/m*n)%5d%20for%20n%20in%200:m-1;%20m:=6"
+  >Eine Schar von Parameterkurven</a>.
+<li><a href="plot.htm?%5b(1-a)*(cos(t)-8)+a*(cos(t)+8),(1-a)*sin(t)+a*sin(2t)/2%5d%20for%20a%20in%200:1:0.2"
+  >Metamorphose</a>.
 </ul>
 
 <br>
@@ -114,6 +120,10 @@
   >Kleinere Kachelauflösung. Nimmt etwas Rechenzeit in Anspruch</a>.
 <li><a href="plot-bivariat.htm?f(x,y),%5ba(t),b(t),f(a(t),b(t))%5d;t0:=0,t1:=4,f(x,y):=sin(x)*sin(y),a(t):=t*cos(pi*t),b(t):=t*sin(pi*t);;scale(0.5)"
   >Eine Kurve auf eine Fläche heben</a>.
+<li><a href="plot-bivariat.htm?f(x,y),f(x,y)=1;f(x,y):=x*sin(y)+y*cos(x);;scale(0.5)"
+  >Eine bivariate Funktion mit einer Höhenlinie</a>.
+<li><a href="plot-bivariat.htm?f(x,y),f(x,y)=c%20for%20c%20in%20-4:8;f(x,y):=x*sin(y)+y*cos(x);;scale(0.5)"
+  >Eine bivariate Funktion mit mehreren Höhenlinien</a>.
 </ul>
 
 <br>

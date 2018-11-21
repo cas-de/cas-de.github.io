@@ -173,14 +173,17 @@ function plot_implicit_sf(gx,f,d,xstep,ystep){
 }
 
 function plot_node(gx,t,index){
+    if(Array.isArray(t) && t[0]==="extern"){
+        plot_node_bivariate(gx,t[1],index);
+        return;
+    }
     if(Array.isArray(t) && t[0]==="="){
         t = ["-",t[1],t[2]];
     }
     var f = compile(t,["x","y","z"]);
     var m = gtile;
-    if(plot_refresh){
+    if(move_mode){
         plot_implicit_sf(gx,f,2,1,1);
-        plot_refresh = false;
     }else{
         plot_implicit_sf(gx,f,m*0.5,gstep[0]*4/m,gstep[1]*4/m);
     }
