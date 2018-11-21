@@ -23,7 +23,51 @@ function zeroes_bisection_fast(f,a,b,n){
     return zeroes;
 }
 
-function plot_implicit_sf(gx,f,d,xstep,ystep){
+function buffer_zip(a00,a01,a11,a10,epsilon){
+    var len = a00.length;
+    var a = [];
+    var t0,t1,t2,t3;
+    var j,j0,j1,jmin,d,dmin;
+    var n = 2;
+    for(var i=0; i<len; i++){
+        t0 = a00[i];
+        j0 = Math.max(0,i-n);
+
+        j1 = Math.min(i+n,a01.length-1);
+        jmin = j0;
+        dmin = Math.abs(t0-a01[jmin]);
+        for(j=j0+1; j<=j1; j++){
+            d = Math.abs(t0-a01[j]);
+            if(d<dmin){jmin = j; dmin = d;}
+        }
+        if(!(dmin<epsilon)) continue;
+        t1 = a01[jmin];
+
+        j1 = Math.min(i+n,a11.length-1);
+        jmin = j0;
+        dmin = Math.abs(t0-a11[jmin]);
+        for(j=j0+1; j<=j1; j++){
+            d = Math.abs(t0-a11[j]);
+            if(d<dmin){jmin = j; dmin = d;}
+        }
+        if(!(dmin<epsilon)) continue;
+        t2 = a11[jmin];
+
+        j1 = Math.min(i+n,a10.length-1);
+        jmin = j0;
+        dmin = Math.abs(t1-a10[jmin]);
+        for(j=j0+1; j<=j1; j++){
+            d = Math.abs(t1-a10[j]);
+            if(d<dmin){jmin = j; dmin = d;}
+        }
+        if(!(dmin<epsilon)) continue;
+        t3 = a10[jmin];
+        a.push([t0,t1,t2,t3]);
+    }
+    return a;
+}
+
+function plot_implicit_sf(gx,f,d,xstep,ystep,epsilon){
     var x,y,z,w00,v;
     var kx,ky,kz;
     var context = gx.context;
@@ -40,10 +84,9 @@ function plot_implicit_sf(gx,f,d,xstep,ystep){
     var z0 = x0;
     var z1 = x1;
     var n = 20;
-    var epsilon = 2*d/ax;
 
     var zip_buffer = [];
-    var shift,shift1,shift2,shift3;
+    var t;
 
     kx = 0;
     for(x = x0; x<x1; x+=dx){
@@ -57,20 +100,14 @@ function plot_implicit_sf(gx,f,d,xstep,ystep){
             var a01 = zeroes_bisection_fast(g01,z0,z1,n);
             var a11 = zeroes_bisection_fast(g11,z0,z1,n);
             var a10 = zeroes_bisection_fast(g10,z0,z1,n);
-            var len = Math.min(a00.length,a01.length,a11.length,a10.length);
-            shift1=0; shift2=0; shift3=0;
-            for(var k=0; k<len; k++){
-                w00 = a00[k];
-                shift=false;
-                if(Math.abs(w00-a01[k-shift1])>epsilon){shift1++; shift=true;}
-                if(Math.abs(w00-a11[k-shift2])>epsilon){shift2++; shift=true;}
-                if(Math.abs(w00-a10[k-shift3])>epsilon){shift3++; shift=true;}
-                if(shift){continue;}
+            var a = buffer_zip(a00,a01,a11,a10,epsilon);
+            for(var i=0; i<a.length; i++){
+                t = a[i];
                 zip_buffer.push([
-                    [x,y,a00[k]],
-                    [x,y+dy,a01[k-shift1]],
-                    [x+dx,y+dy,a11[k-shift2]],
-                    [x+dx,y,a10[k-shift3]],
+                    [x,y,t[0]],
+                    [x,y+dy,t[1]],
+                    [x+dx,y+dy,t[2]],
+                    [x+dx,y,t[3]],
                     kx, ky
                 ]);
             }
@@ -91,20 +128,14 @@ function plot_implicit_sf(gx,f,d,xstep,ystep){
             var a01 = zeroes_bisection_fast(g01,y0,y1,n);
             var a11 = zeroes_bisection_fast(g11,y0,y1,n);
             var a10 = zeroes_bisection_fast(g10,y0,y1,n);
-            var len = Math.min(a00.length,a01.length,a11.length,a10.length);
-            shift1=0; shift2=0; shift3=0;
-            for(var k=0; k<len; k++){
-                w00 = a00[k];
-                shift=false;
-                if(Math.abs(w00-a01[k-shift1])>epsilon){shift1++; shift=true;}
-                if(Math.abs(w00-a11[k-shift2])>epsilon){shift2++; shift=true;}
-                if(Math.abs(w00-a10[k-shift3])>epsilon){shift3++; shift=true;}
-                if(shift){continue;}
+            var a = buffer_zip(a00,a01,a11,a10,epsilon);
+            for(var i=0; i<a.length; i++){
+                t = a[i];
                 zip_buffer.push([
-                    [x,a00[k],z],
-                    [x,a01[k-shift1],z+dz],
-                    [x+dx,a11[k-shift2],z+dz],
-                    [x+dx,a10[k-shift3],z],
+                    [x,t[0],z],
+                    [x,t[1],z+dz],
+                    [x+dx,t[2],z+dz],
+                    [x+dx,t[3],z],
                     kx, kz
                 ]);
             }
@@ -125,20 +156,14 @@ function plot_implicit_sf(gx,f,d,xstep,ystep){
             var a01 = zeroes_bisection_fast(g01,x0,x1,n);
             var a11 = zeroes_bisection_fast(g11,x0,x1,n);
             var a10 = zeroes_bisection_fast(g10,x0,x1,n);
-            var len = Math.min(a00.length,a01.length,a11.length,a10.length);
-            shift1=0; shift2=0; shift3=0;
-            for(var k=0; k<len; k++){
-                w00 = a00[k];
-                shift=false;
-                if(Math.abs(w00-a01[k-shift1])>epsilon){shift1++; shift=true;}
-                if(Math.abs(w00-a11[k-shift2])>epsilon){shift2++; shift=true;}
-                if(Math.abs(w00-a10[k-shift3])>epsilon){shift3++; shift=true;}
-                if(shift){continue;}
+            var a = buffer_zip(a00,a01,a11,a10,epsilon);
+            for(var i=0; i<a.length; i++){
+                t = a[i];
                 zip_buffer.push([
-                    [a00[k],y,z],
-                    [a01[k-shift1],y,z+dz],
-                    [a11[k-shift2],y+dy,z+dz],
-                    [a10[k-shift3],y+dy,z],
+                    [t[0],y,z],
+                    [t[1],y,z+dz],
+                    [t[2],y+dy,z+dz],
+                    [t[3],y+dy,z],
                     ky, kz
                 ]);
             }
@@ -151,7 +176,6 @@ function plot_implicit_sf(gx,f,d,xstep,ystep){
     var tile_buffer = gx.tile_buffer;
     var p00,p01,p11,p10;
     var p0,p1,p2,p3;
-    var t;
     for(var i=0; i<zip_buffer.length; i++){
         t = zip_buffer[i];
         p00=t[0]; p01=t[1]; p11=t[2]; p10=t[3];
@@ -183,8 +207,8 @@ function plot_node(gx,t,index){
     var f = compile(t,["x","y","z"]);
     var m = gtile;
     if(move_mode){
-        plot_implicit_sf(gx,f,2,1,1);
+        plot_implicit_sf(gx,f,2,1,1,4/ax);
     }else{
-        plot_implicit_sf(gx,f,m*0.5,gstep[0]*4/m,gstep[1]*4/m);
+        plot_implicit_sf(gx,f,m*0.5,gstep[0]*4/m,gstep[1]*4/m,1.2/ax);
     }
 }
