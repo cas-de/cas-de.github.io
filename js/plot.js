@@ -2561,21 +2561,30 @@ function upper_str(x){
     return x.toString().toUpperCase();
 }
 
-function link(position){
+function link(position,regard_zscale){
+    if(regard_zscale==undefined) regard_zscale = false;
     var s = document.getElementById("inputf").value;
     var out = document.getElementById("calc-out");
     var url = window.location.href.split("?")[0];
-    var scale = (xscale.index==yscale.index?
-        (xscale.index==index0?"":";;scale("+upper_str(1/ax)+")"):
-        ";;scale("+upper_str(1/ax)+","+upper_str(1/ay)+")"
-    );
+    var scale;
+    if(regard_zscale){
+        scale = (xscale.index==yscale.index && xscale.index==zscale.index?
+            (xscale.index==index0?"":";;scale("+upper_str(1/ax)+")"):
+            ";;scale("+upper_str(1/ax)+","+upper_str(1/ay)+","+upper_str(1/az)+")"            
+        );
+    }else{
+        scale = (xscale.index==yscale.index?
+            (xscale.index==index0?"":";;scale("+upper_str(1/ax)+")"):
+            ";;scale("+upper_str(1/ax)+","+upper_str(1/ay)+")"
+        );
+    }
     var pos = "";
     var t = graphics.pos;
     if(position && (t[0]!=0 || t[1]!=0)){
         var n = Math.max(0,1+Math.round(Math.log(ax)));
-        t[0] = t[0].toFixed(n);
-        t[1] = t[1].toFixed(n);
-        pos = (scale==""?";;":",")+"P("+t[0]+","+t[1]+")";
+        var t0 = t[0].toFixed(n);
+        var t1 = t[1].toFixed(n);
+        pos = (scale==""?";;":",")+"P("+t0+","+t1+")";
     }
     out.innerHTML = "<p style='font-size: 80%'>"+url+"?"+encode_query(s+scale+pos);
 }
