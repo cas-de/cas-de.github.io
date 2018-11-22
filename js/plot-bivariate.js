@@ -16,6 +16,34 @@ var TILE = 0;
 var LINE = 1;
 var LINE_SHADOW = 2;
 
+function xyzscale_inc(){
+    ax = scale_inc(xscale,ax);
+    ay = scale_inc(yscale,ay);
+    az = scale_inc(zscale,az);
+    set_pos(graphics,graphics.pos);
+    update(graphics);
+}
+
+function xyzscale_dec(){
+    ax = scale_dec(xscale,ax);
+    ay = scale_dec(yscale,ay);
+    az = scale_dec(zscale,az);
+    set_pos(graphics,graphics.pos);
+    update(graphics);
+}
+
+function zscale_inc(){
+    az = scale_inc(zscale,az);
+    set_pos(graphics,graphics.pos);
+    update(graphics);
+}
+
+function zscale_dec(){
+    az = scale_dec(zscale,az);
+    set_pos(graphics,graphics.pos);
+    update(graphics);
+}
+
 function set_w(wx,wy){
     if(wy==undefined) wy=wx;
     grx = Array.isArray(wx)?wx:[-wx,wx];
@@ -258,12 +286,12 @@ function labels(gx,proj){
         line(x,-10,0,x,-10.4,0);
     }
     for(var y=-8; y<=8; y+=2){
-        s = ftos_strip(y/ax,ax);
+        s = ftos_strip(y/ay,ay);
         puts(s,-11,y,-0.5);
         line(-10,y,0,-10.4,y,0);
     }
     for(var z=2; z<10; z+=2){
-        s = ftos_strip(z/ax,ax);
+        s = ftos_strip(z/az,az);
         puts(s,-10.5,-10.5,z);
         line(-10,-10,z,-10.2,-10.2,z);
     }
@@ -403,21 +431,22 @@ function plot_sf(gx,f,d,xstep,ystep){
     var s = Math.sin(gx.phi);
 
     var dx = d/ax;
-    var dy = d/ax;
+    var dy = d/ay;
     var x0 = grx[0]/ax;
     var x1 = grx[1]/ax;
-    var y0 = gry[0]/ax;
-    var y1 = gry[1]/ax;
+    var y0 = gry[0]/ay;
+    var y1 = gry[1]/ay;
+    var mz = az/ax;
 
     var a = gx.tile_buffer;
     var kx = 0;
     for(x = x0; x<x1; x+=dx){
         var ky = 1;
         for(y = y0; y<y1; y+=dy){
-            z00 = f(x,y);
-            z01 = f(x,y+dy);
-            z11 = f(x+dx,y+dy);
-            z10 = f(x+dx,y);
+            z00 = mz*f(x,y);
+            z01 = mz*f(x,y+dy);
+            z11 = mz*f(x+dx,y+dy);
+            z10 = mz*f(x+dx,y);
             p0 = proj(x,y,z00);
             p1 = proj(x,y+dy,z01);
             p2 = proj(x+dx,y+dy,z11);
@@ -446,7 +475,8 @@ function plot_psf(gx,f,d,ustep,vstep){
     var du = 0.25*d;
     var dv = 0.25*d;
     var wx = 10/ax;
-    var wy = wx;
+    var wy = 10/ay;
+    var mz = az/ax;
     var u0 = ftab["u0"];
     var u1 = ftab["u1"];
     var v0 = ftab["v0"];
@@ -461,6 +491,7 @@ function plot_psf(gx,f,d,ustep,vstep){
             p01 = f(u,v+dv);
             p11 = f(u+du,v+dv);
             p10 = f(u+du,v);
+            p00[2]*=mz; p01[2]*=mz; p11[2]*=mz; p10[2]*=mz;
             p0 = proj(p00[0],p00[1],p00[2]);
             p1 = proj(p01[0],p01[1],p01[2]);
             p2 = proj(p11[0],p11[1],p11[2]);
@@ -483,10 +514,11 @@ function plot_curve(gx,f){
     var a = gx.tile_buffer;
     var t0 = ftab["t0"];
     var t1 = ftab["t1"];
+    var mz = az/ax;
     var p1 = undefined;
     for(var t=t0; t<t1; t+=0.01){
         var v = f(t);
-        var p0 = proj(v[0],v[1],v[2]);
+        var p0 = proj(v[0],v[1],mz*v[2]);
         if(p1!=undefined){
             a.push([LINE,-1000,p0,p1]);
         }
@@ -552,12 +584,14 @@ async function plot_level_set(gx,f,z0,n,d,N,cond){
 
     var p0,p1,t,x,y,z;
     var dx = d/ax;
-    var dy = d/ax;
+    var dy = d/ay;
     var dt = 1/(n*ax);
     var xa = grx[0]/ax;
     var xb = grx[1]/ax;
-    var ya = gry[0]/ax;
-    var yb = gry[1]/ax;
+    var ya = gry[0]/ay;
+    var yb = gry[1]/ay;
+    var mz = az/ax;
+    var mz0 = mz*z0;
 
     var c = Math.cos(gx.phi);
     var s = Math.sin(gx.phi);
@@ -576,8 +610,8 @@ async function plot_level_set(gx,f,z0,n,d,N,cond){
 
         for(var i=0; i<a.length; i++){
             t = a[i];
-            p0 = proj(t[0],y,z0);
-            p1 = proj(t[1],y+dy,z0);
+            p0 = proj(t[0],y,mz0);
+            p1 = proj(t[1],y+dy,mz0);
             tile_buffer.push([LINE,s*y-c*t[0]-0.6,p0,p1]);
         }
         if(cond && k%100==0){
@@ -596,8 +630,8 @@ async function plot_level_set(gx,f,z0,n,d,N,cond){
         var a = buffer_zip(buffer1,buffer2);
         for(var i=0; i<a.length; i++){
             t = a[i];
-            p0 = proj(x,t[0],z0);
-            p1 = proj(x+dx,t[1],z0);
+            p0 = proj(x,t[0],mz0);
+            p1 = proj(x+dx,t[1],mz0);
             tile_buffer.push([LINE,s*t[0]-c*x-0.6,p0,p1]);
         }
         if(cond && k%100==0){

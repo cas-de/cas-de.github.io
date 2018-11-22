@@ -4,9 +4,11 @@
 var graphics;
 var ax=1;
 var ay=1;
+var az=1;
 var index0 = 10000;
 var xscale = {index: index0};
 var yscale = {index: index0};
+var zscale = {index: index0};
 var hud_display = false;
 var GAMMA = 0.57721566490153286;
 var dark = false;
@@ -798,7 +800,8 @@ var superscript = {
 };
 
 var keyword_tab = {
-    "for": "for", "in": "in"
+    "for": "for", "in": "in",
+    "für": "for"
 };
 
 var Symbol = 0;
@@ -2423,80 +2426,66 @@ function set_position(x,y){
     return [x,y];
 }
 
-function set_scale(dx,dy){
+function set_scale(dx,dy,dz){
     if(dy==undefined) dy=dx;
-    var t = graphics.pos;
+    if(dz==undefined) dz=dx;
     ax = 1/dx;
     ay = 1/dy;
-    set_pos(graphics,t);
+    az = 1/dz;
+    set_pos(graphics,graphics.pos);
     xscale.index = index0+Math.round(3*lg(ax));
     yscale.index = index0+Math.round(3*lg(ay));
+    zscale.index = index0+Math.round(3*lg(az));
     return [dx,dy];
 }
 
-function scale_inc(scale){
-    var m;
-    if(scale.index%3==2){
-        m = 5/2;
-    }else{
-        m = 2;
-    }
+function scale_inc(scale,a){
+    var m = scale.index%3==2?5/2:2;
     scale.index++;
-    var t = graphics.pos;
-    if(scale===xscale){
-        ax = Math.round(1E10*ax*m)/1E10;
-    }else{
-        ay = Math.round(1E10*ay*m)/1E10;
-    }
-    set_pos(graphics,t);
+    return Math.round(1E10*a*m)/1E10;
 }
 
-function scale_dec(scale){
-    var m;
-    if(scale.index%3==0){
-        m = 5/2;
-    }else{
-        m = 2;
-    }
+function scale_dec(scale,a){
+    var m = scale.index%3==0?5/2:2;
     scale.index--;
-    var t = graphics.pos;
-    if(scale===xscale){
-        ax = Math.round(1E10*ax/m)/1E10;
-    }else{
-        ay = Math.round(1E10*ay/m)/1E10;
-    }
-    set_pos(graphics,t);
+    return Math.round(1E10*a/m)/1E10;
 }
 
 function xyscale_inc(){
-    scale_inc(xscale);
-    scale_inc(yscale);
+    ax = scale_inc(xscale,ax);
+    ay = scale_inc(yscale,ay);
+    set_pos(graphics,graphics.pos);
     update(graphics);
 }
 
 function xyscale_dec(){
-    scale_dec(xscale);
-    scale_dec(yscale);
+    ax = scale_dec(xscale,ax);
+    ay = scale_dec(yscale,ay);
+    set_pos(graphics,graphics.pos);
     update(graphics);
 }
 
 function xscale_inc(){
-    scale_inc(xscale);
+    ax = scale_inc(xscale,ax);
+    set_pos(graphics,graphics.pos);
     update(graphics);
 }
 
 function yscale_inc(){
-    scale_inc(yscale);
+    ay = scale_inc(yscale,ay);
+    set_pos(graphics,graphics.pos);
     update(graphics);
 }
 
 function xscale_dec(){
-    scale_dec(xscale);
+    ax = scale_dec(xscale,ax);
+    set_pos(graphics,graphics.pos);
     update(graphics);
 }
 
 function yscale_dec(){
-    scale_dec(yscale);
+    ay = scale_dec(yscale,ay);
+    set_pos(graphics,graphics.pos);
     update(graphics);
 }
 
@@ -2541,27 +2530,11 @@ function keys_calc(event){
     if(event.keyCode==13) calc();
 }
 
-function decode_percent(s){
-    var a = [];
-    var n = s.length;
-    var i = 0;
-    while(i<n){
-        if(i+2<n && s[i]=='%'){
-            a.push(decodeURIComponent(s.slice(i,i+3)));
-            i+=3;
-        }else{
-            a.push(s[i]);
-            i++;
-        }
-    }
-    return a.join("");
-}
-
 function query(href){
     var a = href.split("?");
     if(a.length>1){
         var input = document.getElementById("inputf");
-        input.value = decode_percent(a[1]);
+        input.value = decodeURIComponent(a[1]);
     }
 }
 
@@ -2573,7 +2546,9 @@ var encode_tab = {
 function encode_query(s){
     var a = [];
     for(var i=0; i<s.length; i++){
-        if(encode_tab.hasOwnProperty(s[i])){
+        if(s.charCodeAt(i)>127){
+            a.push(encodeURIComponent(s[i]));
+        }else if(encode_tab.hasOwnProperty(s[i])){
             a.push("%"+encode_tab[s[i]]);
         }else{
             a.push(s[i]);

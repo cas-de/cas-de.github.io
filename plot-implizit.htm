@@ -18,8 +18,8 @@
 <tr><td>
 <input type="button" value="plot" onclick="main()">
 <input type="button" value="&equiv;" onclick="switch_hud()">
-<input type="button" value="+" onclick="xyscale_inc()"> 
-<input type="button" value="&minus;" onclick="xyscale_dec()">
+<input type="button" value="+" onclick="xyzscale_inc()"> 
+<input type="button" value="&minus;" onclick="xyzscale_dec()">
 <br>
 <input type="text" id="inputf"
 onkeyup="keys(event);" value="x^2+y^2+z^2=25">
@@ -28,6 +28,8 @@ onkeyup="keys(event);" value="x^2+y^2+z^2=25">
 <div id="out" class="mono">
 </div>
 <div class="hud" id="hud">
+<input type="button" value="z+" onclick="zscale_inc()"> 
+<input type="button" value="z&minus;" onclick="zscale_dec()">
 <input type="button" value="Teilen" onclick="link()">
 <input type="button" value="Bild" onclick="calc_img()">
 <a href="doc.htm">Hilfe</a>

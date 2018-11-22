@@ -75,14 +75,15 @@ function plot_implicit_sf(gx,f,d,xstep,ystep,epsilon){
     var s = Math.sin(gx.phi);
 
     var dx = d/ax;
-    var dy = d/ax;
-    var dz = d/ax;
+    var dy = d/ay;
+    var dz = d/az;
+    var mz = az/ax;
     var x0 = grx[0]/ax;
     var x1 = grx[1]/ax;
-    var y0 = gry[0]/ax;
-    var y1 = gry[1]/ax;
-    var z0 = x0;
-    var z1 = x1;
+    var y0 = gry[0]/ay;
+    var y1 = gry[1]/ay;
+    var z0 = x0/mz;
+    var z1 = x1/mz;
     var n = 20;
 
     var zip_buffer = [];
@@ -100,14 +101,14 @@ function plot_implicit_sf(gx,f,d,xstep,ystep,epsilon){
             var a01 = zeroes_bisection_fast(g01,z0,z1,n);
             var a11 = zeroes_bisection_fast(g11,z0,z1,n);
             var a10 = zeroes_bisection_fast(g10,z0,z1,n);
-            var a = buffer_zip(a00,a01,a11,a10,epsilon);
+            var a = buffer_zip(a00,a01,a11,a10,epsilon/mz);
             for(var i=0; i<a.length; i++){
                 t = a[i];
                 zip_buffer.push([
-                    [x,y,t[0]],
-                    [x,y+dy,t[1]],
-                    [x+dx,y+dy,t[2]],
-                    [x+dx,y,t[3]],
+                    [x,y,mz*t[0]],
+                    [x,y+dy,mz*t[1]],
+                    [x+dx,y+dy,mz*t[2]],
+                    [x+dx,y,mz*t[3]],
                     kx, ky
                 ]);
             }
@@ -132,10 +133,10 @@ function plot_implicit_sf(gx,f,d,xstep,ystep,epsilon){
             for(var i=0; i<a.length; i++){
                 t = a[i];
                 zip_buffer.push([
-                    [x,t[0],z],
-                    [x,t[1],z+dz],
-                    [x+dx,t[2],z+dz],
-                    [x+dx,t[3],z],
+                    [x,t[0],mz*z],
+                    [x,t[1],mz*(z+dz)],
+                    [x+dx,t[2],mz*(z+dz)],
+                    [x+dx,t[3],mz*z],
                     kx, kz
                 ]);
             }
@@ -160,10 +161,10 @@ function plot_implicit_sf(gx,f,d,xstep,ystep,epsilon){
             for(var i=0; i<a.length; i++){
                 t = a[i];
                 zip_buffer.push([
-                    [t[0],y,z],
-                    [t[1],y,z+dz],
-                    [t[2],y+dy,z+dz],
-                    [t[3],y+dy,z],
+                    [t[0],y,mz*z],
+                    [t[1],y,mz*(z+dz)],
+                    [t[2],y+dy,mz*(z+dz)],
+                    [t[3],y+dy,mz*z],
                     ky, kz
                 ]);
             }
