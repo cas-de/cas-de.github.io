@@ -666,7 +666,7 @@ function plot_node_bivariate(gx,t,index){
         if(move_mode){
             plot_level_set(gx,f,z0,1,0.4,12,0.4,false);
         }else{
-            plot_level_set(gx,f,z0,10,0.1,12,0.1,false);
+            plot_level_set(gx,f,z0,10,0.1,12,0.2,false);
         }
     }else{
         var f = compile(t,["x","y"]);
