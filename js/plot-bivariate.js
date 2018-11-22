@@ -553,7 +553,7 @@ function zeroes_fast(f,ta,tb,dt,N){
     return buffer;
 }
 
-function buffer_zip(a,b){
+function buffer_zip(a,b,epsilon){
     var len = a.length;
     var buffer = [];
     for(var i=0; i<len; i++){
@@ -569,14 +569,14 @@ function buffer_zip(a,b){
                 dmin = d;
             }
         }
-        if(dmin<0.6){
+        if(dmin<epsilon){
             buffer.push([ai,b[jmin]]);
         }
     }
     return buffer;
 }
 
-async function plot_level_set(gx,f,z0,n,d,N,cond){
+async function plot_level_set(gx,f,z0,n,d,N,epsilon,cond){
     var pid = {};
     var index = pid_stack.length;
     pid_stack.push(pid);
@@ -597,17 +597,17 @@ async function plot_level_set(gx,f,z0,n,d,N,cond){
     var s = Math.sin(gx.phi);
 
     var k=0;
+    var g,a0,a1,a;
     var tile_buffer = gx.tile_buffer;
     var proj = gx.proj;
-    for(y=ya; y<yb; y+=dy){
-        var g = function(x){return f(x,y)-z0;};
-        var buffer1 = zeroes_fast(g,xa,xb,dt,N);
-        
-        var g = function(x){return f(x,y+dy)-z0;};
-        var buffer2 = zeroes_fast(g,xa,xb,dt,N);
-        
-        var a = buffer_zip(buffer1,buffer2);
 
+    g = function(x){return f(x,ya)-z0;};
+    a0 = zeroes_fast(g,xa,xb,dt,N);
+    for(y=ya; y<yb; y+=dy){
+        g = function(x){return f(x,y+dy)-z0;};
+        a1 = zeroes_fast(g,xa,xb,dt,N);
+        a = buffer_zip(a0,a1,epsilon);
+        a0 = a1;
         for(var i=0; i<a.length; i++){
             t = a[i];
             p0 = proj(t[0],y,mz0);
@@ -620,14 +620,14 @@ async function plot_level_set(gx,f,z0,n,d,N,cond){
         if(cancel(pid,index,pid_stack)) return;
         k++;
     }
+
+    g = function(y){return f(xa,y)-z0;};
+    a0 = zeroes_fast(g,ya,yb,dt,N);
     for(x=xa; x<xb; x+=dx){
-        var g = function(y){return f(x,y)-z0;};
-        var buffer1 = zeroes_fast(g,ya,yb,dt,N);
-        
-        var g = function(y){return f(x+dx,y)-z0;};
-        var buffer2 = zeroes_fast(g,ya,yb,dt,N);
-        
-        var a = buffer_zip(buffer1,buffer2);
+        g = function(y){return f(x+dx,y)-z0;};
+        a1 = zeroes_fast(g,ya,yb,dt,N);
+        a = buffer_zip(a0,a1,epsilon);
+        a0 = a1;
         for(var i=0; i<a.length; i++){
             t = a[i];
             p0 = proj(x,t[0],mz0);
@@ -664,9 +664,9 @@ function plot_node_bivariate(gx,t,index){
         var f = compile(t[1],["x","y"]);
         var z0 = compile(t[2],[])();
         if(move_mode){
-            plot_level_set(gx,f,z0,1,0.4,12,false);
+            plot_level_set(gx,f,z0,1,0.4,12,0.4,false);
         }else{
-            plot_level_set(gx,f,z0,10,0.1,12,false);
+            plot_level_set(gx,f,z0,10,0.1,12,0.1,false);
         }
     }else{
         var f = compile(t,["x","y"]);
