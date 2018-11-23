@@ -215,6 +215,7 @@ function plot_node(gx,t,index){
     if(Array.isArray(t) && t[0]==="="){
         t = ["-",t[1],t[2]];
     }
+    infer_type(t);
     var f = compile(t,["x","y","z"]);
     var m = gtile;
     if(move_mode){

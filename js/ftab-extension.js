@@ -327,12 +327,61 @@ function table(f,a){
     return b.join("");
 }
 
+function det(A){
+    var n = A.length;
+    if(n==2){
+        return A[0][0]*A[1][1]-A[0][1]*A[1][0];
+    }else if(n==3){
+        return (
+            A[0][0]*(A[1][1]*A[2][2]-A[1][2]*A[2][1]) -
+            A[1][0]*(A[0][1]*A[2][2]-A[0][2]*A[2][1]) +
+            A[2][0]*(A[0][1]*A[1][2]-A[0][2]*A[1][1])
+        );
+    }else{
+        return NaN;
+    }
+}
+
+function unit_vector(v){
+    var r = abs_vec(v);
+    return mul_scalar_vector(1/r,v);
+}
+
+function nablah(h){
+    return function nabla(f,x){
+        if(x.length==2){
+            return [
+                (f(x[0]+h,x[1])-f(x[0]-h,x[1]))/(2*h),
+                (f(x[0],x[1]+h)-f(x[0],x[1]-h))/(2*h),
+            ];
+        }else{
+            return [
+                (f(x[0]+h,x[1],x[2])-f(x[0]-h,x[1],x[2]))/(2*h),
+                (f(x[0],x[1]+h,x[2])-f(x[0],x[1]-h,x[2]))/(2*h),
+                (f(x[0],x[1],x[2]+h)-f(x[0],x[1],x[2]-h))/(2*h)
+            ];
+        }
+    }
+}
+
+function rotation_matrix(phi){
+    return [
+        [Math.cos(phi),-Math.sin(phi)],
+        [Math.sin(phi), Math.cos(phi)]
+    ];
+}
+
+function apply(f,v){
+    return f.apply(null,v);
+}
+
 var ftab_extension = {
   PT: ChebyshevT, PU: ChebyshevU, PH: Hermite, 
   PP: Legendre, PL: Laguerre, bc: bc,
   psi: psi, digamma: digamma,
   zeta: zeta, table: table, ipp: ipp,
-  Si: Si, Ci: Ci
+  Si: Si, Ci: Ci, det: det, unit: unit_vector,
+  nabla: nablah(0.001), apply: apply, rot: rotation_matrix
 };
 
 

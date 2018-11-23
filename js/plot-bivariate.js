@@ -167,23 +167,6 @@ function draw_line(context,proj,x0,y0,z0,x1,y1,z1){
     context.stroke();
 }
 
-function mul_matrix_matrix(A,B){
-    var m = A.length;
-    var n = B[0].length;
-    var p = A[0].length;
-    var C = [];
-    for(var i=0; i<m; i++){
-        var v = [];
-        for(var j=0; j<n; j++){
-            var y = 0;
-            for(var k=0; k<p; k++){y += A[i][k]*B[k][j];}
-            v.push(y);
-        }
-        C.push(v);
-    }
-    return C;
-}
-
 function matrix_mul(){
     var Y = arguments[0];
     for(var i=1; i<arguments.length; i++){
@@ -647,19 +630,6 @@ function plot_node_bivariate(gx,t,index){
     var m = gtile;
     if(Array.isArray(t) && t[0]==="for"){
         node_loop(plot_node_bivariate,gx,t,index);
-    }else if(Array.isArray(t) && (t[0]==="[]" || t[0]==="vec")){
-        if(t[0]==="vec") t = t[1];
-        if(contains_variable(t,"t")){
-            var f = compile(t,["t"]);
-            plot_curve(gx,f);
-        }else{
-            var f = compile(t,["u","v"]);
-            if(move_mode){
-                plot_psf(gx,f,1,1,1);
-            }else{
-                plot_psf(gx,f,m*0.5,gstep[0]*2/m,gstep[1]*2/m);
-            }
-        }
     }else if(Array.isArray(t) && t[0]==="="){
         var f = compile(t[1],["x","y"]);
         var z0 = compile(t[2],[])();
@@ -669,11 +639,26 @@ function plot_node_bivariate(gx,t,index){
             plot_level_set(gx,f,z0,10,0.1,12,0.2,false);
         }
     }else{
-        var f = compile(t,["x","y"]);
-        if(move_mode){
-            plot_sf(gx,f,1,1,1);
+        var T = infer_type(t);
+        if(T==TypeVector){
+            if(contains_variable(t,"t")){
+                var f = compile(t,["t"]);
+                plot_curve(gx,f);
+            }else{
+                var f = compile(t,["u","v"]);
+                if(move_mode){
+                    plot_psf(gx,f,1,1,1);
+                }else{
+                    plot_psf(gx,f,m*0.5,gstep[0]*2/m,gstep[1]*2/m);
+                }
+            }
         }else{
-            plot_sf(gx,f,m*0.25,gstep[0]*4/m,gstep[1]*4/m);
+            var f = compile(t,["x","y"]);
+            if(move_mode){
+                plot_sf(gx,f,1,1,1);
+            }else{
+                plot_sf(gx,f,m*0.25,gstep[0]*4/m,gstep[1]*4/m);
+            }
         }
     }
 }

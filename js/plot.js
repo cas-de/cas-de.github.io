@@ -78,12 +78,12 @@ var ftab = {
     P: set_position, scale: set_scale,
     zeroes: zeroes, roots: zeroes,
     map: map, filter: filter, freq: set_freq,
-    img: plot_img, vec: identity
+    img: plot_img,
+    _addtt_: add_tensor_tensor, _subtt_: sub_tensor_tensor,
+    _mulsv_: mul_scalar_vector, _mulmv_: mul_matrix_vector,
+    _mulmm_: mul_matrix_matrix, _mulvv_: scalar_product,
+    _vabs_: abs_vec
 };
-
-function identity(x){
-    return x;
-}
 
 function load_async(URL,callback){
    var head = document.getElementsByTagName("head")[0];
@@ -874,7 +874,7 @@ function scan(s){
             a.push([SymbolIdentifier,"deg",line,col]);
             i++; col++;
         }else{
-            if(s[i]=='(' && a.length>0){
+            if((s[i]=='(' || s[i]=='[') && a.length>0){
                 var last = a[a.length-1];
                 if(last[0]==SymbolNumber){
                     a.push([Symbol,"*",line,col]);
@@ -1200,6 +1200,153 @@ function parse(a,s){
 function ast(s){
     var a = scan(s);
     return parse(a,s);
+}
+
+function abs_vec(v){
+    var y = 0;
+    for(var i=0; i<v.length; i++){
+        y+=v[i]*v[i];
+    }
+    return Math.sqrt(y);
+}
+
+function scalar_product(v,w){
+    var y = 0;
+    for(var i=0; i<v.length; i++){
+        y+=v[i]*w[i];
+    }
+    return y;
+}
+
+function mul_scalar_vector(r,v){
+    var w = [];
+    for(var i=0; i<v.length; i++){
+        w.push(r*v[i]);
+    }
+    return w;
+}
+
+function mul_matrix_vector(A,v){
+    var m = A.length;
+    var n = v.length;
+    var w = [];
+    for(var i=0; i<m; i++){
+        var y = 0;
+        for(var j=0; j<n; j++){y+=A[i][j]*v[j];}
+        w.push(y);
+    }
+    return w;
+}
+
+function mul_matrix_matrix(A,B){
+    var m = A.length;
+    var n = B[0].length;
+    var p = A[0].length;
+    var C = [];
+    for(var i=0; i<m; i++){
+        var v = [];
+        for(var j=0; j<n; j++){
+            var y = 0;
+            for(var k=0; k<p; k++){y+=A[i][k]*B[k][j];}
+            v.push(y);
+        }
+        C.push(v);
+    }
+    return C;
+}
+
+function add_tensor_tensor(a,b){
+    var c = [];
+    for(var i=0; i<a.length; i++){
+        if(Array.isArray(a[i])){
+            c.push(add_tensor_tensor(a[i],b[i]));
+        }else{
+            c.push(a[i]+b[i]);
+        }
+    }
+    return c;
+}
+
+function sub_tensor_tensor(a,b){
+    var c = [];
+    for(var i=0; i<a.length; i++){
+        if(Array.isArray(a[i])){
+            c.push(sub_tensor_tensor(a[i],b[i]));
+        }else{
+            c.push(a[i]-b[i]);
+        }
+    }
+    return c;
+}
+
+var TypeNumber = 0;
+var TypeVector = 1;
+var TypeMatrix = 2;
+var type_op_table = {"[]":0,"+":0,"-":0,"*":0,"/":0,"abs":0};
+var fn_type_table = {
+    "unit": TypeVector,
+    "nabla": TypeVector,
+    "rot": TypeMatrix
+};
+var id_type_table = {};
+
+function infer_type(t){
+    if(Array.isArray(t)){
+        var T = t.map(infer_type);
+        if(type_op_table.hasOwnProperty(t[0])){
+            if(t[0]==="[]"){
+                if(T.length>1 && T[1]==TypeVector){
+                    return TypeMatrix;
+                }else{
+                    return TypeVector;
+                }
+            }else if(t[0]==="+"){
+                if(T[1]!=TypeNumber){
+                    t[0] = "_addtt_";
+                    return T[1];
+                }
+            }else if(t[0]==="-"){
+                if(T[1]!=TypeNumber){
+                    t[0] = "_subtt_";
+                    return T[1];
+                }
+            }else if(t[0]==="*"){
+                if(T[2]==TypeVector){
+                    if(T[1]==TypeMatrix){
+                        t[0] = "_mulmv_";
+                        return TypeVector;
+                    }else if(T[1]==TypeVector){
+                        t[0] = "_mulvv_";
+                    }else{
+                        t[0] = "_mulsv_";
+                        return TypeVector;
+                    }
+                }else if(T[2]==TypeMatrix){
+                    t[0] = "_mulmm_";
+                    return TypeMatrix;
+                }
+            }else if(t[0]==="/"){
+                if(T[1]!=TypeNumber){
+                    t[0] = "_mulsv_";
+                    var v = t[1];
+                    t[1] = ["/",1,t[2]];
+                    t[2] = v;
+                    return T[1];
+                }
+            }else if(t[0]==="abs"){
+                if(T[1]==TypeVector){
+                    t[0] = "_vabs_";
+                }
+            }
+        }else if(fn_type_table.hasOwnProperty(t[0])){
+            return fn_type_table[t[0]];
+        }
+    }else if(typeof t=="string"){
+        if(id_type_table.hasOwnProperty(t)){
+            return id_type_table[t];
+        }
+    }
+    return TypeNumber;
 }
 
 function compile_application(a,id,t,context){
@@ -2273,37 +2420,45 @@ function plot_node(gx,t,color){
             f = from_ode(gx,t);
             plot_async(gx,f,color);
         }else if(t[1]==="y" && !contains_variable(t[2],"y")){
+            infer_type(t);
             f = compile(t[2],["x"]);
             plot_async(gx,f,color);
         }else{
             t = ["-",t[1],t[2]];
+            infer_type(t);
             f = compile(t,["x","y"]);
             plot_zero_set_async(gx,f,color);
         }
-    }else if(Array.isArray(t) && t[0]==="[]"){
-        f = compile(t,["t"]);
-        vplot_async(gx,f,color);
-    }else if(Array.isArray(t) && t[0]==="vec"){
-        f = compile(t[1],["t"]);
-        vplot_async(gx,f,color);
     }else if(Array.isArray(t) && bool_result_ops.hasOwnProperty(t[0])){
+        infer_type(t);
         f = compile(t,["x","y"]);
         plot_bool(gx,f,color,1);
     }else if(contains_variable(t,"y")){
+        infer_type(t);
         f = compile(t,["x","y"]);
         plot_level_async(gx,f,color);
     }else{
-        f = compile(t,["x"]);
-        plot_async(gx,f,color);
+        var T = infer_type(t);
+        if(T==TypeVector){
+            f = compile(t,["t"]);
+            vplot_async(gx,f,color);
+        }else{
+            f = compile(t,["x"]);
+            plot_async(gx,f,color);
+        }
     }
 }
 
 function global_definition(t){
     if(Array.isArray(t[1])){
         var app = t[1];
+        var T = infer_type(t[2]);
+        if(T!=TypeNumber) fn_type_table[app[0]] = T;
         var value = compile(t[2],app.slice(1),"");
         ftab[app[0]] = value;
     }else{
+        var T = infer_type(t[2]);
+        if(T!=TypeNumber) id_type_table[t[1]] = T;
         var value = compile(t[2],[]);
         ftab[t[1]] = value();
     }
@@ -2385,6 +2540,7 @@ function calculate(compile){
     }
     try{
         var t = ast(input);
+        infer_type(t);
         var value = compile(t,[]);
         // out.innerHTML = "<p><code>"+str(t)+"</code>";
         // var t0 = performance.now();
