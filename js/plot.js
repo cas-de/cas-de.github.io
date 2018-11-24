@@ -1612,25 +1612,25 @@ function new_point(gx){
         var y2 = y*y;
         return y2*y2;
     };
-    var psetdiff = function(color,rx,ry,px,py){
+    var psetdiff = function(a,color,rx,ry,px,py){
         var dx = Math.abs(px-rx);
         var dy = Math.abs(py-ry);
         var d = Math.sqrt(dx*dx+dy*dy);
-        pseta(color,px,py,255*fade(d));
+        pseta(color,px,py,a*fade(d));
     };
-    var fpsets = function(color,rx,ry){
+    var fpsets = function(a,color,rx,ry){
         var px = Math.floor(rx);
         var py = Math.floor(ry);
         for(var i=-2; i<=2; i++){
             for(var j=-2; j<=2; j++){
-                psetdiff(color,rx,ry,px+i,py+j);
+                psetdiff(a,color,rx,ry,px+i,py+j);
             }
         }
     };
     var spoint = function(color,x,y){
         var rx = gx.px0+mx*x;
         var ry = gx.py0-my*y;
-        fpsets(color,rx,ry);
+        fpsets(255,color,rx,ry);
     };
     var point = function(color,x,y){
         var px = floor(gx.w2+mx*x);
@@ -2411,7 +2411,7 @@ var bool_result_ops = {
     "<":0, ">":0, "<=":0, ">=":0, "&":0, "|":0
 };
 
-function plot_node(gx,t,color){
+function plot_node_basic(gx,t,color){
     var f;
     if(Array.isArray(t) && t[0]==="for"){
         node_loop(plot_node,gx,t,color);
@@ -2447,6 +2447,10 @@ function plot_node(gx,t,color){
             plot_async(gx,f,color);
         }
     }
+}
+
+function plot_node(gx,t,color){
+    plot_node_basic(gx,t,color);
 }
 
 function global_definition(t){
