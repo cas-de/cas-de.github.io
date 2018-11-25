@@ -2422,7 +2422,7 @@ function node_loop(callback,gx,t,color){
     for(var i=0; i<a.length; i++){
         t = substitute(node,v,a[i]);
         if(Array.isArray(t) && t[0]===";"){
-            for(var j=2; j<node.length; j++){
+            for(var j=2; j<t.length; j++){
                 eval_statements(t[j]);
             }
             t = t[1];
