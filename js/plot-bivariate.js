@@ -683,7 +683,7 @@ function plot_node_relief(gx,t,index){
 
 function plot(gx){
     var input = get_value("inputf").trim();
-    var a = input.split(";");
+    var a = input.split(";;");
     process_statements(a);
     pid_stack = [];
 
@@ -696,8 +696,14 @@ function plot(gx){
     gx.proj = new_proj(gx.phi,gx.theta,gx.px0,gx.py0,mx);
     gx.tile_buffer = [];
     
-    if(input.length>0){
+    if(a[0].length>0){
         var t = ast(a[0]);
+        if(Array.isArray(t) && t[0]===";"){
+            for(var i=2; i<t.length; i++){
+                eval_statements(t[i]);
+            }
+            t = t[1];
+        }
         if(Array.isArray(t) && t[0]==="block"){
             for(var i=1; i<t.length; i++){
                 if(Array.isArray(t[i]) && t[i][0]===":="){

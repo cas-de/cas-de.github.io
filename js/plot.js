@@ -915,7 +915,7 @@ function atom(i){
         return t[1];
     }else if(t[0] == Symbol && t[1]=='('){
         i.index++;
-        var x = expression_list(i,"let");
+        var x = semicolon(i,"let");
         t = i.a[i.index];
         if(t[0] == Symbol && t[1]==')'){
             i.index++;
@@ -1187,9 +1187,27 @@ function expression_list(i,type){
     }
 }
 
+function semicolon(i,type){
+    var a = [";"];
+    while(1){
+        a.push(expression_list(i,type));
+        var t = i.a[i.index];
+        if(t[0]==Symbol && t[1]==";"){
+            i.index++;
+        }else{
+            break;
+        }
+    }
+    if(a.length==2){
+        return a[1];
+    }else{
+        return a;
+    }
+}
+
 function parse(a,s){
     var i = {index: 0, a: a, s: s};
-    var x = expression_list(i,"block");
+    var x = semicolon(i,"block");
     var t = i.a[i.index];
     if(t[0] != SymbolTerminator){
         syntax_error(i,"unerwartetes Symbol: '"+t[1]+"'.");
@@ -2403,6 +2421,12 @@ function node_loop(callback,gx,t,color){
     var node = t[1];
     for(var i=0; i<a.length; i++){
         t = substitute(node,v,a[i]);
+        if(Array.isArray(t) && t[0]===";"){
+            for(var j=2; j<node.length; j++){
+                eval_statements(t[j]);
+            }
+            t = t[1];
+        }
         callback(gx,t,color);
     }
 }
@@ -2468,37 +2492,30 @@ function global_definition(t){
     }
 }
 
-function eval_statements(s){
-    var t = ast(s);
-    var value;
-    if(Array.isArray(t) && t[0]==="block"){
+function eval_statements(t){
+    if(Array.isArray(t) && (t[0]==="block" || t[0]===";")){
         for(var i=1; i<t.length; i++){
-            if(Array.isArray(t[i]) && t[i][0]===":="){
-                global_definition(t[i]);
-            }else{
-                value = compile(t[i],[]);
-                value();
-            }
+            eval_statements(t[i]);
         }
     }else{
         if(Array.isArray(t) && t[0]===":="){
             global_definition(t);
         }else{
-            value = compile(t,[]);
-            var y = value();
+            var value = compile(t,[]);
+            value();
         }
     }
 }
 
 function process_statements(a){
     if(a.length>1){
-        if(a.length>2){
-            var inputf = document.getElementById("inputf");
-            inputf.value = a[0];
-            if(a[1].length>0) inputf.value += ";"+a[1];
-        }
-        for(var i=1; i<a.length; i++){
-            if(a[i].length>0) eval_statements(a[i]);
+        var inputf = document.getElementById("inputf");
+        inputf.value = a[0];
+    }
+    for(var i=1; i<a.length; i++){
+        if(a[i].length>0){
+            var t = ast(a[i]);
+            eval_statements(t);
         }
     }
 }
@@ -2506,7 +2523,7 @@ function process_statements(a){
 function plot(gx){
     var color_index = 0;
     var input = get_value("inputf").trim();
-    var a = input.split(";");
+    var a = input.split(";;");
     process_statements(a);
     pid_stack = [];
 
@@ -2514,8 +2531,14 @@ function plot(gx){
     flush(gx);
     labels(gx);
 
-    if(input.length>0){
+    if(a[0].length>0){
         var t = ast(a[0]);
+        if(Array.isArray(t) && t[0]===";"){
+            for(var i=2; i<t.length; i++){
+                eval_statements(t[i]);
+            }
+            t = t[1];
+        }
         if(Array.isArray(t) && t[0]==="block"){
             for(var i=1; i<t.length; i++){
                 if(Array.isArray(t[i]) && t[i][0]===":="){
