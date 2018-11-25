@@ -685,6 +685,17 @@ function plot(gx){
     var input = get_value("inputf").trim();
     var a = input.split(";;");
     process_statements(a);
+    var t;
+    if(a[0].length>0){
+        t = ast(a[0]);
+        if(Array.isArray(t) && t[0]===";"){
+            for(var i=2; i<t.length; i++){
+                eval_statements(t[i]);
+            }
+            t = t[1];
+        }
+    }
+
     pid_stack = [];
 
     clear(gx,gx.color_bg);
@@ -697,13 +708,6 @@ function plot(gx){
     gx.tile_buffer = [];
     
     if(a[0].length>0){
-        var t = ast(a[0]);
-        if(Array.isArray(t) && t[0]===";"){
-            for(var i=2; i<t.length; i++){
-                eval_statements(t[i]);
-            }
-            t = t[1];
-        }
         if(Array.isArray(t) && t[0]==="block"){
             for(var i=1; i<t.length; i++){
                 if(Array.isArray(t[i]) && t[i][0]===":="){
