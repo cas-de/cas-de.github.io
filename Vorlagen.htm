@@ -19,8 +19,9 @@
 <li><a href="#Reelle-Funktionen">Reelle Funktionen</a>
 <li><a href="#Implizite-Funktionen">Implizite Funktionen</a>
 <li><a href="#Parameterkurven">Parameterkurven</a>
-<li><a href="#Anfangswertprobleme">Anfangswertprobleme</a>
+<li><a href="#Diskrete-Funktionen">Diskrete Funktionen</a>
 <li><a href="#Ungleichungen">Ungleichungen</a>
+<li><a href="#Anfangswertprobleme">Anfangswertprobleme</a>
 <li><a href="#Bivariate-Funktionen">Bivariate Funktionen</a>
 <li><a href="#Parameterflaechen">Parameterflächen</a>
 <li><a href="#Implizite-Flaechen">Implizite Flächen</a>
@@ -44,7 +45,7 @@
   >Eine Integralfunktion</a>.
 <li><a href="plot.htm?int(0,10,t.t%5e(x-1)*e%5e(-t))"
   >Die Gammafunktion als Parameterintegral</a>.
-<li><a href="plot.htm?x%5en%20for%20n%20in%20-4:4"
+<li><a href="plot.htm?x%5en%20f%C3%BCr%20n%20in%20-4:4"
   >Eine Schar von Funktionen</a>.
 <li><a href="plot.htm?if(x%3c1,0,x-1)"
   >Eine Fallunterscheidung</a>.
@@ -52,7 +53,7 @@
   >Tangente an eine Funktion</a>.
 <li><a href="plot.htm?p(x);%20p:=ipp(%5b0,0%5d,%5b1,1%5d,%5b2,0%5d)"
   >Ein Interpolationspolynom</a>.
-<li><a href="plot.htm?(p(x);%20p:=ipp(%5b0,0%5d,%5b1,1%5d,%5bn,0%5d))%20for%20n%20in%202:8"
+<li><a href="plot.htm?(p(x);%20p:=ipp(%5b0,0%5d,%5b1,1%5d,%5bn,0%5d))%20f%C3%BCr%20n%20in%202:8"
   >Eine Schar von Interpolationspolynomen</a>.
 </ul>
 
@@ -63,7 +64,7 @@
   >Eine implizite Funktion</a>.
 <li><a href="plot.htm?x%5e2-y%5e2=1,y=x,y=-x"
   >Eine implizite Funktion mit Asymptoten</a>.
-<li><a href="plot.htm?abs(x)%5en+abs(y)%5en=1%20for%20n%20in%20%5b1/2,1,2,4%5d"
+<li><a href="plot.htm?abs(x)%5en+abs(y)%5en=1%20f%C3%BCr%20n%20in%20%5b1/2,1,2,4%5d"
   >Eine Schar von impliziten Funktionen</a>.
 <li><a href="plot.htm?x%5e2+(y/x)%5e2=1;;scale(0.5)"
   >Die Lemniskate von Gerono</a>.
@@ -95,14 +96,18 @@
 </ul>
 
 <br>
-<h3 id="Anfangswertprobleme">Anfangswertprobleme</h3>
+<h3 id="Diskrete-Funktionen">Diskrete Funktionen</h3>
 <ul>
-<li><a href="plot.htm?y%27=y;%20p:=%5b0,1%5d"
-  >Eine Dgl. erster Ordnung</a>. Angabe der Anfangswerte als
-  <code>p:=[x<sub>0</sub>,y(x<sub>0</sub>)]</code>.
-<li><a href="plot.htm?y%27%27=-y;%20p:=%5b0,0,1%5d"
-  >Eine Dgl. zweiter Ordnung</a>. Angabe der Anfangswerte als
-  <code>p:=[x<sub>0</sub>,y(x<sub>0</sub>),y'(x<sub>0</sub>)]</code>.
+<li><a href="plot.htm?Punkte(a,1:20);%20a(n):=1/n"
+  >Eine Zahlenfolge</a> mit expliziter Bildungsvorschrift.
+<li><a href="plot.htm?Punkte(a,1:20);%20a(n):=if(n%3c3,1,a(n-1)+a(n-2));;scale(1,2)"
+  >Eine Zahlenfolge</a> mit rekursiver Bildungsvorschrift.
+<li><a href="plot.htm?Punkte(a,1:20),-2,2;%20a(n):=1/n"
+  >Eine Zahlenfolge</a> mit Schranken.
+<li><a href="plot.htm?Punkte(s,1:100);%20a(n):=1/n,%20s(n):=sum(1,n,a);;scale(5,1)"
+  >Eine Reihe</a>.
+<li><a href="plot.htm?Punkte(f,1:2000);%20f(n):=phi(n);;scale(100)"
+  >Die eulersche Phi-Funktion</a>.
 </ul>
 
 <br>
@@ -116,6 +121,17 @@
   >Ein System von Ungleichungen</a>. Überdeckung sichtbar.
 <li><a href="plot.htm?abs(x)+abs(y)%3c2&abs(y)%3c1"
   >Lösungsmenge des Systems</a>.
+</ul>
+
+<br>
+<h3 id="Anfangswertprobleme">Anfangswertprobleme</h3>
+<ul>
+<li><a href="plot.htm?y%27=y;%20p:=%5b0,1%5d"
+  >Eine Dgl. erster Ordnung</a>. Angabe der Anfangswerte als
+  <code>p:=[x<sub>0</sub>,y(x<sub>0</sub>)]</code>.
+<li><a href="plot.htm?y%27%27=-y;%20p:=%5b0,0,1%5d"
+  >Eine Dgl. zweiter Ordnung</a>. Angabe der Anfangswerte als
+  <code>p:=[x<sub>0</sub>,y(x<sub>0</sub>),y'(x<sub>0</sub>)]</code>.
 </ul>
 
 <br>

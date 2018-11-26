@@ -1535,12 +1535,18 @@ function compile_expression(a,t,context,type){
     }
 }
 
-function compile(t,argv,type){
+function compile(t,argv,type,name){
     if(type==undefined) type="number";
     var a = [];
     var local = Object.create(null);
     for(var i=0; i<argv.length; i++){
         local[argv[i]] = type;
+    }
+    if(name==undefined){
+        name = "";
+    }else{
+        local[name] = "";
+        name = " "+name;
     }
     var context = {
         pre: ["var power=Math.pow;"],
@@ -1548,7 +1554,7 @@ function compile(t,argv,type){
         statements: []
     };
     a.push("(function(){");
-    a.push("return function("+argv.join(",")+"){");
+    a.push("return function"+name+"("+argv.join(",")+"){");
     var statements_index = a.length;
     a.push("");
     a.push("return ");
@@ -1559,7 +1565,7 @@ function compile(t,argv,type){
     if(context.statements.length>0){
         a[statements_index] = context.statements.join("");
     }
-    // alert(a.join(""));
+    // console.log(a.join(""));
     return window.eval(a.join(""));
 }
 
@@ -1697,6 +1703,26 @@ function new_point(gx){
             pset4a(color,px,py,a);
         }
     };
+    var circle = function(color,x,y,r,fill){
+        var rx = gx.px0+ax*mx*x;
+        var ry = gx.py0-ay*my*y;
+        if(fill){
+            var px = Math.round(rx);
+            var py = Math.round(ry);
+            var n = Math.round(r);
+            var r2 = r*r;
+            for(var i=-n; i<=n; i++){
+                for(var j=-n; j<=n; j++){
+                    if(i*i+j*j<r2){pset(color,px+i,py+j);}
+                }
+            }
+        }
+        var t1 = 2*Math.PI;
+        var d = 1/r;
+        for(var t=0; t<t1; t+=d){
+            fpsets(255,color,rx+r*Math.cos(t),ry+r*Math.sin(t));
+        }
+    };
 
     gx.pset = pset;
     gx.pset4 = pset4;
@@ -1708,6 +1734,7 @@ function new_point(gx){
     gx.hspine = hspine;
     gx.vspine = vspine;
     gx.pseta_median = pseta_median;
+    gx.circle = circle;
 }
 
 function init(canvas,w,h){
@@ -1728,12 +1755,12 @@ function init(canvas,w,h){
         gx.color_axes = color_dark_axes;
         gx.color_grid = color_dark_grid;
         color_table = color_table_dark;
-        gx.context.fillStyle = "#5a5a5a";
+        gx.font_color = "#5a5a5a";
     }else{
         gx.color_bg = color_bg;
         gx.color_axes = color_axes;
         gx.color_grid = color_grid;
-        gx.context.fillStyle = "#404040";
+        gx.font_color = "#404040";
     }
 
     gx.color = [0,0,0,255];
@@ -1846,7 +1873,10 @@ function labels(gx){
     var xshift = Math.round((0.5*gx.w-px0)/gx.mx);
     var yshift = Math.round((0.5*gx.h-py0)/gx.mx);
     var px,py,s,px_adjust,py_adjust;
+    context.fillStyle = gx.font_color;
     context.textAlign = "center";
+
+
     var bulky_pred = false;
     var char_max = gx.char_max;
     var bulky2 = false;
@@ -2390,6 +2420,23 @@ function from_ode(gx,t){
     return fv;
 }
 
+function points(gx,color,f,a){
+    var r = 4;
+    if(a.length>1){
+        r = r*clamp(4*ax*Math.abs(a[1]-a[0]),0.25,1);
+    }
+    for(var i=0; i<a.length; i++){
+        var y = f(a[i]);
+        if(Array.isArray(y)){
+            gx.circle(color,y[0],y[1],4,true);
+        }else{
+            gx.circle(color,a[i],y,r,true);
+        }
+    }
+    flush(gx);
+    labels(gx);
+}
+
 function contains_variable(t,v){
     if(Array.isArray(t)){
         for(var i=0; i<t.length; i++){
@@ -2439,6 +2486,10 @@ function plot_node_basic(gx,t,color){
     var f;
     if(Array.isArray(t) && t[0]==="for"){
         node_loop(plot_node,gx,t,color);
+    }else if(Array.isArray(t) && t[0]==="Punkte"){
+        var a = compile(t[2],[])();
+        f = compile(t[1],[])();
+        points(gx,color,f,a);
     }else if(Array.isArray(t) && t[0]==="="){
         if(Array.isArray(t[1]) && t[1][0]==="D"){
             f = from_ode(gx,t);
@@ -2482,7 +2533,7 @@ function global_definition(t){
         var app = t[1];
         var T = infer_type(t[2]);
         if(T!=TypeNumber) fn_type_table[app[0]] = T;
-        var value = compile(t[2],app.slice(1),"");
+        var value = compile(t[2],app.slice(1),"",app[0]);
         ftab[app[0]] = value;
     }else{
         var T = infer_type(t[2]);

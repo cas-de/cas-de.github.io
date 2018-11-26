@@ -375,13 +375,36 @@ function apply(f,v){
     return f.apply(null,v);
 }
 
+function isprime(n){
+    n = Math.round(n);
+    if(n<2) return 0;
+    var m = Math.floor(Math.sqrt(n));
+    for(var k=2; k<=m; k++){
+        if(n%k==0) return 0;
+    }
+    return 1;
+}
+
+function euler_phi(n){
+    n = Math.round(n);
+    if(n<1) return NaN;
+    var y = 1;
+    for(var p=2; p<=n; p++){
+        if(isprime(p) && n%p==0){
+          y = y*(1-1/p);
+        }
+    }
+    return n*y;
+}
+
 var ftab_extension = {
   PT: ChebyshevT, PU: ChebyshevU, PH: Hermite, 
   PP: Legendre, PL: Laguerre, bc: bc,
   psi: psi, digamma: digamma,
   zeta: zeta, table: table, ipp: ipp,
   Si: Si, Ci: Ci, det: det, unit: unit_vector,
-  nabla: nablah(0.001), apply: apply, rot: rotation_matrix
+  nabla: nablah(0.001), apply: apply, rot: rotation_matrix,
+  isprime: isprime, prim: isprime, phi: euler_phi
 };
 
 

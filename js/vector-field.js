@@ -34,8 +34,9 @@ function plot_vector_field(gx,f){
     var xshift = Math.round((0.5*gx.w-px0)/gx.mx);
     var yshift = -Math.round((0.5*gx.h-py0)/gx.mx);
     var d = 0.5;
-    var color0 = [20,80,180,100];
-    var color1 = [160,0,40,160];
+
+    var color0 = [0,80,160,120];
+    var color1 = [160,0,0,160];
     var color = [0,0,0,0];
     for(y=yshift-ycount; y<=yshift+ycount; y+=d){
         for(x=xshift-xcount; x<=xshift+xcount; x+=d){
@@ -45,7 +46,7 @@ function plot_vector_field(gx,f){
             color[1] = (1-alpha)*color0[1]+alpha*color1[1];
             color[2] = (1-alpha)*color0[2]+alpha*color1[2];
             color[3] = (1-alpha)*color0[3]+alpha*color1[3];
-            vector(gx,color,x,y,v[0],v[1],1);
+            vector(gx,color,x,y,v[0],v[1],0.7+0.3*alpha);
         }
     }
     flush(gx);
