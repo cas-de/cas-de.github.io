@@ -394,7 +394,7 @@ function euler_phi(n){
           y = y*(1-1/p);
         }
     }
-    return n*y;
+    return Math.round(n*y);
 }
 
 var ftab_extension = {

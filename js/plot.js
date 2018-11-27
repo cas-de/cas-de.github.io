@@ -14,6 +14,7 @@ var GAMMA = 0.57721566490153286;
 var dark = false;
 var ftab_extension_loaded = false;
 var async_continuation = undefined;
+var recursion_table = {};
 var freq = 1;
 
 var color_bg = [255,255,255,255];
@@ -78,7 +79,7 @@ var ftab = {
     P: set_position, scale: set_scale,
     zeroes: zeroes, roots: zeroes,
     map: map, filter: filter, freq: set_freq,
-    img: plot_img,
+    img: plot_img, calc: calc_cmd,
     _addtt_: add_tensor_tensor, _subtt_: sub_tensor_tensor,
     _mulsv_: mul_scalar_vector, _mulmv_: mul_matrix_vector,
     _mulmm_: mul_matrix_matrix, _mulvv_: scalar_product,
@@ -727,6 +728,15 @@ function lambertwm1(x){
     return y;
 }
 
+function calc_cmd(cmd){
+    var hud = document.getElementById("hud");
+    var input = document.getElementById("input-calc");
+    hud_display = true;
+    hud.style.display = "block";
+    input.value = cmd;
+    calc();
+}
+
 function isalpha(s){
     return /^[a-zäöü]+$/i.test(s);
 }
@@ -807,7 +817,8 @@ var keyword_tab = {
 var Symbol = 0;
 var SymbolIdentifier = 1;
 var SymbolNumber = 2;
-var SymbolTerminator = 3;
+var SymbolString = 3;
+var SymbolTerminator = 4;
 
 function scan(s){
     var a = [];
@@ -873,6 +884,13 @@ function scan(s){
             a.push([Symbol,"*",line,col]);
             a.push([SymbolIdentifier,"deg",line,col]);
             i++; col++;
+        }else if(s[i]=='"'){
+            i++; col++;
+            var col0 = col;
+            var j = i;
+            while(i<n && s[i]!='"'){i++; col++;}
+            a.push([SymbolString,s.slice(j,i),line,col0]);
+            i++; col++;
         }else{
             if((s[i]=='(' || s[i]=='[') && a.length>0){
                 var last = a[a.length-1];
@@ -929,6 +947,9 @@ function atom(i){
         return application_list(i,a,']');
     }else if(t[0] == Symbol && t[1]=='|'){
         return lambda_expression(i);
+    }else if(t[0] == SymbolString){
+        i.index++;
+        return ["_string_",t[1]];
     }else{
         syntax_error(i,"ein Operand wurde erwartet.");
     }
@@ -1190,8 +1211,14 @@ function expression_list(i,type){
 function semicolon(i,type){
     var a = [";"];
     while(1){
-        a.push(expression_list(i,type));
         var t = i.a[i.index];
+        if(t[0]==Symbol && t[1]==";"){
+            a.push(null);
+            i.index++;
+            continue;
+        }
+        a.push(expression_list(i,type));
+        t = i.a[i.index];
         if(t[0]==Symbol && t[1]==";"){
             i.index++;
         }else{
@@ -1526,6 +1553,8 @@ function compile_expression(a,t,context,type){
                 compile_expression(a,t[3],context);
             }
             a.push(")");
+        }else if(op=="_string_"){
+            a.push('"'+t[1]+'"');
         }else{
             compile_expression(a,op,context,"app");
             compile_application(a,"",t,context);
@@ -1535,26 +1564,17 @@ function compile_expression(a,t,context,type){
     }
 }
 
-function compile(t,argv,type,name){
-    if(type==undefined) type="number";
-    var a = [];
-    var local = Object.create(null);
-    for(var i=0; i<argv.length; i++){
-        local[argv[i]] = type;
-    }
-    if(name==undefined){
-        name = "";
-    }else{
-        local[name] = "";
-        name = " "+name;
-    }
-    var context = {
-        pre: ["var power=Math.pow;"],
-        local: local,
-        statements: []
+function fix(m,F){
+    return function f(n){
+        if(!m.hasOwnProperty(n)){m[n] = F(f,n);}
+        return m[n];
     };
+}
+
+function compile_fn_body(a,t,context,sig){
     a.push("(function(){");
-    a.push("return function"+name+"("+argv.join(",")+"){");
+    a.push("return function"+sig);
+    a.push("){");
     var statements_index = a.length;
     a.push("");
     a.push("return ");
@@ -1565,8 +1585,35 @@ function compile(t,argv,type,name){
     if(context.statements.length>0){
         a[statements_index] = context.statements.join("");
     }
-    // console.log(a.join(""));
-    return window.eval(a.join(""));
+}
+
+function compile(t,argv,type,name){
+    if(type==undefined) type="number";
+    var a = [];
+    var local = Object.create(null);
+    for(var i=0; i<argv.length; i++){
+        local[argv[i]] = type;
+    }
+    if(name!=undefined){
+        local[name] = "";
+    }
+    var context = {
+        pre: ["var power=Math.pow;"],
+        local: local,
+        statements: []
+    };
+    if(name!=undefined && recursion_table.hasOwnProperty(name)){
+        compile_fn_body(a,t,context,"("+name+","+argv.join(","));
+        var m = recursion_table[name];
+        delete recursion_table[name];
+        // console.log(a.join(""));
+        return fix(m,window.eval(a.join("")));
+    }else{
+        name = name==undefined?"":" "+name;
+        compile_fn_body(a,t,context,name+"("+argv.join(","));
+        // console.log(a.join(""));
+        return window.eval(a.join(""));
+    }
 }
 
 function compile_string(s,argv){
@@ -2473,6 +2520,7 @@ function node_loop(callback,gx,t,color){
                 eval_statements(t[j]);
             }
             t = t[1];
+            if(t===null) continue;
         }
         callback(gx,t,color);
     }
@@ -2531,10 +2579,18 @@ function plot_node(gx,t,color){
 function global_definition(t){
     if(Array.isArray(t[1])){
         var app = t[1];
+        var name = app[0];
         var T = infer_type(t[2]);
-        if(T!=TypeNumber) fn_type_table[app[0]] = T;
-        var value = compile(t[2],app.slice(1),"",app[0]);
-        ftab[app[0]] = value;
+        if(app.length==2 && typeof app[1]!="string"){
+            if(!recursion_table.hasOwnProperty(name)){
+                recursion_table[name] = {};
+            }
+            recursion_table[name][app[1]] = compile(t[2],[])();
+        }else{
+            if(T!=TypeNumber) fn_type_table[name] = T;
+            var value = compile(t[2],app.slice(1),"",name);
+            ftab[name] = value;
+        }
     }else{
         var T = infer_type(t[2]);
         if(T!=TypeNumber) id_type_table[t[1]] = T;
@@ -2589,6 +2645,7 @@ function plot(gx){
                 eval_statements(t[i]);
             }
             t = t[1];
+            if(t===null) return;
         }
         if(Array.isArray(t) && t[0]==="block"){
             for(var i=1; i<t.length; i++){

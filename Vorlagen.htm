@@ -100,7 +100,7 @@
 <ul>
 <li><a href="plot.htm?Punkte(a,1:20);%20a(n):=1/n"
   >Eine Zahlenfolge</a> mit expliziter Bildungsvorschrift.
-<li><a href="plot.htm?Punkte(a,1:20);%20a(n):=if(n%3c3,1,a(n-1)+a(n-2));;scale(1,2)"
+<li><a href="plot.htm?Punkte(a,1:20);%20a(1):=1,%20a(2):=1,%20a(n):=a(n-1)+a(n-2);;scale(1,2)"
   >Eine Zahlenfolge</a> mit rekursiver Bildungsvorschrift.
 <li><a href="plot.htm?Punkte(a,1:20),-2,2;%20a(n):=1/n"
   >Eine Zahlenfolge</a> mit Schranken.
@@ -108,6 +108,10 @@
   >Eine Reihe</a>.
 <li><a href="plot.htm?Punkte(f,1:2000);%20f(n):=phi(n);;scale(100)"
   >Die eulersche Phi-Funktion</a>.
+<li><a href="plot.htm?Punkte(a,1:1000);%20a(0):=0,%20a(n):=a(n-1)+rand()-1/2;;scale(100,5)"
+  >Ein Random Walk</a>.
+<li><a href="plot.htm?Punkte(Q,1:4000),%20x/2;%20Q(1):=1,%20Q(2):=1,%20Q(n):=Q(n-Q(n-1))+Q(n-Q(n-2));;scale(100),%20calc(%22map(Q,1:200)%22)"
+  >Hofstadters Q-Folge</a>.
 </ul>
 
 <br>
@@ -132,6 +136,8 @@
 <li><a href="plot.htm?y%27%27=-y;%20p:=%5b0,0,1%5d"
   >Eine Dgl. zweiter Ordnung</a>. Angabe der Anfangswerte als
   <code>p:=[x<sub>0</sub>,y(x<sub>0</sub>),y'(x<sub>0</sub>)]</code>.
+<li><a href="Vektorfeld.htm?y%27=y,%20%5b1,y%5d;%20p:=%5b0,1%5d"
+  >Richtungsfeld einer Dgl. erster Ordnung</a>.
 </ul>
 
 <br>
@@ -145,7 +151,7 @@
   >Kleinere Kachelauflösung. Nimmt etwas Rechenzeit in Anspruch</a>.
 <li><a href="plot-bivariat.htm?f(x,y),%5ba(t),b(t),f(a(t),b(t))%5d;t0:=0,t1:=4,f(x,y):=sin(x)*sin(y),a(t):=t*cos(pi*t),b(t):=t*sin(pi*t);;scale(0.5)"
   >Eine Kurve auf eine Fläche heben</a>.
-<li><a href="plot-bivariat.htm?f(x,y),f(x,y)=1;f(x,y):=x*sin(y)+y*cos(x);;scale(0.5)"
+<li><a href="plot-bivariat.htm?f(x,y),f(x,y)=1;f(x,y):=x*sin(y)+y*cos(x),alpha:=0.6;;scale(1,1,5)"
   >Eine bivariate Funktion mit einer Höhenlinie</a>.
 <li><a href="plot-bivariat.htm?f(x,y),f(x,y)=c%20for%20c%20in%20-4:8;f(x,y):=x*sin(y)+y*cos(x);;scale(0.5)"
   >Eine bivariate Funktion mit mehreren Höhenlinien</a>.
