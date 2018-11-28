@@ -397,6 +397,53 @@ function euler_phi(n){
     return Math.round(n*y);
 }
 
+function pli_nodes(t){
+    return function(x){
+        if(t.length==0){return NaN;}
+        var a = 0;
+        var b = t.length-1;
+        if(x<t[a][0] || x>t[b][0]){return NaN;}
+        var i;
+        while(a<=b){
+            i = a+Math.round((b-a)/2);
+            if(x<t[i][0]){b = i-1;}else{a = i+1;}
+        }
+        i = a;
+        if(i>0){
+            var p1 = t[i-1];
+            var p2 = t[i];
+            return (p2[1]-p1[1])/(p2[0]-p1[0])*(x-p2[0])+p2[1];
+        }else{
+            return NaN;
+        }
+    };
+}
+
+function pli_fn(f,xa,xb,d){
+    var a = range(xa,xb,d).map(function(x){return f(x);});
+    return pli(xa,d,a);
+}
+
+function pli_general(x,y,z,w){
+    if(y==undefined || z==undefined){
+        return pli_nodes(x);
+    }else if(w==undefined){
+        return pli(x,y,z);
+    }else{
+        return pli_fn(x,y,z,w);
+    }
+}
+
+function laplace_transform(f,x){
+    var g = function(t){return f(t)*Math.exp(-x*t);};
+    return gauss(g,0,40,1);
+}
+
+function delta(x,a){
+    var t = Math.sqrt(Math.PI)*a*x;
+    return a*Math.exp(-t*t);
+}
+
 var ftab_extension = {
   PT: ChebyshevT, PU: ChebyshevU, PH: Hermite, 
   PP: Legendre, PL: Laguerre, bc: bc,
@@ -404,7 +451,8 @@ var ftab_extension = {
   zeta: zeta, table: table, ipp: ipp,
   Si: Si, Ci: Ci, det: det, unit: unit_vector,
   nabla: nablah(0.001), apply: apply, rot: rotation_matrix,
-  isprime: isprime, prim: isprime, phi: euler_phi
+  isprime: isprime, prim: isprime, phi: euler_phi,
+  pli: pli_general, L: laplace_transform, delta: delta
 };
 
 
