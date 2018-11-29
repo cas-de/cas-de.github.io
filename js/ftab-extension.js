@@ -315,13 +315,67 @@ function ipp(a){
     };
 }
 
-function table(f,a){
+function trailing_zero_count(s){
+    var decimal_point = false;
+    for(var i=0; i<s.length; i++){
+        if(s[i]=='.'){decimal_point = true;}
+        else if(s[i]=='e' || s[i]=='E'){return 0;}
+    }
+    if(!decimal_point) return 0;
+    var i = s.length-1;
+    var count = 0;
+    while(i>=0 && (s[i]=='0' || s[i]=='.')){
+        count++;
+        i--;
+    }
+    return count;
+}
+
+function trailing_zero_count_min(a){
+    if(a.length==0) return 0;
+    var count = trailing_zero_count(a[0]);
+    for(var i=1; i<a.length; i++){
+        count = Math.min(count,trailing_zero_count(a[i]));
+    }
+    return count;
+}
+
+function trim_by_count(a,count){
+    for(var i=0; i<a.length; i++){
+        var n = a[i].length;
+        a[i] = a[i].slice(0,n-count);
+    }
+}
+
+function trim_trailing_zeroes_min(a){
+    var count = trailing_zero_count_min(a);
+    trim_by_count(a,count);
+}
+
+function ftos_prec(n){
+    return function(x){return x.toFixed(n);};
+}
+
+function table(f,a,prec){
+    if(prec==undefined) prec=10;
+    var ftos = ftos_prec(prec);
+    var ax = [];
+    var ay = [];
+    for(var i=0; i<a.length; i++){
+        ax.push(str(a[i],ftos));
+    }
+    for(var i=0; i<a.length; i++){
+        ay.push(str(f(a[i]),ftos));
+    }
+    trim_trailing_zeroes_min(ax);
+    trim_trailing_zeroes_min(ay);
+    
     var b = ["<table class='bt'><tr><th>x<th>y"];
     for(var i=0; i<a.length; i++){
         b.push("<tr><td style='text-align: right'>");
-        b.push(str(a[i]));
+        b.push(ax[i]);
         b.push("<td style='text-align: right'>");
-        b.push(str(f(a[i])));
+        b.push(ay[i]);
     }
     b.push("</table>");
     return b.join("");
@@ -448,7 +502,8 @@ var ftab_extension = {
   PT: ChebyshevT, PU: ChebyshevU, PH: Hermite, 
   PP: Legendre, PL: Laguerre, bc: bc,
   psi: psi, digamma: digamma,
-  zeta: zeta, table: table, ipp: ipp,
+  zeta: zeta, ipp: ipp,
+  table: table, Wertetabelle: table,
   Si: Si, Ci: Ci, det: det, unit: unit_vector,
   nabla: nablah(0.001), apply: apply, rot: rotation_matrix,
   isprime: isprime, prim: isprime, phi: euler_phi,

@@ -76,6 +76,19 @@ canvas.main-canvas{
   color: #804020;
 }
 
+table.bt {
+  border-collapse: collapse;
+}
+table.bt td, table.bt th{
+  border: 2px solid #404040;
+  background-color: #000000;
+  color: #a0a0a0;
+  padding-left: 6px;
+  padding-right: 6px;
+  font-size: 80%;
+}
 
-
-
+table.bt th{
+  background-color: #002020;
+  color: #e0e0e0;
+}

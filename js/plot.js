@@ -11,10 +11,12 @@ var yscale = {index: index0};
 var zscale = {index: index0};
 var hud_display = false;
 var GAMMA = 0.57721566490153286;
+var PHI = 1.618033988749895;
 var dark = false;
 var ftab_extension_loaded = false;
 var async_continuation = undefined;
 var recursion_table = {};
+var post_app_stack = [];
 var freq = 1;
 
 var color_bg = [255,255,255,255];
@@ -47,7 +49,7 @@ var diff_operator = diffh_curry(0.001);
 var ftab = {
     pi: Math.PI, tau: 2*Math.PI, e: Math.E, nan: NaN, inf: Infinity,
     deg: Math.PI/180, grad: Math.PI/180, gon: Math.PI/200,
-    gc: GAMMA, angle: angle, t0: 0, t1: 2*Math.PI,
+    gc: GAMMA, gr: PHI, angle: angle, t0: 0, t1: 2*Math.PI,
     abs: Math.abs, sgn: Math.sign, sign: Math.sign,
     max: Math.max, min: Math.min, clamp: clamp,
     hypot: Math.hypot, floor: Math.floor, ceil: Math.ceil,
@@ -130,8 +132,12 @@ function range(a,b,step){
         return y;
     }else{
         var y = [];
-        for(var i=a; i<=b; i+=step){
-            y.push(i);
+        var i=0;
+        var x = a;
+        while(x<=b){
+            y.push(Math.round(1E12*x)/1E12);
+            i++;
+            x = a+i*step;
         }
         return y;
     }
@@ -729,12 +735,14 @@ function lambertwm1(x){
 }
 
 function calc_cmd(cmd){
-    var hud = document.getElementById("hud");
-    var input = document.getElementById("input-calc");
-    hud_display = true;
-    hud.style.display = "block";
-    input.value = cmd;
-    calc();
+    post_app_stack.push(function(){
+        var hud = document.getElementById("hud");
+        var input = document.getElementById("input-calc");
+        hud_display = true;
+        hud.style.display = "block";
+        input.value = cmd;
+        calc();
+    });
 }
 
 function isalpha(s){
@@ -749,16 +757,21 @@ function isspace(s){
     return s==' ' || s=='\t' || s=='\n';
 }
 
-function str(x){
+function str(x,ftos){
     if(Array.isArray(x)){
-        return "["+x.map(str).join(", ")+"]";
+        var f = function(t){return str(t);};
+        return "["+x.map(f).join(", ")+"]";
     }else if(x instanceof Function){
         return "eine Funktion";
     }else if(typeof x == "string"){
         return x;
     }else if(typeof x == "number"){
         if(Number.isFinite(x)){
-            return x.toString().toUpperCase();
+            if(ftos==undefined){
+                return x.toString().toUpperCase();
+            }else{
+                return ftos(x).toUpperCase();
+            }
         }else if(Number.isNaN(x)){
             return "nan";
         }else{
@@ -2805,6 +2818,7 @@ function update(gx){
             throw e;
         }
     }
+    process_post_applications();
 }
 
 function main(){
@@ -2915,6 +2929,14 @@ function calc_img(){
     var input = document.getElementById("input-calc");
     input.value = "img(540,360)";
     calc();
+}
+
+function process_post_applications(){
+    for(var i=0; i<post_app_stack.length; i++){
+        var f = post_app_stack[i];
+        f();
+    }
+    post_app_stack = [];
 }
 
 window.onload = function(){
