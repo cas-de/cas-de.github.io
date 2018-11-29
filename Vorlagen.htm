@@ -146,6 +146,8 @@
   <code>p:=[x<sub>0</sub>,y(x<sub>0</sub>),y'(x<sub>0</sub>)]</code>.
 <li><a href="Vektorfeld.htm?y%27=y,%20%5b1,y%5d;%20p:=%5b0,1%5d"
   >Richtungsfeld einer Dgl. erster Ordnung</a>.
+<li><a href="plot.htm?f(x);%20f:=iter(y.pli(x.1+int(0,x,t.y(t)),-10,10,0.1),40,t.1)"
+  >Eine Picard-Iteration</a>.
 </ul>
 
 <br>
@@ -231,7 +233,7 @@
 <li><a href="Newton.htm">Ein Newton-Fraktal</a>.
 <li><a href="Newton.htm?z-f(z,c)/(z.f(z,c))%27(z);f(z,c):=z%5e3+(c-1)*z-c,z0(c):=0;;scale(0.02),P(0.31396,1.63954)"
   >Newton-Fraktal</a> zum Startwert null für eine Familie kubischer Polynome.
-<li><a href="plot.htm?(r:=x,pow(x.r*x*(1-x),1000,rand(0,1)));;scale(0.05,0.1),P(3.46,0.54)"
+<li><a href="plot.htm?(r:=x,iter(x.r*x*(1-x),1000,rand(0,1)));;scale(0.05,0.1),P(3.46,0.54)"
   >Bifurkationsdiagramm der logistischen Gleichung</a>.
 </ul>
 

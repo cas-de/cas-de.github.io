@@ -73,7 +73,7 @@ var ftab = {
     Gamma: Gamma, erf: erf, erfc: erfc,
     En: En, Ei: Ei, li: li, Li: Li,
     diff: diff, int: integral, D: diff_operator, int16: int16,
-    pow: pow, sum: sum, prod: prod, af: af,
+    iter: pow, sum: sum, prod: prod, af: af,
     rand: rand, rng: rand, tg: tg, sc: sc, res: res,
     range: range, inv: invab, agm: agm,
     E: eiE, K: eiK, F: eiF, Pi: eiPi,

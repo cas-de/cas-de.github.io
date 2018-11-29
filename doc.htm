@@ -160,7 +160,7 @@
 <td>(f|<sub>[a,b]</sub>)<sup>&minus;1</sup>(x)
 <td>Umkehrfunktion der Einschränkung von f auf [a,b].
 <tr>
-<td><code>pow(f,n,x)</code>
+<td><code>iter(f,n,x)</code>
 <td>f<sup>n</sup>(x)
 <td>Die n-te iterierte von f.
 </table>
@@ -507,12 +507,31 @@
 <td>Versucht, die Nullstellen von f(x) für x&in;[a,b] zu bestimmen.
 <tr>
 <td><code>map(f,a)</code>
-<td>Wendet f auf jedes Element der Liste a an.
+<td>Wendet f auf jedes Element der Liste&nbsp;a an.
 <br>Beispiel: <code>map(x.2x,1:10)</code>.
 <tr>
 <td><code>filter(p,a)</code>
-<td>Die Elemente aus a, die das Prädikat p erfüllen.
+<td>Die Elemente aus a, die das Prädikat&nbsp;p erfüllen.
 <br>Beispiel: <code>filter(k.mod(k,2)=1,1:10)</code>.
+<tr>
+<td><code>pli(f,a,b,d)</code>
+<td>Piecewise linear interpolation. Interpoliert die Funktion&nbsp;f
+auf dem Intervall [a,b] in Schrittweite&nbsp;d stückweise linear.
+<br>Beispiel: <code><a href="plot.htm?f(x);%20f:=pli(sin,-10,10,1)"
+  >f(x); f:=pli(sin,-10,10,1)</a></code>.
+<tr>
+<td><code>pli(x0,d,a)</code>
+<td>Interpoliert die equidistanten Stützstellen <code>t=[x,y]</code>
+mit <code>x=x0+k*d</code> und <code>y=a[k]</code>
+stückweise linear.
+<tr>
+<td><code>pli(a)</code>
+<td>Interpoliert die Stützstellen <code>t=a[k]</code> mit
+<code>x=t[0]</code> und <code>y=t[1]</code> stückweise linear.
+<tr>
+<td><code>ipp(a)</code>
+<td>Interpolationspolynom für die Stützstellen <code>t=a[k]</code>
+mit <code>x=t[0]</code> und <code>y=t[1]</code>.
 </table>
 
 <br>
@@ -534,10 +553,10 @@ ausgeführt und dann entfernt.
 <dt><a href="plot.htm?sin(x),cos(x),tan(x),cot(x)">sin(x),cos(x),tan(x),cot(x)</a>
 <dd>Viele Funktionen.
 
-<dt><a href="plot.htm?x^2-y^2=1">x^2-x^2=1</a>
+<dt><a href="plot.htm?x%5e2-y%5e2=1">x^2-x^2=1</a>
 <dd>Eine implizite Funktion.
 
-<dt><a href="plot.htm?x^2-y^2=1,x,-x">x^2-x^2=1,x,-x</a>
+<dt><a href="plot.htm?x%5e2-y%5e2=1,x,-x">x^2-x^2=1,x,-x</a>
 <dd>Eine implizite Funktion und ihre Asymptoten.
 
 <dt><a href="plot.htm?f(x):=ln(x),f(x),f%27(x)"
@@ -548,11 +567,11 @@ ausgeführt und dann entfernt.
 >f(x):=sin(x),a:=2,f(x),f(a)+f'(a)*(x-a)</a>
 <dd>Tangente an eine Funktion.
 
-<dt><a href="plot.htm?exp(x),sum(0,4,k.x^k/fac(k))"
+<dt><a href="plot.htm?exp(x),sum(0,4,k.x%5ek/fac(k))"
 >exp(x),sum(0,4,k.x^k/fac(k))</a>
 <dd>Partialsumme der Exponentialreihe.
 
-<dt><a href="plot.htm?int(0,10,t.t^(x-1)*exp(-t))"
+<dt><a href="plot.htm?int(0,10,t.t%5e(x-1)*exp(-t))"
 >int(0,10,t.t^(x-1)*exp(-t))</a>
 <dd>Gamma-Funktion via Parameterintegral.
 
@@ -568,7 +587,7 @@ ausgeführt und dann entfernt.
 >r(t):=sin(5t)+4,[r(t)*cos(t),r(t)*sin(t)]</a>
 <dd>Ein Stern.
 
-<dt><a href="plot-bivariat.htm?cos(sqrt(x^2+y^2))"
+<dt><a href="plot-bivariat.htm?cos(sqrt(x%5e2+y%5e2))"
 >cos(sqrt(x^2+y^2))</a>
 <dd>Eine bivariate Funktion.
 
