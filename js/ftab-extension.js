@@ -381,6 +381,34 @@ function table(f,a,prec){
     return b.join("");
 }
 
+function idm(n){
+    var a = [];
+    for(var i=0; i<n; i++){
+        var t = [];
+        for(var j=0; j<n; j++){t.push(i==j?1:0);}
+        a.push(t);
+    }
+    return a;
+}
+
+function diag(v){
+    var a = [];
+    for(var i=0; i<v.length; i++){
+        var t = [];
+        for(var j=0; j<v.length; j++){t.push(i==j?v[i]:0);}
+        a.push(t);
+    }
+    return a;
+}
+
+function diag_variadic(){
+    if(arguments.length==1 && Array.isArray(arguments[0])){
+        return diag(arguments[0]);
+    }else{
+        return diag(arguments);
+    }
+}
+
 function det(A){
     var n = A.length;
     if(n==2){
@@ -427,28 +455,6 @@ function rotation_matrix(phi){
 
 function apply(f,v){
     return f.apply(null,v);
-}
-
-function isprime(n){
-    n = Math.round(n);
-    if(n<2) return 0;
-    var m = Math.floor(Math.sqrt(n));
-    for(var k=2; k<=m; k++){
-        if(n%k==0) return 0;
-    }
-    return 1;
-}
-
-function euler_phi(n){
-    n = Math.round(n);
-    if(n<1) return NaN;
-    var y = 1;
-    for(var p=2; p<=n; p++){
-        if(isprime(p) && n%p==0){
-          y = y*(1-1/p);
-        }
-    }
-    return Math.round(n*y);
 }
 
 function pli_nodes(t){
@@ -498,16 +504,149 @@ function delta(x,a){
     return a*Math.exp(-t*t);
 }
 
+function gcd(a,b){
+    a = Math.round(Math.abs(a));
+    b = Math.round(Math.abs(b));
+    var h;
+    while(b>0){
+        h = a%b; a=b; b=h;
+    }
+    return a;
+}
+
+function lcm(a,b){
+    a = Math.abs(a);
+    b = Math.abs(b);
+    return a/gcd(a,b)*b;
+}
+
+function gcd_list(a){
+    if(a.length==0) return 0;
+    var y = a[0];
+    for(var i=1; i<a.length; i++){
+        y = gcd(y,a[i]);
+    }
+    return y;
+}
+
+function lcm_list(a){
+    if(a.length==0) return 0;
+    var y = a[0];
+    for(var i=1; i<a.length; i++){
+        y = lcm(y,a[i]);
+    }
+    return y;
+}
+
+function gcd_variadic(){
+    if(arguments.length==1 && Array.isArray(arguments[0])){
+        return gcd_list(arguments[0]);
+    }else{
+        return gcd_list(arguments);
+    }
+}
+
+function lcm_variadic(){
+    if(arguments.length==1 && Array.isArray(arguments[0])){
+        return lcm_list(arguments[0]);
+    }else{
+        return lcm_list(arguments);
+    }
+}
+
+function isprime(n){
+    n = Math.round(n);
+    if(n<2) return 0;
+    var m = Math.floor(Math.sqrt(n));
+    for(var k=2; k<=m; k++){
+        if(n%k==0) return 0;
+    }
+    return 1;
+}
+
+function euler_phi(n){
+    n = Math.round(n);
+    if(n<1) return NaN;
+    var y = 1;
+    for(var p=2; p<=n; p++){
+        if(isprime(p) && n%p==0){
+            y = y*(1-1/p);
+        }
+    }
+    return Math.round(n*y);
+}
+
+function carmichael_lambda(n){
+    if(n<1) return NaN;
+    if(n==1) return 1;
+    var a,i,y;
+    a = factor(n);
+    for(i=0; i<a.length; i++){
+        y = a[i];
+        if(y[0]==2){
+            if(y[1]==1) y = 1;
+            else if(y[1]==2) y = 2;
+            else y = Math.pow(2,y[1]-2);
+        }else{
+            y = Math.pow(y[0],y[1]-1)*(y[0]-1);
+        }
+        a[i] = y;
+    }
+    return lcm_list(a);
+}
+
+function nextprime(n){
+    while(!isprime(n))n++;
+    return n;
+}
+
+function factor(n){
+    n = Math.round(n);
+    var a,k,m;
+    a = [];
+    k = 2;
+    while(k<=n){
+        m = 0;
+        while(n%k==0){n=n/k; m++;}
+        if(m!=0) a.push([k,m]);
+        k = nextprime(k+1);
+    }
+    return a;
+}
+
+function pcf(x){
+    var y = 0;
+    for(var k=1; k<=x; k++){
+        y+=isprime(k);
+    }
+    return y;
+}
+
+function sigma(k,n){
+    k = Math.round(k);
+    n = Math.round(n);
+    if(n<1) return NaN;
+    var y = 0;
+    for(var d=1; d<=n; d++){
+        if(n%d==0) y+=Math.pow(d,k);
+    }
+    return y;
+}
+
 var ftab_extension = {
   PT: ChebyshevT, PU: ChebyshevU, PH: Hermite, 
   PP: Legendre, PL: Laguerre, bc: bc,
   psi: psi, digamma: digamma,
   zeta: zeta, ipp: ipp,
   table: table, Wertetabelle: table,
-  Si: Si, Ci: Ci, det: det, unit: unit_vector,
+  Si: Si, Ci: Ci, det: det, unit: unit_vector, I: idm,
+  diag: diag_variadic,
   nabla: nablah(0.001), apply: apply, rot: rotation_matrix,
-  isprime: isprime, prim: isprime, phi: euler_phi,
-  pli: pli_general, L: laplace_transform, delta: delta
+  pli: pli_general, L: laplace_transform, delta: delta,
+  gcd: gcd_variadic, ggT: gcd_variadic,
+  lcm: lcm_variadic, kgV: lcm_variadic,
+  isprime: isprime, prim: isprime, pcf: pcf, factor: factor,
+  phi: euler_phi, lambda: carmichael_lambda, sigma: sigma
 };
 
 

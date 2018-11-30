@@ -28,6 +28,8 @@
 <li><a href="#ei">Elliptische Integrale und verwandte Funktionen</a>
 <li><a href="#polynomial-functions">Polynomfunktionen</a>
 <li><a href="#functional-analysis">Funktionalanalysis</a>
+<li><a href="#LA">Lineare Algebra</a>
+<li><a href="#Zahlentheorie">Zahlentheorie</a>
 <li><a href="#utility-functions">Hilfsfunktionen</a>
 <li><a href="#input-examples">Eingabe-Beispiele</a>
 </ol>
@@ -99,6 +101,10 @@
 <td>a&or;b
 <td>Disjunktion: a oder b.
 <tr>
+<td><code>not(a)</code>
+<td>&not;a
+<td>Logische Negation.
+<tr>
 <td><code>a&lt;b,&nbsp;a&gt;b</code>
 <td>a&lt;b, a&gt;b
 <td>Vergleich.
@@ -162,7 +168,7 @@
 <tr>
 <td><code>iter(f,n,x)</code>
 <td>f<sup>n</sup>(x)
-<td>Die n-te iterierte von f.
+<td>Die n-te Iteration von f.
 </table>
 
 <br>
@@ -465,11 +471,72 @@
 </table>
 
 <br>
+<h3 id="LA">Lineare Algebra</h3>
+<table class="bt">
+<tr>
+<th>Funktion
+<th>Erklärung
+<tr>
+<td><code>I(n)</code>
+<td>Die n&times;n Einheitsmatrix.
+<tr>
+<td><code>rot(phi)</code>
+<td>Rotationsmatrix zum Winkel &phi;.
+<tr>
+<td><code>det(A)</code>
+<td>Determinante der Matrix A.
+<tr>
+<td><code>diag(x1,...,xn)</code>
+<td>Diagonalmatrix.
+</table>
+
+<br>
+<h3 id="Zahlentheorie">Zahlentheorie</h3>
+<table class="bt">
+<tr>
+<th>Funktion
+<th>Erklärung
+<tr>
+<td><code>ggT(a,b)</code>
+<td>Größter gemeinsamer Teiler.
+<tr>
+<td><code>kgV(a,b)</code>
+<td>Kleinstes gemeinsames Vielfaches.
+<tr>
+<td><code>ggT(a)</code>
+<td>Der ggT aller Zahlen der Liste a.
+<tr>
+<td><code>kgV(a)</code>
+<td>Das kgV aller Zahlen der Liste a.
+<tr>
+<td><code>prim(n)</code>
+<td>Primzahltest.
+<tr>
+<td><code>pcf(n)</code>
+<td>Primzahlfunktion, engl. prime-counting function. 
+<tr>
+<td><code>factor(n)</code>
+<td>Primfaktorzerlegung von n.
+<tr>
+<td><code>phi(n)</code>
+<td>Die eulersche Phi-Funktion.
+<tr>
+<td><code>lambda(n)</code>
+<td>Die Carmichael-Funktion.
+<tr>
+<td><code>sigma(k,n)</code>
+<td>Die Teilerfunktion &sigma;<sub>k</sub>(n).
+</table>
+
+<br>
 <h3 id="utility-functions">Hilfsfunktionen</h3>
 <table class="bt">
 <tr>
 <th>Funktion
 <th>Erklärung
+<tr>
+<td><code>len(a)</code>
+<td>Länge der Liste a.
 <tr>
 <td><code>rand()</code>
 <td>Zufallszahl aus dem Intervall [0,1].

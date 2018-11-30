@@ -81,9 +81,9 @@ var ftab = {
     P: set_position, scale: set_scale,
     zeroes: zeroes, roots: zeroes,
     map: map, filter: filter, freq: set_freq,
-    img: plot_img, calc: calc_cmd,
+    img: plot_img, calc: calc_cmd, len: list_length, not: not,
     _addtt_: add_tensor_tensor, _subtt_: sub_tensor_tensor,
-    _mulsv_: mul_scalar_vector, _mulmv_: mul_matrix_vector,
+    _mulst_: mul_scalar_tensor, _mulmv_: mul_matrix_vector,
     _mulmm_: mul_matrix_matrix, _mulvv_: scalar_product,
     _vabs_: abs_vec
 };
@@ -111,6 +111,9 @@ function load_ftab_extension(ftab,path){
         async_continuation();
     });
 }
+
+function list_length(a){return a.length;}
+function not(a){return 1-a;}
 
 function rand(a,b){
     if(a==undefined){
@@ -1276,12 +1279,16 @@ function scalar_product(v,w){
     return y;
 }
 
-function mul_scalar_vector(r,v){
-    var w = [];
-    for(var i=0; i<v.length; i++){
-        w.push(r*v[i]);
+function mul_scalar_tensor(r,a){
+    var b = [];
+    for(var i=0; i<a.length; i++){
+        if(Array.isArray(a[i])){
+            b.push(mul_scalar_tensor(r,a[i]));
+        }else{
+            b.push(r*a[i]);
+        }
     }
-    return w;
+    return b;
 }
 
 function mul_matrix_vector(A,v){
@@ -1344,7 +1351,9 @@ var type_op_table = {"[]":0,"+":0,"-":0,"*":0,"/":0,"abs":0};
 var fn_type_table = {
     "unit": TypeVector,
     "nabla": TypeVector,
-    "rot": TypeMatrix
+    "rot": TypeMatrix,
+    "I": TypeMatrix,
+    "diag": TypeMatrix
 };
 var id_type_table = {};
 
@@ -1376,12 +1385,17 @@ function infer_type(t){
                     }else if(T[1]==TypeVector){
                         t[0] = "_mulvv_";
                     }else{
-                        t[0] = "_mulsv_";
+                        t[0] = "_mulst_";
                         return TypeVector;
                     }
                 }else if(T[2]==TypeMatrix){
-                    t[0] = "_mulmm_";
-                    return TypeMatrix;
+                    if(T[1]==TypeMatrix){
+                        t[0] = "_mulmm_";
+                        return TypeMatrix;
+                    }else{
+                        t[0] = "_mulst_";
+                        return TypeMatrix;
+                    }
                 }
             }else if(t[0]==="/"){
                 if(T[1]!=TypeNumber){
@@ -2540,7 +2554,7 @@ function node_loop(callback,gx,t,color){
 }
 
 var bool_result_ops = {
-    "<":0, ">":0, "<=":0, ">=":0, "&":0, "|":0
+    "<":0, ">":0, "<=":0, ">=":0, "&":0, "|":0, "not":0
 };
 
 function plot_node_basic(gx,t,color){
@@ -2679,6 +2693,29 @@ function plot(gx){
     }
 }
 
+function calculate_eval(t){
+    if(Array.isArray(t) && t[0]===";"){
+        var a = [];
+        for(var i=2; i<t.length; i++){
+            var y = calculate_eval(t[i]);
+            if(y!=undefined) a.push(y);
+        }
+        return calculate_eval(t[1]);
+    }else if(Array.isArray(t) && t[0]==="block"){
+        var a = [];
+        for(var i=1; i<t.length; i++){
+            var y = calculate_eval(t[i]);
+            if(y!=undefined) a.push(y);
+        }
+        if(a.length>0) return a;
+    }else if(Array.isArray(t) && t[0]===":="){
+        global_definition(t);
+    }else{
+        infer_type(t);
+        return compile(t,[])();
+    }
+}
+
 function calculate(compile){
     var input = get_value("input-calc");
     var out = document.getElementById("calc-out");
@@ -2688,11 +2725,14 @@ function calculate(compile){
     }
     try{
         var t = ast(input);
-        infer_type(t);
-        var value = compile(t,[]);
+        var value = calculate_eval(t);
         // out.innerHTML = "<p><code>"+str(t)+"</code>";
         // var t0 = performance.now();
-        out.innerHTML = "<p><code>= "+str(value())+"</code>";
+        if(value==undefined){
+            out.innerHTML = "";
+        }else{
+            out.innerHTML = "<p><code>= "+str(value)+"</code>";
+        }
         // var t1 = performance.now();
         // out.innerHTML += "<p><code>time: "+(t1-t0)+"ms</code>";
     }catch(e){
