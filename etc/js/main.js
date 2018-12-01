@@ -665,6 +665,15 @@ function tex_export_tex(buffer,s){
                 a.push("\\");
                 a.push(id);
             }
+        }else if(s[i]=='<'){
+            a.push("&lt;");
+            i++;
+        }else if(s[i]=='>'){
+            a.push("&gt;");
+            i++;
+        }else if(s[i]=='&'){
+            a.push("&amp;");
+            i++;
         }else{
             a.push(s[i]);
             i++;
