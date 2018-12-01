@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Editor</title>
+  <script src="js/main.js"></script>
+  <link href="css/ui.css" rel="stylesheet">
+</head>
+<body>
+
+<button onclick="button_example()">Beispiel</button>
+<button onclick="button_sqrt()">&radic;</button>
+<button onclick="button_pm()">&plusmn;</button>
+<button onclick="button_mp()">∓</button>
+<button onclick="button_implies()">&rArr;</button>
+<button onclick="button_iff()">&hArr;</button>
+<button onclick="button_forall()">&forall;</button>
+<button onclick="button_exists()">&exist;</button>
+<br>
+
+<button onclick="button_preview()">Vorschau</button>
+<button onclick="button_export()">Export</button>
+
+<button onclick="button_parens()">()</button>
+<button onclick="button_frac()">a/b</button>
+<button onclick="button_diff()">d/dx</button>
+<button onclick="button_pdiff()">&part;/&part;x</button>
+<button onclick="button_lim()">lim</button>
+<button onclick="button_sum()">&sum;</button>
+<button onclick="button_int()">&int; f(x) dx</button>
+<button onclick="button_fn()">f: A&rarr;B</button>
+<button onclick="button_matrix()">Matrix</button>
+<button onclick="button_vector()">Vector</button>
+
+<div class="container">
+<div class="left">
+<textarea id="input" rows="26" cols="64"
+  onkeyup="input_mod()" onmouseup="input_mod()"
+></textarea>
+</div>
+<div class="right">
+<div id="output">
+</div>
+</div>
+
+</body>
+</html>
+
