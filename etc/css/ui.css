@@ -59,13 +59,14 @@ div.container {
   display: flex;
 }
 div.left {
-  border: 2px solid #a0a0a0;
+  border: 2px solid #b4b4b0;
   flex-grow: 0;
 }
 div.right {
-  border: 2px solid #a0a0a0;
+  border: 2px solid #b4b4b0;
   flex-grow: 2;
   overflow: scroll;
   max-height: 32em;
+  padding-left: 10px;
 }
-#output{}
+

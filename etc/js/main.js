@@ -67,6 +67,14 @@ function scan(s){
             flush_node(a,node);
             a.push([Symbol,"//"]);
             i+=2;
+        }else if(i+1<n && s[i]=='[' && s[i+1]=='/'){
+            flush_node(a,node);
+            a.push([Symbol,"[/"]);
+            i+=2;
+        }else if(s[i]=='[' || s[i]==']'){
+            flush_node(a,node);
+            a.push([Symbol,s[i]]);
+            i+=1;
         }else{
             node.push(s[i]);
             i++;
@@ -333,6 +341,35 @@ function wiki_syntax(a,i,end,op){
     a.push([op,y]);
 }
 
+function bbcode(a,i){
+    i.index++;
+    var t = i.a[i.index];
+    if(t[0]!=Text){
+        a.push("[");
+        return;
+    }
+    var id = t[1];
+    i.index++;
+    t = i.a[i.index];
+    if(t[0]!=Symbol || t[1]!="]"){
+        a.push("["+id);
+        return;
+    }
+    i.index++;
+    var y = ast(i,"[/");
+    var t = i.a[i.index];
+    if(t[0]!=Symbol || t[1]!="[/"){
+        a.push([id,y]);
+        return;
+    }
+    i.index++;
+    t = i.a[i.index];
+    if(t[0]==Text) i.index++;
+    t = i.a[i.index];
+    if(t[0]==Symbol && t[1]=="]") i.index++;
+    a.push([id,y]);
+}
+
 function ast(i,stop){
     var a = ["block"];
     while(1){
@@ -361,8 +398,10 @@ function ast(i,stop){
                 wiki_syntax(a,i,"**","b");
             }else if(t[1]=="//"){
                 wiki_syntax(a,i,"//","i");
+            }else if(t[1]=="["){
+                bbcode(a,i);
             }else{
-                throw "unknown symbol";
+                throw "unknown symbol '"+t[1]+"'";
             }
         }
     }
