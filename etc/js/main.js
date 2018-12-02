@@ -14,6 +14,248 @@ var standard_context = {
     font_extra: false
 };
 
+var argc_table = {
+    "frac": 2,
+    "mathrm": 1,
+    "mathbf": 1,
+    "mathbb": 1,
+    "mathsf": 1,
+    "mathcal": 1,    
+    "sqrt": 1,
+    "vec": 1,
+    "overline": 1,
+    "underline": 1,
+    "ol": 1,
+    "ul": 1,
+    "left": 1,
+    "right": 1
+};
+
+var greek_upper = {
+    "Gamma": "&Gamma;",
+    "Delta": "&Delta;",
+    "Theta": "&Theta;",
+    "Lambda": "&Lambda;",
+    "Xi": "&Xi;",
+    "Pi": "&Pi;",
+    "Sigma": "&Sigma;",
+    "Upsilon": "&Upsilon;",
+    "Phi": "&Phi;",
+    "Chi": "&Chi;",
+    "Psi": "&Psi;",
+    "Omega": "&Omega;"
+};
+
+var macro_tab_mathml = {
+    "sin": "<mi>sin</mi>",
+    "cos": "<mi>cos</mi>",
+    "tan": "<mi>tan</mi>",
+    "cot": "<mi>cot</mi>",
+    "sinh": "<mi>sinh</mi>",
+    "cosh": "<mi>cosh</mi>",
+    "tanh": "<mi>tanh</mi>",
+    "coth": "<mi>coth</mi>",
+    "lim": "<mi>lim</mi>",
+    "ln": "<mi>ln</mi>",
+    "log": "<mi>log</mi>",
+    "int": "<mo>&int;</mo>",
+    "iint": "<mo>∬</mo>",
+    "iiint": "<mo>∭</mo>",
+    "pm": "<mo>&plusmn;</mo>",
+    "mp": "<mo>∓</mo>",
+    "sum": "<mo>&sum;</mo>",
+    "prod": "<mo>&prod;</mo>",
+    "coprod": "<mo>∐</mo>",
+
+    "langle": "<mo stretchy='false'>&lang;</mo>",
+    "rangle": "<mo stretchy='false'>&rang;</mo>",
+    "lfloor": "<mo stretchy='false'>⌊</mo>",
+    "rfloor": "<mo stretchy='false'>⌋</mo>",
+    "lceil": "<mo stretchy='false'>⌈</mo>",
+    "rceil": "<mo stretchy='false'>⌉</mo>",
+    "nabla": "<mo>&nabla;</mo>",
+    "partial": "<mo>&part;</mo>",
+    "Re": "<mo>&real;</mo>",
+    "Im": "<mo>&image;</mo>",
+    "emptyset": "<mi>&empty;</mi>",
+    "varnothing": "<mi>&empty;</mi>",
+    "colon": ":<mspace width='4px'/>",
+    "infty": "<mo>&infin;</mo>",
+    "div": "<mo>&divide;</mo>",
+    "surd": "<mo>√</mo>",
+    "backslash": "<mo>\\</mo>",
+    "prime": "<mo>'</mo>",
+    "forall": "<mo>&forall;</mo>",
+    "exists": "<mo>&exist;</mo>",
+    "ell": "<mi>ℓ</mi>",
+    "aleph": "<mi></mi>",
+    "wp": "<mi>℘</mi>",
+
+    "cap": "<mo>&cap;</mo>",
+    "cup": "<mo>&cup;</mo>",
+    "land": "<mo>&and;</mo>",
+    "lor": "<mo>&or;</mo>",
+    "wedge": "<mo>&and;</mo>",
+    "vee": "<mo>&or;</mo>",
+    "sqcap": "<mo>⊓</mo>",
+    "sqcup": "<mo>⊔</mo>",
+    "circ": "<mo>∘</mo>",
+    "ast": "<mo>*</mo>",
+    "cdot": "<mo>&sdot;</mo>",
+    "star": "<mo>⋆</mo>",
+    "bullet": "<mo>∙</mo>",
+    "times": "<mo>&times;</mo>",
+    "oplus": "<mo>&oplus;</mo>",
+    "ominus": "<mo>⊖</mo>",
+    "otimes": "<mo>&otimes;</mo>",
+    "odot": "<mo>⊙</mo>",
+    "oslash": "<mo>⊘</mo>",
+    "boxplus": "<mo>⊞</mo>",
+    "boxminus": "<mo>⊟</mo>",
+    "boxtimes": "<mo>⊠</mo>",
+    "boxdot": "<mo>⊡</mo>",
+    "uplus": "<mo>⊎</mo>",
+    "setminus": "<mo>\\</mo>",
+    "sharp": "<mo>♯</mo>",
+    "flat": "<mo>♭</mo>",
+    "natural": "<mo>♮</mo>",
+    "neg": "<mo>&not;</mo>",
+
+    "in": "<mo>&isin;</mo>",
+    "notin": "<mo>&notin;</mo>",
+    "subset": "<mo>&sub;</mo>",
+    "subseteq": "<mo>&sube;</mo>",
+    "supset": "<mo>&sup;</mo>",
+    "supseteq": "<mo>&supe;</mo>",
+    "bot": "<mo>&perp;</mo>",
+    "top": "<mo>⊤</mo>",
+    "perp": "<mo>&perp;</mo>",
+    "models": "<mo>⊨</mo>",
+    "vdash": "<mo>⊢</mo>",
+    "le": "<mo>&le;</mo>",
+    "ge": "<mo>&ge;</mo>",
+    "leq": "<mo>&le;</mo>",
+    "geq": "<mo>&geq;</mo>",
+    "ne": "<mo>&ne;</mo>",
+    "neq": "<mo>&ne;</mo>",
+    "equiv": "<mo>&equiv;</mo>",
+    "cong": "<mo>&cong;</mo>",
+    "sim": "<mo>&sim;</mo>",
+    "simeq": "<mo>≃</mo>",
+    "approx": "<mo>&asymp;</mo>",
+    "lhd": "<mo>⊲</mo>",
+    "rhd": "<mo>⊳</mo>",
+    "unlhd": "<mo>⊴</mo>",
+    "unrhd": "<mo>⊵</mo>",
+    "parallel": "<mo>||</mo>",
+    "propto": "<mo>&prop;</mo>",
+
+    "to": "<mo>&rarr;</mo>",
+    "mapsto": "<mo>↦</mo>",
+    "longmapsto": "<mo>⟼</mo>",
+    "implies": "<mo>⟹</mo>",
+    "iff": "<mo>⟺</mo>",
+    "leftarrow": "<mo>&larr;</mo>",
+    "rightarrow": "<mo>&rarr;</mo>",
+    "Leftarrow": "<mo>&lArr;</mo>",
+    "Rightarrow": "<mo>&rArr;</mo>",
+    "leftrightarrow": "<mo>&harr;</mo>",
+    "Leftrightarrow": "<mo>&hArr;</mo>",
+    "uparrow": "<mo>&uarr;</mo>",
+    "downarrow": "<mo>&darr;</mo>",
+    "Uparrow": "<mo>⇑</mo>",
+    "Downarrow": "<mo>⇓</mo>",
+    "nearrow": "<mo>↗</mo>",
+    "searrow": "<mo>↘</mo>",
+    "nwarrow": "<mo>↖</mo>",
+    "swarrow": "<mo>↙</mo>",
+    "longrightarrow": "<mo>⟶</mo>",
+    "longleftarrow": "<mo>⟵</mo>",
+    "longleftrightarrow": "<mo>⟷</mo>",
+    "Longrightarrow": "<mo>⟹</mo>",
+    "Longleftarrow": "<mo>⟸</mo>",
+    "Longleftrightarrow": "<mo>⟺</mo>",
+    "rightharpoonup": "<mo>⇀</mo>",
+    "leftharpoonup": "<mo>↼</mo>",
+    "rightharpoondown": "<mo>↽</mo>",
+    "leftharpoondown": "<mo>⇁</mo>",
+
+    "ldots": "<mo>&hellip;</mo>",
+    "cdots": "<mo>&hellip;</mo>",
+    "mid": "<mo>|</mo>",
+    "quad": "<mspace width='14px'/>",
+    "qquad": "<mspace width='28px'/>",
+    "alpha": "<mi>&alpha;</mi>",
+    "beta": "<mi>&beta;</mi>",
+    "gamma": "<mi>&gamma;</mi>",
+    "delta": "<mi>&delta;</mi>",
+    "epsilon": "<mi>&epsilon;</mi>",
+    "varepsilon": "<mi>&epsilon;</mi>",
+    "zeta": "<mi>&zeta;</mi>",
+    "eta": "<mi>&eta;</mi>",
+    "theta": "<mi>&theta;</mi>",
+    "iota": "<mi>&iota;</mi>",
+    "kappa": "<mi>&kappa;</mi>",
+    "lambda": "<mi>&lambda;</mi>",
+    "mu": "<mi>&mu;</mi>",
+    "nu": "<mi>&nu;</mi>",
+    "xi": "<mi>&xi;</mi>",
+    "omicron": "<mo>&omicron;</mi>",
+    "pi": "<mi>&pi;</mi>",
+    "rho": "<mi>&rho;</mi>",
+    "varrho": "<mi>&rho;</mi>",
+    "sigma": "<mi>&sigma;</mi>",
+    "tau": "<mi>&tau;</mi>",
+    "upsilon": "<mi>&upsilon;</mi>",
+    "phi": "<mi>&phi;</mi>",
+    "varphi": "<mi>&phi;</mi>",
+    "chi": "<mi>&chi;</mi>",
+    "psi": "<mi>&psi;</mi>",
+    "omega": "<mi>&omega;</mi>",
+    ",": "<mspace width='3px'/>",
+    "{": "<mo>{</mo>",
+    "}": "<mo>}</mo>",
+    "|": "<mo stretchy='false'>||</mo>",
+    "%": "<mo>%</mo>",
+    "#": "<mo>#</mo>",
+    "&": "<mo>&amp;</mo>",
+    "_": "<mo>_</mo>",
+
+    "N": "<mi mathvariant='bold'>N</mi>",
+    "Z": "<mi mathvariant='bold'>Z</mi>",
+    "R": "<mi mathvariant='bold'>R</mi>",
+    "C": "<mi mathvariant='bold'>C</mi>",
+    "H": "<mi mathvariant='bold'>H</mi>",
+    "P": "<mi mathvariant='bold'>P</mi>",
+    "la": "<mo>&larr;</mo>",
+    "ra": "<mo>&rarr;</mo>",
+    "lra": "<mo>&harr;</mo>",
+    "La": "<mo>&lArr;</mo>",
+    "Ra": "<mo>&rArr;</mo>",
+    "Lra": "<mo>&hArr;</mo>",
+    "longra": "<mo>⟶</mo>",
+    "longla": "<mo>⟵</mo>",
+    "longlra": "<mo>⟷</mo>",
+    "Longra": "<mo>⟹</mo>",
+    "Longla": "<mo>⟸</mo>",
+    "Longlra": "<mo>⟺</mo>",
+    "ua": "<mo>&uarr;</mo>",
+    "da": "<mo>&darr;</mo>",
+    "Ua": "<mo>⇑</mo>",
+    "Da": "<mo>⇓</mo>"
+};
+
+function object_update(x,y,f){
+    var a = Object.keys(y);
+    for(var i=0; i<a.length; i++){
+        x[a[i]] = f(y[a[i]]);
+    }
+}
+
+object_update(macro_tab_mathml,greek_upper,function(x){
+    return "<mi mathvariant='normal'>"+x+"</mi>";
+});
+
 function isalpha(s){
     return /^[a-zäöü]+$/i.test(s);
 }
@@ -97,7 +339,7 @@ function tex_scan(s){
             i++;
         }else if(isdigit(s[i])){
             var j = i;
-            while(i<n && isdigit(s[i])) i++;
+            while(i<n && (isdigit(s[i]) || s[i]=='.')) i++;
             a.push([Digits,s.slice(j,i)]);
         }else if(s[i]=='\\'){
             i++;
@@ -121,130 +363,6 @@ function tex_scan(s){
     a.push([Terminal]);
     return a;
 }
-
-var argc_table = {
-    "frac": 2,
-    "mathrm": 1,
-    "mathbf": 1,
-    "mathbb": 1,
-    "mathsf": 1,
-    "mathcal": 1,    
-    "sqrt": 1,
-    "vec": 1,
-    "left": 1,
-    "right": 1
-};
-
-var greek_upper = {
-    "Gamma": "&Gamma;",
-    "Delta": "&Delta;",
-    "Theta": "&Theta;",
-    "Lambda": "&Lambda;",
-    "Xi": "&Xi;",
-    "Pi": "&Pi;",
-    "Sigma": "&Sigma;",
-    "Phi": "&Phi;",
-    "Chi": "&Chi;",
-    "Psi": "&Psi;",
-    "Omega": "&Omega;"
-};
-
-var macro_tab_mathml = {
-    "sin": "<mi>sin</mi>",
-    "cos": "<mi>cos</mi>",
-    "tan": "<mi>tan</mi>",
-    "lim": "<mo>lim</mo>",
-    "int": "<mo>&int;</mo>",
-    "iint": "<mo>∬</mo>",
-    "iiint": "<mo>∭</mo>",
-    "pm": "<mo>&plusmn;</mo>",
-    "mp": "<mo>∓</mo>",
-    "sum": "<mo>&sum;</mo>",
-    "prod": "<mo>&prod;</mo>",
-    "R": "<mi mathvariant='bold'>R</mi>",
-    "N": "<mi mathvariant='bold'>N</mi>",
-    "Z": "<mi mathvariant='bold'>Z</mi>",
-    "C": "<mi mathvariant='bold'>C</mi>",
-    "langle": "<mo stretchy='false'>&lang;</mo>",
-    "rangle": "<mo stretchy='false'>&rang;</mo>",
-    "nabla": "<mo>&nabla;</mo>",
-    "partial": "<mo>&part;</mo>",
-    "colon": ":<mspace width='4px'/>",
-    "to": "<mo>&rarr;</mo>",
-    "infty": "<mo>&infin;</mo>",
-    "in": "<mo>&in;</mo>",
-    "implies": "<mo>⟹</mo>",
-    "iff": "<mo>⟺</mo>",
-    "subset": "<mo>&sub;</mo>",
-    "subseteq": "<mo>&sube;</mo>",
-    "emptyset": "<mi>&empty;</mi>",
-    "cup": "<mo>&cup;</mo>",
-    "cap": "<mo>&cap;</mo>",
-    "circ": "<mo>∘</mo>",
-    "oplus": "<mo>&oplus;</mo>",
-    "otimes": "<mo>&otimes;</mo>",
-    "bot": "<mo>&perp;</mo>",
-    "le": "<mo>&le;</mo>",
-    "ge": "<mo>&ge;</mo>",
-    "neq": "<mo>&ne;</mo>",
-    "cong": "<mo>&cong;</mo>",
-    "sim": "<mo>&sim;</mo>",
-    "simeq": "<mo>≃</mo>",
-    "approx": "<mo>&asymp;</mo>",
-    "leftarrow": "<mo>&larr;</mo>",
-    "rightarrow": "<mo>&rarr;</mo>",
-    "Leftarrow": "<mo>&lArr;</mo>",
-    "Rightarrow": "<mo>&rArr;</mo>",
-    "rightleftarrow": "<mo>&harr;</mo>",
-    "Rightleftarrow": "<mo>&hArr;</mo>",
-    "lor": "<mo>&or;</mo>",
-    "land": "<mo>&and;</mo>",
-    "ldots": "<mo>&hellip;</mo>",
-    "cdots": "<mo>&hellip;</mo>",
-    "mid": "<mo>|</mo>",
-    "forall": "<mo>&forall;</mo>",
-    "exists": "<mo>&exist;</mo>",
-    "quad": "<mspace width='14px'/>",
-    "qquad": "<mspace width='28px'/>",
-    "alpha": "<mi>&alpha;</mi>",
-    "beta": "<mi>&beta;</mi>",
-    "gamma": "<mi>&gamma;</mi>",
-    "delta": "<mi>&delta;</mi>",
-    "epsilon": "<mi>&epsilon;</mi>",
-    "varepsilon": "<mi>&epsilon;</mi>",
-    "zeta": "<mi>&zeta;</mi>",
-    "eta": "<mi>&eta;</mi>",
-    "theta": "<mi>&theta;</mi>",
-    "iota": "<mi>&iota;</mi>",
-    "kappa": "<mi>&kappa;</mi>",
-    "mu": "<mi>&mu;</mi>",
-    "nu": "<mi>&nu;</mi>",
-    "xi": "<mi>&xi;</mi>",
-    "omicron": "<mo>&omicron;</mi>",
-    "pi": "<mi>&pi;</mi>",
-    "rho": "<mi>&rho;</mi>",
-    "sigma": "<mi>&sigma;</mi>",
-    "tau": "<mi>&tau;</mi>",
-    "phi": "<mi>&phi;</mi>",
-    "chi": "<mi>&chi;</mi>",
-    "psi": "<mi>&psi;</mi>",
-    "omega": "<mi>&omega</mi>",
-    ",": "<mspace width='3px'/>",
-    "{": "<mo>{</mo>",
-    "}": "<mo>}</mo>",
-    "|": "<mo stretchy='false'>||</mo>"
-};
-
-function object_update(x,y,f){
-    var a = Object.keys(y);
-    for(var i=0; i<a.length; i++){
-        x[a[i]] = f(y[a[i]]);
-    }
-}
-
-object_update(macro_tab_mathml,greek_upper,function(x){
-    return "<mi mathvariant='normal'>"+x+"</mi>";
-});
 
 function tex_macro(id,i){
     var argc = 0;
@@ -468,6 +586,16 @@ function tex_macro_mathml(buffer,id,a,context){
         }else{
             buffer.push("<mo>"+a[0]+"</mo>");
         }
+    }else if(id=="ol" || id=="overline"){
+        buffer.push("<mover accent='true'>");
+        tex_export_mathml(buffer,a[0],context);
+        buffer.push("<mo stretchy='true'>&OverBar;</mo>");
+        buffer.push("</mover>");
+    }else if(id=="ul" || id=="underline"){
+        buffer.push("<munder accent='true'>");
+        tex_export_mathml(buffer,a[0],context);
+        buffer.push("<mo stretchy='true'>&UnderBar;</mo>");
+        buffer.push("</munder>");
     }else{
         if(macro_tab_mathml.hasOwnProperty(id)){
             buffer.push(macro_tab_mathml[id]);
@@ -478,7 +606,7 @@ function tex_macro_mathml(buffer,id,a,context){
 }
 
 var under_over_table = {
-    "sum":0, "lim":0
+    "sum":0, "lim":0, "coprod":0
 };
 
 function is_under_over(t){
@@ -646,7 +774,25 @@ var tex_substitution_table = {
     "N": "\\mathbb N",
     "Z": "\\mathbb Z",
     "R": "\\mathbb R",
-    "C": "\\mathbb C"
+    "C": "\\mathbb C",
+    "H": "\\mathbb H",
+    "P": "\\mathbb P",
+    "la": "\\leftarrow",
+    "ra": "\\rightarrow",
+    "lra": "\\leftrightarrow",
+    "La": "\\Leftarrow",
+    "Ra": "\\Rightarrow",
+    "Lra": "\\Leftrightarrow",
+    "longra": "\\longrightarrow",
+    "longla": "\\longleftarrow",
+    "longlra": "\\longleftrightarrow",
+    "Longra": "\\Longrightarrow",
+    "Longla": "\\Longleftarrow",
+    "Longlra": "\\Longleftrightarrow",
+    "ua": "\\uparrow",
+    "da": "\\downarrow",
+    "ol": "\\overline",
+    "ul": "\\underline"
 };
 
 function tex_export_tex(buffer,s){
