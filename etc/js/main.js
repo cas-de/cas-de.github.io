@@ -23,10 +23,13 @@ var argc_table = {
     "mathcal": 1,    
     "sqrt": 1,
     "vec": 1,
+    "bar": 1,
     "overline": 1,
     "underline": 1,
     "ol": 1,
     "ul": 1,
+    "operatorname": 1,
+    "n": 1,
     "left": 1,
     "right": 1
 };
@@ -61,11 +64,16 @@ var macro_tab_mathml = {
     "int": "<mo>&int;</mo>",
     "iint": "<mo>∬</mo>",
     "iiint": "<mo>∭</mo>",
+    "oint": "<mo>∮</mo>",
     "pm": "<mo>&plusmn;</mo>",
     "mp": "<mo>∓</mo>",
     "sum": "<mo>&sum;</mo>",
     "prod": "<mo>&prod;</mo>",
     "coprod": "<mo>∐</mo>",
+    "bigcap": "<mo>⋂</mo>",
+    "bigcup": "<mo>⋃</mo>",
+    "bigwedge": "<mo>⋀ </mo>",
+    "bigvee": "<mo>⋁</mo>",
 
     "langle": "<mo stretchy='false'>&lang;</mo>",
     "rangle": "<mo stretchy='false'>&rang;</mo>",
@@ -559,7 +567,10 @@ function tex_macro_mathml(buffer,id,a,context){
         tex_export_mathml(buffer,a[0],context);
         tex_export_mathml(buffer,a[1],context);
         buffer.push("</mfrac>");
-    }else if(id=="mathrm" || id=="mathbf" || id=="mathbb" || id=="mathsf" || id=="mathcal"){
+    }else if(
+        id=="mathrm" || id=="mathbf" || id=="mathbb" ||
+        id=="mathsf" || id=="mathcal"
+    ){
         buffer.push("<mrow>");
         tex_export_mathml(buffer,a[0],{font_extra: true, font_type: id});
         buffer.push("</mrow>");
@@ -586,7 +597,7 @@ function tex_macro_mathml(buffer,id,a,context){
         }else{
             buffer.push("<mo>"+a[0]+"</mo>");
         }
-    }else if(id=="ol" || id=="overline"){
+    }else if(id=="bar" || id=="ol" || id=="overline"){
         buffer.push("<mover accent='true'>");
         tex_export_mathml(buffer,a[0],context);
         buffer.push("<mo stretchy='true'>&OverBar;</mo>");
@@ -596,6 +607,10 @@ function tex_macro_mathml(buffer,id,a,context){
         tex_export_mathml(buffer,a[0],context);
         buffer.push("<mo stretchy='true'>&UnderBar;</mo>");
         buffer.push("</munder>");
+    }else if(id=="n" || id=="operatorname"){
+        buffer.push("<mstyle mathvariant='normal'>");
+        tex_export_mathml(buffer,a[0],context);
+        buffer.push("</mstyle><mspace width='4px'/>");
     }else{
         if(macro_tab_mathml.hasOwnProperty(id)){
             buffer.push(macro_tab_mathml[id]);
@@ -606,7 +621,8 @@ function tex_macro_mathml(buffer,id,a,context){
 }
 
 var under_over_table = {
-    "sum":0, "lim":0, "coprod":0
+    "sum":0, "lim":0, "coprod":0,
+    "bigcap":0, "bigcup":0, "bigwedge":0, "bigvee":0
 };
 
 function is_under_over(t){
@@ -792,7 +808,8 @@ var tex_substitution_table = {
     "ua": "\\uparrow",
     "da": "\\downarrow",
     "ol": "\\overline",
-    "ul": "\\underline"
+    "ul": "\\underline",
+    "n": "\\operatorname"
 };
 
 function tex_export_tex(buffer,s){
