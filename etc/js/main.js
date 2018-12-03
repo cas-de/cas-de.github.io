@@ -266,8 +266,8 @@ var macro_tab_mathml = {
     "da": "<mo>&darr;</mo>",
     "Ua": "<mo>⇑</mo>",
     "Da": "<mo>⇓</mo>",
-    "re": "<mo>Re</mo>",
-    "im": "<mo>Im</mo>"
+    "re": "<mi>Re</mi>",
+    "im": "<mi>Im</mi>"
 };
 
 function object_update(x,y,f){
