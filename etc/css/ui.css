@@ -70,3 +70,28 @@ div.right {
   padding-left: 10px;
 }
 
+button{
+  background-image: linear-gradient(#ffffff,#ebebea);
+  border: 1px solid #bababa;
+  border-radius: 5px;
+  padding-bottom: 4px;
+  padding-top: 4px;
+  margin-bottom: 4px;
+  margin-top: 1px;
+  padding-left: 13px;
+  padding-right: 13px;
+  margin-left: 1px;
+  margin-right: 1px;
+}
+
+button:active{
+  background-image: linear-gradient(#d0d0d0,#f0f0f0);
+}
+
+button::-moz-focus-inner {
+  border: 0;
+}
+
+button:focus{
+  outline: none;
+}

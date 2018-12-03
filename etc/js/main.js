@@ -1,7 +1,8 @@
 
 var update_needed = true;
 var export_input = false;
-var tex_mode = false;
+var mathjax_mode = false;
+var last_input = undefined;
 
 var Text = 0;
 var Symbol = 1;
@@ -626,11 +627,7 @@ function ast(i,stop){
                 a.push(["n"]);
             }else if(t[1]=="$"){
                 i.index++;
-                if(tex_mode){
-                    a.push(["tex",i.a[i.index][1]]);
-                }else{
-                    a.push(["tex",tex_parse(i.a[i.index][1])]);
-                }
+                a.push(["tex",i.a[i.index][1]]);
                 i.index++;
             }else if(t[1]=="`"){
                 wiki_syntax(a,i,"`","code");
@@ -952,9 +949,15 @@ function export_html_node(buffer,t){
             export_html_node(buffer,t[1]);
             buffer.push("</i>");
         }else if(op=="tex"){
-            buffer.push("<math displaystyle='true'>");
-            tex_export_mathml(buffer,t[1],standard_context);
-            buffer.push("</math>");
+            if(mathjax_mode){
+                buffer.push("\\(\\displaystyle ");
+                tex_export_tex(buffer,t[1]);
+                buffer.push("\\)");
+            }else{
+                buffer.push("<math displaystyle='true'>");
+                tex_export_mathml(buffer,tex_parse(t[1]),standard_context);
+                buffer.push("</math>");
+            }
         }else{
             throw "unknown function: "+t[1];
         }
@@ -970,7 +973,6 @@ function export_html(t){
 }
 
 function into_html(s){
-    tex_mode = false;
     var t = parse(s);
     // console.log(JSON.stringify(t));
     return export_html(t);
@@ -1077,7 +1079,6 @@ function export_mb(t){
 }
 
 function into_mb(s){
-    tex_mode = true;
     var t = parse(s);
     return export_mb(t);
 }
@@ -1087,15 +1088,22 @@ function update(force){
         update_needed = false;
         var input = document.getElementById("input");
         var output = document.getElementById("output");
+        var input_value = input.value;
         if(export_input){
-            var out = into_mb(input.value);
+            var out = into_mb(input_value);
             // console.log(out);
             output.innerHTML = out;
         }else{
-            var out = into_html(input.value);
-            // console.log(out);
-            output.innerHTML = out;
+            if(last_input!=input_value){
+                var out = into_html(input_value);
+                // console.log(out);
+                output.innerHTML = out;
+                if(mathjax_mode){
+                    MathJax.Hub.Queue(["Typeset",MathJax.Hub,output]);
+                }
+            }
         }
+        last_input = input_value;
     }
 }
 
@@ -1115,6 +1123,7 @@ function insert_text(text,offset){
 
 function button_preview(){
     export_input = false;
+    last_input = undefined;
     update(true);
 }
 
@@ -1215,7 +1224,26 @@ function button_matrix31(){
     insert_text("\\begin{pmatrix}x \\\\ y\\\\ z\\end{pmatrix}");
 }
 
+function query(){
+    var a = window.location.href.split("?");
+    if(a.length>1){
+        a = a[1].split(",");
+        for(var i=0; i<a.length; i++){
+            if(a[i]=="mathjax"){mathjax_mode = true;}
+        }
+    }
+}
+
 window.onload = function(){
-    setInterval(update,250);
+    query();
+    if(mathjax_mode){
+        var script = document.createElement("script");
+        script.type = "text/javascript";
+        script.src  = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML";
+        document.getElementsByTagName("head")[0].appendChild(script);
+        setInterval(update,1000);
+    }else{
+        setInterval(update,250);
+    }
 };
 
