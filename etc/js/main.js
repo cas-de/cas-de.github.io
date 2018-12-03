@@ -30,8 +30,11 @@ var argc_table = {
     "ul": 1,
     "operatorname": 1,
     "n": 1,
+    "binom": 2,
     "left": 1,
-    "right": 1
+    "right": 1,
+    "begin": 1,
+    "end": 1
 };
 
 var greek_upper = {
@@ -351,14 +354,19 @@ function tex_scan(s){
             a.push([Digits,s.slice(j,i)]);
         }else if(s[i]=='\\'){
             i++;
-            while(i<n && isspace(s[i])) i++;
-            if(i<n && isalpha(s[i])){
-                var j = i;
-                while(i<n && isalpha(s[i])) i++;
-                a.push([Macro,s.slice(j,i)]);
-            }else if(i<n){
-                a.push([Macro,s[i]]);
+            if(i<n && s[i]=='\\'){
+                a.push([Symbol,"br"]);
                 i++;
+            }else{
+                while(i<n && isspace(s[i])) i++;
+                if(i<n && isalpha(s[i])){
+                    var j = i;
+                    while(i<n && isalpha(s[i])) i++;
+                    a.push([Macro,s.slice(j,i)]);
+                }else if(i<n){
+                    a.push([Macro,s[i]]);
+                    i++;
+                }
             }
         }else if(i+1<n && s[i]==':' && s[i+1]=='='){
             a.push([Symbol,":="]);
@@ -370,6 +378,18 @@ function tex_scan(s){
     }
     a.push([Terminal]);
     return a;
+}
+
+function tex_join(t){
+    if(Array.isArray(t)){
+        var a = [];
+        for(var i=1; i<t.length; i++){
+            a.push(tex_join(t[i]));
+        }
+        return a.join("");
+    }else{
+        return t;
+    }
 }
 
 function tex_macro(id,i){
@@ -384,7 +404,17 @@ function tex_macro(id,i){
         var y = tex_node(i);
         argv.push(y);
     }
-    return ["\\",id,argv];
+    if(id=="begin" && argv.length==1){
+        id = tex_join(argv[0]);
+        var x = tex_matrix(i);
+        var t = i.a[i.index];
+        if(t[0]==Macro){
+            var terminal = tex_macro(t[1],i);
+        }
+        return ["\\",id,[x]];
+    }else{
+        return ["\\",id,argv];
+    }
 }
 
 function tex_node(i){
@@ -432,13 +462,73 @@ function tex_sub_sup(i){
     return x;
 }
 
+function tex_row(i,t0){
+    var a,t;
+    t = i.a[i.index];
+    if(t[0]==Symbol && t[1]=='&'){
+        a = ["&",""];
+    }else{
+        a = ["&",tex_ast(i)];
+    }
+    while(1){
+        t = i.a[i.index];
+        if(t[0]==Symbol && t[1]=='&'){
+            i.index++;
+            t = i.a[i.index];
+            if(t[0]==Symbol && (t[1]=='&' || t[1]=='br')){
+                a.push("");
+            }else{
+                a.push(tex_ast(i));
+            }
+        }else{
+            break;
+        }
+    }
+    if(a.length==2){
+        return a[1];
+    }else{
+        return a;
+    }
+}
+
+function tex_matrix(i){
+    var a,t;
+    t = i.a[i.index];
+    if(t[0]==Symbol && t[1]=="br"){
+        a = ["br",""];
+    }else{
+        a = ["br",tex_row(i)];
+    }
+    while(1){
+        t = i.a[i.index];
+        if(t[0]==Symbol && t[1]=="br"){
+            i.index++;
+            t = i.a[i.index];
+            if(t[0]==Symbol && t[1]=="br"){
+                a.push("");
+            }else{
+                a.push(tex_row(i));
+            }
+        }else{
+            break;
+        }
+    }
+    if(a.length==2){
+        return a[1];
+    }else{
+        return a;
+    }
+}
+
 function tex_ast(i){
     var a = ["{}"];
     while(1){
         var t = i.a[i.index];
         if(t[0]==Terminal){
             break;
-        }else if(t[0]==Symbol && t[1]=="}"){
+        }else if(t[0]==Symbol && (t[1]=="}" || t[1]=="&" || t[1]=="br")){
+            break;
+        }else if(t[0]==Macro && t[1]=="end"){
             break;
         }else{
             a.push(tex_sub_sup(i));
@@ -561,8 +651,53 @@ function encode_html(s){
     return a.join("");
 }
 
+function tex_cell_mathml(buffer,t,context){
+    buffer.push("<mtd>");
+    tex_export_mathml(buffer,t,context);
+    buffer.push("</mtd>");
+}
+
+function tex_row_mathml(buffer,t,context){
+    buffer.push("<mtr>");
+    if(Array.isArray(t) && t[0]=="&"){
+        for(var i=1; i<t.length; i++){
+            tex_cell_mathml(buffer,t[i],context);
+        }
+    }else{
+        tex_cell_mathml(buffer,t,context);
+    }
+    buffer.push("</mtr>");
+}
+
+function tex_matrix_mathml(buffer,t,context,left,right){
+    buffer.push("<mrow><mo>");
+    buffer.push(left);
+    buffer.push("</mo><mtable>");
+    if(Array.isArray(t) && t[0]=="br"){
+        for(var i=1; i<t.length; i++){
+            tex_row_mathml(buffer,t[i],context);
+        }
+    }else{
+        tex_row_mathml(buffer,t,context);
+    }
+    buffer.push("</mtable><mo>");
+    buffer.push(right);
+    buffer.push("</mo></mrow>");
+}
+
+var brackets_table = {
+    "pmatrix": ["(",")"],
+    "bmatrix": ["[","]"],
+    "vmatrix": ["|","|"],
+    "Bmatrix": ["{","}"],
+    "Vmatrix": ["‖","‖"],
+    "matrix": ["",""]
+};
+
 function tex_macro_mathml(buffer,id,a,context){
-    if(id=="frac"){
+    if(macro_tab_mathml.hasOwnProperty(id)){
+        buffer.push(macro_tab_mathml[id]);
+    }else if(id=="frac"){
         buffer.push("<mfrac>");
         tex_export_mathml(buffer,a[0],context);
         tex_export_mathml(buffer,a[1],context);
@@ -611,12 +746,19 @@ function tex_macro_mathml(buffer,id,a,context){
         buffer.push("<mstyle mathvariant='normal'>");
         tex_export_mathml(buffer,a[0],context);
         buffer.push("</mstyle><mspace width='4px'/>");
+    }else if(id=="binom"){
+        buffer.push("<mrow><mo>(</mo><mfrac linethickness='0'>");
+        tex_export_mathml(buffer,a[0],context);
+        tex_export_mathml(buffer,a[1],context);
+        buffer.push("</mfrac><mo>)</mo></mrow>");
+    }else if(
+        id=="pmatrix" || id=="bmatrix" || id=="vmatrix" ||
+        id=="Bmatrix" || id=="Vmatrix" || id=="matrix"
+    ){
+        var brackets = brackets_table[id];
+        tex_matrix_mathml(buffer,a[0],context,brackets[0],brackets[1]);
     }else{
-        if(macro_tab_mathml.hasOwnProperty(id)){
-            buffer.push(macro_tab_mathml[id]);
-        }else{
-            buffer.push("<mo>\\"+id+"</mo>");
-        }
+        buffer.push("<mo>\\"+id+"</mo>");
     }
 }
 
@@ -632,6 +774,36 @@ function is_under_over(t){
         }
     }
     return false;
+}
+
+function tex_identifier_mathml(buffer,t,context){
+    if(context.font_extra){
+        if(context.font_type=="mathrm"){
+            buffer.push("<mo mathvariant='normal' lspace='0px' rspace='0px'>");
+            buffer.push(t);
+            buffer.push("</mo>");
+        }else if(context.font_type=="mathbf"){
+            buffer.push("<mo mathvariant='bold' lspace='0px' rspace='0px'>");
+            buffer.push(t);
+            buffer.push("</mo>");
+        }else if(context.font_type=="mathbb"){
+            buffer.push("<mo mathvariant='double-struck' lspace='0px' rspace='0px'>");
+            buffer.push(t);
+            buffer.push("</mo>");
+        }else if(context.font_type=="mathcal"){
+            buffer.push("<mo mathvariant='script' lspace='0px' rspace='0px'>");
+            buffer.push(t);
+            buffer.push("</mo>");
+        }else if(context.font_type=="mathsf"){
+            buffer.push("<mo mathvariant='sans-serif' lspace='0px' rspace='0px'>");
+            buffer.push(t);
+            buffer.push("</mo>");
+        }
+    }else{
+        buffer.push("<mi>");
+        buffer.push(t);
+        buffer.push("</mi>");
+    }
 }
 
 function tex_export_mathml(buffer,t,context){
@@ -704,39 +876,26 @@ function tex_export_mathml(buffer,t,context){
             buffer.push("<mo stretchy='false'>)</mo>");
         }else if(op=="|"){
             buffer.push("<mo stretchy='false'>|</mo>");
+        }else if(op=="&"){
+            if(t.length>1){
+                tex_export_mathml(buffer,t[1],context);            
+                for(var i=2; i<t.length; i++){
+                    buffer.push("<mspace width='18px'/>");
+                    tex_export_mathml(buffer,t[i],context);
+                }
+            }
+        }else if(op=="br"){
+            for(var i=1; i<t.length; i++){
+                tex_export_mathml(buffer,t[i],context);
+                buffer.push("<mspace linebreak='newline'/>");
+            }
         }else{
             buffer.push("<mo>");
             buffer.push(op);
             buffer.push("</mo>");
         }
     }else{
-        if(context.font_extra){
-            if(context.font_type=="mathrm"){
-                buffer.push("<mo mathvariant='normal' lspace='0px' rspace='0px'>");
-                buffer.push(t);
-                buffer.push("</mo>");
-            }else if(context.font_type=="mathbf"){
-                buffer.push("<mo mathvariant='bold' lspace='0px' rspace='0px'>");
-                buffer.push(t);
-                buffer.push("</mo>");
-            }else if(context.font_type=="mathbb"){
-                buffer.push("<mo mathvariant='double-struck' lspace='0px' rspace='0px'>");
-                buffer.push(t);
-                buffer.push("</mo>");
-            }else if(context.font_type=="mathcal"){
-                buffer.push("<mo mathvariant='script' lspace='0px' rspace='0px'>");
-                buffer.push(t);
-                buffer.push("</mo>");
-            }else if(context.font_type=="mathsf"){
-                buffer.push("<mo mathvariant='sans-serif' lspace='0px' rspace='0px'>");
-                buffer.push(t);
-                buffer.push("</mo>");
-            }
-        }else{
-            buffer.push("<mi>");
-            buffer.push(t);
-            buffer.push("</mi>");
-        }
+        tex_identifier_mathml(buffer,t,context);
     }
 }
 
@@ -782,7 +941,7 @@ function export_html(t){
 function into_html(s){
     tex_mode = false;
     var t = parse(s);
-    // return JSON.stringify(t);
+    // console.log(JSON.stringify(t));
     return export_html(t);
 }
 
@@ -1000,15 +1159,32 @@ function button_sum(){
     insert_text("\\sum_{k=1}^n ");
 }
 
-function button_matrix(){
-    insert_text("\\begin{pmatrix}\na & b\\\\\nc & d\n\\end{pmatrix}");
+function button_matrix22(){
+    insert_text("\
+\\begin{pmatrix}\n\
+a_{11} & a_{12}\\\\\n\
+a_{21} & a_{22}\n\
+\\end{pmatrix}");
 }
 
-function button_vector(){
+function button_matrix33(){
+    insert_text("\
+\\begin{pmatrix}\n\
+a_{11} & a_{12} & a_{13}\\\\\n\
+a_{21} & a_{22} & a_{23}\\\\\n\
+a_{31} & a_{32} & a_{33}\n\
+\\end{pmatrix}");
+}
+
+function button_matrix21(){
     insert_text("\\begin{pmatrix}x \\\\ y\\end{pmatrix}");
 }
 
+function button_matrix31(){
+    insert_text("\\begin{pmatrix}x \\\\ y\\\\ z\\end{pmatrix}");
+}
+
 window.onload = function(){
-    setInterval(update,500);
+    setInterval(update,250);
 };
 
