@@ -37,6 +37,10 @@ var argc_table = {
     "end": 1
 };
 
+var opt_table = {
+    "sqrt": 1
+};
+
 var greek_upper = {
     "Gamma": "&Gamma;",
     "Delta": "&Delta;",
@@ -192,7 +196,14 @@ var macro_tab_mathml = {
     "leftharpoondown": "<mo>⇁</mo>",
 
     "ldots": "<mo>&hellip;</mo>",
-    "cdots": "<mo>&hellip;</mo>",
+    "cdots": "<mo>⋯</mo>",
+    "vdots": "<mo>⋮</mo>",
+    "ddots": "<mo>⋱</mo>",
+    "dotsm": "<mo>⋯</mo>",
+    "dotsb": "<mo>⋯</mo>",
+    "dotsi": "<mo>⋯</mo>",
+    "dotso": "<mo>&hellip;</mo>",
+    "dotsc": "<mo>&hellip;</mo>",
     "mid": "<mo>|</mo>",
     "quad": "<mspace width='14px'/>",
     "qquad": "<mspace width='28px'/>",
@@ -395,12 +406,23 @@ function tex_join(t){
 function tex_macro(id,i){
     var argc = 0;
     var argv = [];
+    var argv_opt = [];
     if(argc_table.hasOwnProperty(id)){
         argc = argc_table[id];
     }
+    if(opt_table.hasOwnProperty(id)){
+        var t = i.a[i.index];
+        if(t[0]==Symbol && t[1]=="["){
+            i.index++;
+            var y = tex_ast(i,"]");
+            argv_opt.push(y);
+            t = i.a[i.index];
+            if(t[0]==Symbol && t[1]=="]") i.index++;
+        }
+    }
     for(var k=0; k<argc; k++){
         var t = i.a[i.index];
-        if(t==Terminal) break;
+        if(t[0]==Terminal) break;
         var y = tex_node(i);
         argv.push(y);
     }
@@ -411,9 +433,9 @@ function tex_macro(id,i){
         if(t[0]==Macro){
             var terminal = tex_macro(t[1],i);
         }
-        return ["\\",id,[x]];
+        return ["\\",id,[x],[]];
     }else{
-        return ["\\",id,argv];
+        return ["\\",id,argv,argv_opt];
     }
 }
 
@@ -520,11 +542,13 @@ function tex_matrix(i){
     }
 }
 
-function tex_ast(i){
+function tex_ast(i,stop){
     var a = ["{}"];
     while(1){
         var t = i.a[i.index];
         if(t[0]==Terminal){
+            break;
+        }else if(stop!=undefined && t[0]==Symbol && t[1]==stop){
             break;
         }else if(t[0]==Symbol && (t[1]=="}" || t[1]=="&" || t[1]=="br")){
             break;
@@ -694,7 +718,7 @@ var brackets_table = {
     "matrix": ["",""]
 };
 
-function tex_macro_mathml(buffer,id,a,context){
+function tex_macro_mathml(buffer,id,a,opt,context){
     if(macro_tab_mathml.hasOwnProperty(id)){
         buffer.push(macro_tab_mathml[id]);
     }else if(id=="frac"){
@@ -710,9 +734,16 @@ function tex_macro_mathml(buffer,id,a,context){
         tex_export_mathml(buffer,a[0],{font_extra: true, font_type: id});
         buffer.push("</mrow>");
     }else if(id=="sqrt"){
-        buffer.push("<msqrt>");
-        tex_export_mathml(buffer,a[0],context);
-        buffer.push("</msqrt>");
+        if(opt.length!=0){
+            buffer.push("<mroot>");
+            tex_export_mathml(buffer,a[0],context);
+            tex_export_mathml(buffer,opt[0],context);
+            buffer.push("</mroot>");
+        }else{
+            buffer.push("<msqrt>");
+            tex_export_mathml(buffer,a[0],context);
+            buffer.push("</msqrt>");
+        }
     }else if(id=="vec"){
         buffer.push("<mover accent='true'>");
         tex_export_mathml(buffer,a[0],context);
@@ -816,7 +847,7 @@ function tex_export_mathml(buffer,t,context){
             }
             buffer.push("</mrow>");
         }else if(op=="\\"){
-            tex_macro_mathml(buffer,t[1],t[2],context);
+            tex_macro_mathml(buffer,t[1],t[2],t[3],context);
         }else if(op=="_"){
             if(is_under_over(t[1])){
                 buffer.push("<munder>");
@@ -870,10 +901,10 @@ function tex_export_mathml(buffer,t,context){
             buffer.push("<mo>&gt;</mo>");
         }else if(op=="~"){
             buffer.push("<mspace width='5px'/>");
-        }else if(op=="("){
-            buffer.push("<mo stretchy='false'>(</mo>");
-        }else if(op==")"){
-            buffer.push("<mo stretchy='false'>)</mo>");
+        }else if(op=="(" || op==")" || op=="[" || op=="]"){
+            buffer.push("<mo stretchy='false'>");
+            buffer.push(op);
+            buffer.push("</mo>");
         }else if(op=="|"){
             buffer.push("<mo stretchy='false'>|</mo>");
         }else if(op=="&"){
