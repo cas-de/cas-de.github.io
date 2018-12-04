@@ -11,10 +11,22 @@ ftab["d"] = set_distance;
 ftab["mesh"] = set_mesh;
 ftab["tile"] = set_tile;
 ftab["alpha"] = 0.94;
+ftab["P"] = set_position;
 
 var TILE = 0;
 var LINE = 1;
 var LINE_SHADOW = 2;
+
+var position = [0,0,0];
+
+function set_position(x,y,z){
+    if(y==undefined) y=0;
+    if(z==undefined) z=0;
+    position[0] = x;
+    position[1] = y;
+    position[2] = z;
+    return [x,y,z];
+}
 
 function xyzscale_inc(){
     ax = scale_inc(xscale,ax);
@@ -254,7 +266,7 @@ function get_mx(gx){
     return Math.min(gx.w/46,gx.h/32);
 }
 
-function labels(gx,proj){
+function labels(gx,proj,ax,position){
     var context = gx.context;
     var px0 = Math.floor(gx.w/2);
     var py0 = Math.floor(gx.h/2);
@@ -263,18 +275,23 @@ function labels(gx,proj){
     var mx = get_mx(gx);
     var puts = new_puts(context,proj,1/ax);
     var line = new_draw_line(context,proj,1/ax);
+
+    var x0 = position[0];
+    var y0 = position[1];
+    var z0 = position[2];
+
     for(var x=-8; x<=8; x+=2){
-        s = ftos_strip(x/ax,ax);
+        s = ftos_strip(x0+x/ax,ax);
         puts(s,x,-11,-0.5);
         line(x,-10,0,x,-10.4,0);
     }
     for(var y=-8; y<=8; y+=2){
-        s = ftos_strip(y/ay,ay);
+        s = ftos_strip(y0+y/ay,ay);
         puts(s,-11,y,-0.5);
         line(-10,y,0,-10.4,y,0);
     }
     for(var z=2; z<10; z+=2){
-        s = ftos_strip(z/az,az);
+        s = ftos_strip(z0+z/az,az);
         puts(s,-10.5,-10.5,z);
         line(-10,-10,z,-10.2,-10.2,z);
     }
@@ -398,7 +415,7 @@ function system_xyz(gx,proj,wx){
         draw_line(context,proj,-wx,-wx,k*h,-wx,-wx,(k+1)*h);
     }
     context.lineWidth = 2;
-    labels(gx,proj,ax);
+    labels(gx,proj,ax,position);
 }
 
 function mesh_cond(x){
@@ -406,7 +423,7 @@ function mesh_cond(x){
 }
 
 function plot_sf(gx,f,d,xstep,ystep){
-    var x,y,z00,z01,z10,z11,v;
+    var x,y,z00,z01,z10,z11,u,v,e;
     var p0,p1,p2,p3;
     var context = gx.context;
     var proj = gx.proj;
@@ -415,28 +432,34 @@ function plot_sf(gx,f,d,xstep,ystep){
 
     var dx = d/ax;
     var dy = d/ay;
-    var x0 = grx[0]/ax;
-    var x1 = grx[1]/ax;
-    var y0 = gry[0]/ay;
-    var y1 = gry[1]/ay;
+    var u0 = grx[0]/ax;
+    var u1 = grx[1]/ax;
+    var v0 = gry[0]/ay;
+    var v1 = gry[1]/ay;
     var mz = az/ax;
+    
+    var x0 = position[0];
+    var y0 = position[1];
+    var z0 = position[2]*mz;
 
     var a = gx.tile_buffer;
     var kx = 0;
-    for(x = x0; x<x1; x+=dx){
+    for(u = u0; u<u1; u+=dx){
         var ky = 1;
-        for(y = y0; y<y1; y+=dy){
+        for(v = v0; v<v1; v+=dy){
+            x = x0+u;
+            y = y0+v;
             z00 = mz*f(x,y);
             z01 = mz*f(x,y+dy);
             z11 = mz*f(x+dx,y+dy);
             z10 = mz*f(x+dx,y);
-            p0 = proj(x,y,z00);
-            p1 = proj(x,y+dy,z01);
-            p2 = proj(x+dx,y+dy,z11);
-            p3 = proj(x+dx,y,z10);
-            v = [dy*(z00-z10),dx*(z00-z01),dx*dy];
-            a.push([TILE,s*y-c*x,p0,p1,p2,p3,z00,
-                mesh_cond(kx/xstep),mesh_cond(ky/ystep),v]);
+            p0 = proj(u,v,z00-z0);
+            p1 = proj(u,v+dy,z01-z0);
+            p2 = proj(u+dx,v+dy,z11-z0);
+            p3 = proj(u+dx,v,z10-z0);
+            e = [dy*(z00-z10),dx*(z00-z01),dx*dy];
+            a.push([TILE,s*v-c*u,p0,p1,p2,p3,z00,
+                mesh_cond(kx/xstep),mesh_cond(ky/ystep),e]);
             ky++;
         }
         kx++;
@@ -448,8 +471,6 @@ function vector_product(vx,vy,vz,wx,wy,wz){
 }
 
 function plot_psf(gx,f,d,ustep,vstep){
-    var u,v,p00,p01,p10,p11,e;
-    var p0,p1,p2,p3;
     var context = gx.context;
     var proj = gx.proj;
     var c = Math.cos(gx.phi);
@@ -464,21 +485,28 @@ function plot_psf(gx,f,d,ustep,vstep){
     var u1 = ftab["u1"];
     var v0 = ftab["v0"];
     var v1 = ftab["v1"];
+    
+    var x0 = position[0];
+    var y0 = position[1];
+    var z0 = position[2]*mz;
 
     var a = gx.tile_buffer;
-    var ku=0;
+    var u,v,p00,p01,p10,p11,e;
+    var p0,p1,p2,p3;
+
+    var ku = 0;
     for(u = u0; u<u1; u+=du){
-        var kv=1;
+        var kv = 1;
         for(v = v0; v<v1; v+=dv){
             p00 = f(u,v);
             p01 = f(u,v+dv);
             p11 = f(u+du,v+dv);
             p10 = f(u+du,v);
             p00[2]*=mz; p01[2]*=mz; p11[2]*=mz; p10[2]*=mz;
-            p0 = proj(p00[0],p00[1],p00[2]);
-            p1 = proj(p01[0],p01[1],p01[2]);
-            p2 = proj(p11[0],p11[1],p11[2]);
-            p3 = proj(p10[0],p10[1],p10[2]);
+            p0 = proj(p00[0]-x0,p00[1]-y0,p00[2]-z0);
+            p1 = proj(p01[0]-x0,p01[1]-y0,p01[2]-z0);
+            p2 = proj(p11[0]-x0,p11[1]-y0,p11[2]-z0);
+            p3 = proj(p10[0]-x0,p10[1]-y0,p10[2]-z0);
 
             e = vector_product(
                 p10[0]-p00[0],p10[1]-p00[1],p10[2]-p00[2],

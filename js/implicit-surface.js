@@ -78,12 +78,16 @@ function plot_implicit_sf(gx,f,d,xstep,ystep,epsilon){
     var dy = d/ay;
     var dz = d/az;
     var mz = az/ax;
-    var x0 = grx[0]/ax;
-    var x1 = grx[1]/ax;
-    var y0 = gry[0]/ay;
-    var y1 = gry[1]/ay;
-    var z0 = x0/mz;
-    var z1 = x1/mz;
+    var px = position[0];
+    var py = position[1];
+    var pz = position[2];
+    
+    var x0 = px+grx[0]/ax;
+    var x1 = px+grx[1]/ax;
+    var y0 = py+gry[0]/ay;
+    var y1 = py+gry[1]/ay;
+    var z0 = pz+grx[0]/az;
+    var z1 = pz+grx[1]/az;
     var n = 20;
 
     var zip_buffer = [];
@@ -109,10 +113,10 @@ function plot_implicit_sf(gx,f,d,xstep,ystep,epsilon){
             for(var i=0; i<a.length; i++){
                 t = a[i];
                 zip_buffer.push([
-                    [x,y,mz*t[0]],
-                    [x,y+dy,mz*t[1]],
-                    [x+dx,y+dy,mz*t[2]],
-                    [x+dx,y,mz*t[3]],
+                    [x-px,y-py,mz*(t[0]-pz)],
+                    [x-px,y-py+dy,mz*(t[1]-pz)],
+                    [x-px+dx,y-py+dy,mz*(t[2]-pz)],
+                    [x-px+dx,y-py,mz*(t[3]-pz)],
                     kx, ky
                 ]);
             }
@@ -140,10 +144,10 @@ function plot_implicit_sf(gx,f,d,xstep,ystep,epsilon){
             for(var i=0; i<a.length; i++){
                 t = a[i];
                 zip_buffer.push([
-                    [x,t[0],mz*z],
-                    [x,t[1],mz*(z+dz)],
-                    [x+dx,t[2],mz*(z+dz)],
-                    [x+dx,t[3],mz*z],
+                    [x-px,t[0]-py,mz*(z-pz)],
+                    [x-px,t[1]-py,mz*(z-pz+dz)],
+                    [x-px+dx,t[2]-py,mz*(z-pz+dz)],
+                    [x-px+dx,t[3]-py,mz*(z-pz)],
                     kx, kz
                 ]);
             }
@@ -171,10 +175,10 @@ function plot_implicit_sf(gx,f,d,xstep,ystep,epsilon){
             for(var i=0; i<a.length; i++){
                 t = a[i];
                 zip_buffer.push([
-                    [t[0],y,mz*z],
-                    [t[1],y,mz*(z+dz)],
-                    [t[2],y+dy,mz*(z+dz)],
-                    [t[3],y+dy,mz*z],
+                    [t[0]-px,y-py,mz*(z-pz)],
+                    [t[1]-px,y-py,mz*(z-pz+dz)],
+                    [t[2]-px,y-py+dy,mz*(z-pz+dz)],
+                    [t[3]-px,y-py+dy,mz*(z-pz)],
                     ky, kz
                 ]);
             }
