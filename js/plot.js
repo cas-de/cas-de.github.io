@@ -1347,7 +1347,9 @@ function sub_tensor_tensor(a,b){
 var TypeNumber = 0;
 var TypeVector = 1;
 var TypeMatrix = 2;
-var type_op_table = {"[]":0,"+":0,"-":0,"*":0,"/":0,"abs":0};
+var type_op_table = {
+    "[]":0, "+":0, "-":0, "*":0, "/":0, "^":0, "abs":0
+};
 var fn_type_table = {
     "unit": TypeVector,
     "nabla": TypeVector,
@@ -1404,6 +1406,11 @@ function infer_type(t){
                     t[1] = ["/",1,t[2]];
                     t[2] = v;
                     return T[1];
+                }
+            }else if(t[0]==="^"){
+                if(T[1]==TypeMatrix){
+                    t[0] = "_matrix_pow_";
+                    return TypeMatrix;
                 }
             }else if(t[0]==="abs"){
                 if(T[1]==TypeVector){

@@ -424,6 +424,97 @@ function det(A){
     }
 }
 
+function copy_array(a){
+    var b = [];
+    for(var i=0; i<a.length; i++){
+        if(Array.isArray(a[i])){
+            b.push(copy_array(a[i]));
+        }else{
+            b.push(a[i]);
+        }
+    }
+    return b;
+}
+
+function mul_inplace(r,v){
+    for(var i=0; i<v.length; i++){
+        v[i] = r*v[i];
+    }
+}
+
+function mul_add_inplace(a,v,b,w){
+    for(var i=0; i<v.length; i++){
+        v[i] = a*v[i]+b*w[i];
+    }
+}
+
+function swap(a,i,j){
+    var t = a[i];
+    a[i] = a[j];
+    a[j] = t;
+}
+
+function pivoting(A,B,n,j){
+    var m = Math.abs(A[j][j]);
+    var k = j;
+    for(var i=j+1; i<n; i++){
+        if(m<Math.abs(A[i][j])){
+            m = Math.abs(A[i][j]);
+            k = i;
+        }
+    }
+    swap(A,k,j);
+    swap(B,k,j);
+}
+
+function gauss_jordan(A,B,n){
+    var i,j;
+    for(j=0; j<n; j++){
+        pivoting(A,B,n,j);
+        mul_inplace(1/A[j][j],B[j]);
+        mul_inplace(1/A[j][j],A[j]);
+        for(i=j+1; i<n; i++){
+            if(A[i][j]!=0){
+                mul_add_inplace(1/A[i][j],B[i],-1,B[j]);
+                mul_add_inplace(1/A[i][j],A[i],-1,A[j]);
+            }
+        }
+    }
+    for(i=0; i<n-1; i++){
+        for(j=i+1; j<n; j++){
+            mul_add_inplace(1,B[i],-A[i][j],B[j]);
+            mul_add_inplace(1,A[i],-A[i][j],A[j]);
+        }
+    }
+    return B;
+}
+
+function matrix_inv(A){
+    var n = A[0].length;
+    var E = idm(n);
+    A = copy_array(A);
+    return gauss_jordan(A,E,n);
+}
+
+function matrix_pow(A,n){
+    if(n<0){
+        A = matrix_inv(A);
+        n = -n;
+    }else if(n==0){
+        return idm(A.length);
+    }
+    n--;
+    var M = A;
+    while(n>0){
+        if(n%2==1){
+            M = mul_matrix_matrix(M,A);
+        }
+        A = mul_matrix_matrix(A,A);
+        n = Math.floor(n/2);
+    }
+    return M;
+}
+
 function unit_vector(v){
     var r = abs_vec(v);
     return mul_scalar_vector(1/r,v);
@@ -640,7 +731,7 @@ var ftab_extension = {
   zeta: zeta, ipp: ipp,
   table: table, Wertetabelle: table,
   Si: Si, Ci: Ci, det: det, unit: unit_vector, I: idm,
-  diag: diag_variadic,
+  diag: diag_variadic, _matrix_pow_: matrix_pow,
   nabla: nablah(0.001), apply: apply, rot: rotation_matrix,
   pli: pli_general, L: laplace_transform, delta: delta,
   gcd: gcd_variadic, ggT: gcd_variadic,
