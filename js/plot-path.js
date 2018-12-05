@@ -1,4 +1,5 @@
 
+dark = false;
 cftab["t0"] = complex(0,0);
 cftab["t1"] = complex(2*Math.PI,0);
 
@@ -33,8 +34,11 @@ async function vcplot_async(gx,f,color){
 }
 
 function plot_node(gx,t,color){
-    var f = ccompile(t,["t"]);
-    vcplot_async(gx,f,color);
+    if(Array.isArray(t) && t[0]==="for"){
+        node_loop(plot_node,gx,t,color);
+    }else{
+        var f = ccompile(t,["t"]);
+        vcplot_async(gx,f,color);
+    }
 }
 
-dark = false;
