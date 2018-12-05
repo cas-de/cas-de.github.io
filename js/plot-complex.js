@@ -19,7 +19,7 @@ arcsin: "casin", arccos: "cacos", arctan: "catan", arccot: "cacot",
 asinh: "casinh", acosh: "cacosh", atanh: "catanh", acoth: "cacoth",
 arsinh: "casinh", arcosh: "cacosh", artanh: "catanh", arcoth: "cacoth",
 gamma: "cgamma", fac: "cfac", sum: "csum", prod: "cprod",
-diff: "cdiff", int: "cint", pow: "citerate", img: "cplot_img"
+diff: "cdiff", int: "cint", iter: "citerate", img: "cplot_img"
 };
 
 var cftab = {

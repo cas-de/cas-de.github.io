@@ -1,7 +1,11 @@
 
 
 function plot_node(gx,t,color){
-    var f = ccompile(t,["x"]);
-    var g = function(x){return f({re:x,im:0}).re;};
-    plot_async(gx,g,color);
+    if(Array.isArray(t) && t[0]==="for"){
+        node_loop(plot_node,gx,t,color);
+    }else{
+        var f = ccompile(t,["x"]);
+        var g = function(x){return f({re:x,im:0}).re;};
+        plot_async(gx,g,color);
+    }
 }
