@@ -1830,6 +1830,7 @@ function init(canvas,w,h){
     gx.px0 = Math.floor(0.5*gx.w);
     gx.py0 = Math.floor(0.5*gx.h);
     gx.pos = [0,0];
+    gx.animation = false;
 
     if(dark){
         gx.color_bg = color_dark_bg;
@@ -2221,6 +2222,7 @@ async function plot_async(gx,f,color){
         fplot(gx,f,0.0002,false,color);
     }else{
         fplot(gx,f,0.01,false,color);
+        if(gx.animation==true) return;
         while(busy){await sleep(40);}
         await sleep(40);
         fplot(gx,f,0.001,true,color);
@@ -2232,6 +2234,10 @@ async function plot_zero_set_async(gx,f,color){
     if(gx.sync_mode==true){
         plot_zero_set(gx,f,1,14,false,color);
     }else{
+        if(gx.animation==true){
+            plot_zero_set(gx,f,40,10,false,color);
+            return;
+        }
         plot_zero_set(gx,f,4,10,false,color);
         while(busy){await sleep(40);}
         await sleep(40);
@@ -2244,6 +2250,7 @@ async function vplot_async(gx,f,color){
         vplot(gx,f,0.001,false,color);
     }else{
         vplot(gx,f,0.01,false,color);
+        if(gx.animation==true) return;
         while(busy){await sleep(40);}
         await sleep(40);
         vplot(gx,f,0.001,true,color);

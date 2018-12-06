@@ -676,6 +676,8 @@ function plot_node_bivariate(gx,t,index){
                 var f = compile(t,["u","v"]);
                 if(move_mode){
                     plot_psf(gx,f,1,1,1);
+                }else if(gx.animation==true){
+                    plot_psf(gx,f,1,1,1);
                 }else{
                     plot_psf(gx,f,m*0.5,gstep[0]*2/m,gstep[1]*2/m);
                 }
@@ -683,6 +685,8 @@ function plot_node_bivariate(gx,t,index){
         }else{
             var f = compile(t,["x","y"]);
             if(move_mode){
+                plot_sf(gx,f,1,1,1);
+            }else if(gx.animation==true){
                 plot_sf(gx,f,1,1,1);
             }else{
                 plot_sf(gx,f,m*0.25,gstep[0]*4/m,gstep[1]*4/m);

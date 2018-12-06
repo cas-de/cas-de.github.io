@@ -57,6 +57,10 @@
   >Eine Schar von Interpolationspolynomen</a>.
 <li><a href="plot.htm?f(x);%20f(x):=x%5e2;;calc(%22Wertetabelle(f,0:4:0.5)%22)"
   >Wertetabelle für eine Funktion</a>.
+<li><a href="plot.htm?y=x%5ea;%20Regler(%22a%22,0,2)"
+  >Schieberegler für einen Parameter</a>.
+<li><a href="plot.htm?y=a*sin(b*x);%20Regler(%22a%22,1,4);%20Regler(%22b%22,1,4)"
+  >Schieberegler für zwei Parameter</a>.
 <li><a href="plot-dunkel.htm?sin(x)"
   >Nachtmodus</a>.
 </ul>
@@ -167,17 +171,21 @@
   >Eine bivariate Funktion mit einer Höhenlinie</a>.
 <li><a href="plot-bivariat.htm?f(x,y),f(x,y)=c%20for%20c%20in%20-4:8;f(x,y):=x*sin(y)+y*cos(x);;scale(0.5)"
   >Eine bivariate Funktion mit mehreren Höhenlinien</a>.
+<li><a href="plot-bivariat.htm?4exp((-x%5e2-y%5e2)/a);%20Regler(%22a%22,1,10);;scale(0.5)"
+  >Schieberegler für einen Parameter</a>.
+<li><a href="plot-bivariat.htm?4exp(-abs(x/a)%5eb-abs(y/a)%5eb);%20Regler(%22a%22,1,10),Regler(%22b%22,1,4);;scale(0.5)"
+  >Schieberegler für zwei Parameter</a>.
 </ul>
 
 <br>
 <h3 id="Parameterflaechen">Parameterflächen</h3>
 <ul>
 <li><a href="plot-bivariat.htm?%5bcos(u)sin(v),sin(u)sin(v),cos(v)%5d;;scale(0.2)"
-  >Kugel</a>.
+  >Eine Kugel</a>.
 <li><a href="plot-bivariat.htm?%5b(R+r*cos(v))cos(u),(R+r*cos(v))sin(u),r*sin(v)%5d;R:=4,r:=2,v1:=2pi"
-  >Torus</a>.
+  >Ein Torus</a>.
 <li><a href="plot-bivariat.htm?%5ba*cos(u)sin(v),a*sin(u)sin(v),a*(cos(v)+ln(tan(v/2)))+b*u%5d;a:=4,b:=0.8,u1:=4pi,v0:=0.1,v1:=1"
-  >Dini-Fläche</a>.
+  >Eine Dini-Fläche</a>.
 <li><a href="plot-bivariat.htm?f(u,v),f(cos(t),sin(2t)+1);R:=4,r:=2,v1:=2pi,f(u,v):=%5b(R+r*cos(v))cos(u),(R+r*cos(v))sin(u),r*sin(v)%5d"
   >Kurve auf Torus</a>.
 </ul>
@@ -186,11 +194,15 @@
 <h3 id="Implizite-Flaechen">Implizite Flächen</h3>
 <ul>
 <li><a href="plot-implizit.htm?x%5e2+y%5e2+z%5e2=1;;scale(0.2)"
-  >Kugel</a>.
+  >Eine Kugel</a>.
 <li><a href="plot-implizit.htm?x%5e2+y%5e2-z%5e2=1;;scale(0.2)"
-  >Hyperboloid</a>.
+  >Ein Hyperboloid</a>.
 <li><a href="plot-implizit.htm?(x%5e2+y%5e2+z%5e2+R%5e2-r%5e2)%5e2=4R%5e2*(x%5e2+y%5e2);%20R:=4,r:=2,w(14);;scale(0.5)"
-  >Torus</a>.
+  >Ein Torus</a>.
+<li><a href="plot-implizit.htm?x%5e2+y%5e2+x*z%5e2=r%5e2;%20Regler(%22r%22,0,4);;scale(0.5)"
+  >Schieberegler für einen Parameter</a>.
+<li><a href="plot-implizit.htm?x%5e2+y%5e2+x*abs(z)%5ea=r%5e2;%20Regler(%22r%22,0,4),Regler(%22a%22,1,4);;scale(0.5)"
+  >Schieberegler für zwei Parameter</a>.
 </ul>
 
 <br>
