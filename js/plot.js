@@ -2525,6 +2525,15 @@ function points(gx,color,f,a){
     labels(gx);
 }
 
+function points_list(gx,color,a){
+    for(var i=0; i<a.length; i++){
+        var t = a[i];
+        gx.circle(color,t[0],t[1],4,true);
+    }
+    flush(gx);
+    labels(gx);
+}
+
 function contains_variable(t,v){
     if(Array.isArray(t)){
         for(var i=0; i<t.length; i++){
@@ -2576,9 +2585,14 @@ function plot_node_basic(gx,t,color){
     if(Array.isArray(t) && t[0]==="for"){
         node_loop(plot_node,gx,t,color);
     }else if(Array.isArray(t) && t[0]==="Punkte"){
-        var a = compile(t[2],[])();
-        f = compile(t[1],[])();
-        points(gx,color,f,a);
+        if(t.length==2){
+            var a = compile(t[1],[])();
+            points_list(gx,color,a);
+        }else{
+            var a = compile(t[2],[])();
+            f = compile(t[1],[])();
+            points(gx,color,f,a);
+        }
     }else if(Array.isArray(t) && t[0]==="="){
         if(Array.isArray(t[1]) && t[1][0]==="D"){
             f = from_ode(gx,t);
