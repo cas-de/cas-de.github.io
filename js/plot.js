@@ -88,6 +88,53 @@ var ftab = {
     _vabs_: abs_vec
 };
 
+var keyword_table = {
+    "for": "for", "in": "in",
+    "für": "for"
+};
+
+var lang_points = "Punkte";
+
+var lang = {
+    a_function: "eine Funktion",
+    syntax_error: "Syntaxfehler: ",
+    expected_right_paren: "')' wurde erwartet.",
+    expected_right_sq: "']' wurde erwartet.",
+    expected_operand: "ein Operand wurde erwartet.",
+    expected_comman_or_bracket: function(i,bracket){
+        syntax_error(i,"',' oder '"+bracket+"' wurde erwartet.");
+    },
+    unexpected_symbol: function(i,x){
+        syntax_error(i,"unerwartetes Symbol: '"+x+"'.");    
+    },
+    number_application_error: function(t){
+        return new Err([
+            "Fehler: die Zahl ",t,
+            " kann nicht als Funktion angewendet werden.<br><br>",
+            "Meintest du '",t,"*(...)' anstelle von '",t,
+            "(...)'?"
+        ].join(""));
+    },
+    fn_as_number_error: function(t,type){
+        return new Err(["Fehler: Operator '",type,
+            "' benötigt Zahlen, aber&nbsp;'",t,
+            "' ist&nbsp;eine Funktion.<br><br>",
+            "Meintest du '",t,"(x)' anstelle von '",t,"'?"
+        ].join(""));
+    },
+    undefined_variable: function(t){
+        return new Err("Fehler: undefinierte Variable: '"+t+"'.");
+    },
+    initial_value_problem_msg: function(){
+        return new Err(
+            "Bitte gib das Anfangswertproblem wie folgt an:<br><br>"+
+            "p:=[x0,y(x0),y'(x0),y''(x0),...]<br><br>"+
+            "z.B.:<br><br>"+
+            "y''=-y; p:=[0,0,1]");
+    },
+    p_to_short: "Fehler: p is zu kurz."
+};
+
 function load_async(URL,callback){
    var head = document.getElementsByTagName("head")[0];
    var s = document.createElement("script");
@@ -765,7 +812,7 @@ function str(x,ftos){
         var f = function(t){return str(t);};
         return "["+x.map(f).join(", ")+"]";
     }else if(x instanceof Function){
-        return "eine Funktion";
+        return lang.a_function;
     }else if(typeof x == "string"){
         return x;
     }else if(typeof x == "number"){
@@ -807,7 +854,7 @@ function syntax_error(i,text){
     var t = i.a[i.index];
     var s = ["&nbsp;&nbsp;",i.s,"<br>&nbsp;&nbsp;",
         repeat("&nbsp;",t[3])+"<b>^</b>", "<br>",
-        "Syntaxfehler: ",text
+        lang.syntax_error, text
     ].join("");
     throw new Err(s);
 }
@@ -823,11 +870,6 @@ var superscript = {
     '\u2077': "7",
     '\u2078': "8",
     '\u2079': "9"
-};
-
-var keyword_tab = {
-    "for": "for", "in": "in",
-    "für": "for"
 };
 
 var Symbol = 0;
@@ -850,8 +892,8 @@ function scan(s){
                 id += s[i];
                 i++; col++;
             }
-            if(keyword_tab.hasOwnProperty(id)){
-                a.push([Symbol,keyword_tab[id],line,col0]);
+            if(keyword_table.hasOwnProperty(id)){
+                a.push([Symbol,keyword_table[id],line,col0]);
             }else{
                 if(a.length>0){
                     var last = a[a.length-1];
@@ -955,7 +997,7 @@ function atom(i){
             i.index++;
             return x;
         }else{
-            syntax_error(i,"')' wurde erwartet.");
+            syntax_error(i,lang.expected_right_paren);
         }
     }else if(t[0] == Symbol && t[1]=='['){
         i.index++;
@@ -967,7 +1009,7 @@ function atom(i){
         i.index++;
         return ["_string_",t[1]];
     }else{
-        syntax_error(i,"ein Operand wurde erwartet.");
+        syntax_error(i,lang.expected_operand);
     }
 }
 
@@ -986,7 +1028,7 @@ function application_list(i,a,bracket){
         }else if(t[0]==Symbol && t[1]==','){
             i.index++;
         }else{
-            syntax_error(i,"',' oder '"+bracket+"' wurde erwartet.");
+            lang.expected_comma_or_bracket(i,bracket);
         }
     }
 }
@@ -998,7 +1040,7 @@ function index_operation(i,x){
         i.index++;
         return ["index",x,y];
     }else{
-        syntax_error(i,"']' wurde erwartet.");
+        syntax_error(i,lang.expected_right_sq);
     }
 }
 
@@ -1253,7 +1295,7 @@ function parse(a,s){
     var x = semicolon(i,"block");
     var t = i.a[i.index];
     if(t[0] != SymbolTerminator){
-        syntax_error(i,"unerwartetes Symbol: '"+t[1]+"'.");
+        lang.unexpected_symbol(i,t[1]);
     }
     return x;
 }
@@ -1491,29 +1533,15 @@ var number_op_table = {
     "<":0, ">":0, "<=":0, ">=":0
 }
 
-function number_application_error(t){
-    return new Err([
-        "Fehler: die Zahl ",t,
-        " kann nicht als Funktion angewendet werden.<br><br>",
-        "Meintest du '",t,"*(...)' anstelle von '",t,
-        "(...)'?"
-    ].join(""));
-}
-
 function type_test(t,type){
     if(type!=undefined){
         if(type=="app"){
             if(typeof ftab[t]=="number"){
-                throw number_application_error(t);
+                throw lang.number_application_error(t);
             }
         }else if(number_op_table.hasOwnProperty(type)){
             if(typeof ftab[t]=="function"){
-                throw new Err(["Fehler: Operator '",type,
-                    "' benötigt Zahlen, aber&nbsp;'",t,
-                    "' ist&nbsp;eine Funktion.<br><br>",
-                    "Meintest du '",t,"(x)' anstelle von '",t,"'?"
-                ].join(""));
-
+                throw lang.fn_as_number_error(t,type);
             }
         }
     }
@@ -1525,7 +1553,7 @@ function compile_expression(a,t,context,type){
     }else if(typeof t == "string"){
         if(t in context.local){
             if(type=="app" && context.local[t]=="number"){
-                throw number_application_error(t);
+                throw lang.number_application_error(t);
             }else{
                 a.push(t);
             }
@@ -1539,7 +1567,7 @@ function compile_expression(a,t,context,type){
             load_ftab_extension(ftab,"js/ftab-extension.js");
             throw new Repeat();
         }else{
-            throw new Err("Fehler: undefinierte Variable: '"+t+"'.");
+            throw lang.undefined_variable(t);
         }
     }else if(Array.isArray(t)){
         var op = t[0];
@@ -2490,14 +2518,10 @@ function from_ode(gx,t){
     var f = ode_as_fn(t,v,order);
     var p = ftab["p"];
     if(!ftab.hasOwnProperty("p") || !Array.isArray(p)){
-        throw new Err(
-            "Bitte gib das Anfangswertproblem wie folgt an:<br><br>"+
-            "p:=[x0,y(x0),y'(x0),y''(x0),...]<br><br>"+
-            "z.B.:<br><br>"+
-            "y''=-y; p:=[0,0,1]")
+        throw lang.initial_value_problem_msg();
     }
     if(p.length<order+1){
-        throw new Err("Fehler: p is zu kurz.");
+        throw new Err(lang.p_to_short);
     }else{
         p = p.slice(0,order+1);
     }
@@ -2584,7 +2608,7 @@ function plot_node_basic(gx,t,color){
     var f;
     if(Array.isArray(t) && t[0]==="for"){
         node_loop(plot_node,gx,t,color);
-    }else if(Array.isArray(t) && t[0]==="Punkte"){
+    }else if(Array.isArray(t) && t[0]===lang_points){
         if(t.length==2){
             var a = compile(t[1],[])();
             points_list(gx,color,a);

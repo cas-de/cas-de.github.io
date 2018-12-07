@@ -508,7 +508,7 @@ function ccompile_expression(a,t,context){
             load_ftab_extension(cglobal_ftab,"js/cftab-extension.js");
             throw new Repeat();
         }else{
-            throw new Err("Error: undefined variable: '"+t+"'.");
+            throw lang.undefined_variable(t);
         }
     }else if(Array.isArray(t)){
         var op = t[0];
