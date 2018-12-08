@@ -35,7 +35,8 @@ var argc_table = {
     "left": 1,
     "right": 1,
     "begin": 1,
-    "end": 1
+    "end": 1,
+    "tilde": 1
 };
 
 var opt_table = {
@@ -205,7 +206,7 @@ var macro_tab_mathml = {
     "dotsi": "<mo>⋯</mo>",
     "dotso": "<mo>&hellip;</mo>",
     "dotsc": "<mo>&hellip;</mo>",
-    "mid": "<mo>|</mo>",
+    "mid": "<mo stretchy='false'>|</mo>",
     "quad": "<mspace width='14px'/>",
     "qquad": "<mspace width='28px'/>",
     "alpha": "<mi>&alpha;</mi>",
@@ -268,7 +269,8 @@ var macro_tab_mathml = {
     "Da": "<mo>⇓</mo>",
     "re": "<mi>Re</mi>",
     "im": "<mi>Im</mi>",
-    "grad": "<mi>grad</mi>"
+    "grad": "<mi>grad</mi>",
+    "id": "<mi>id</mi>"
 };
 
 function object_update(x,y,f){
@@ -768,6 +770,11 @@ function tex_macro_mathml(buffer,id,a,opt,context){
         tex_export_mathml(buffer,a[0],context);
         buffer.push("<mo stretchy='true'>&OverBar;</mo>");
         buffer.push("</mover>");
+    }else if(id=="tilde"){
+        buffer.push("<mover accent='true'>");
+        tex_export_mathml(buffer,a[0],context);
+        buffer.push("<mo stretchy='true'>~</mo>");
+        buffer.push("</mover>");
     }else if(id=="ul" || id=="underline"){
         buffer.push("<munder accent='true'>");
         tex_export_mathml(buffer,a[0],context);
@@ -1007,7 +1014,8 @@ var tex_substitution_table = {
     "n": "\\operatorname",
     "re": "\\operatorname{Re}",
     "im": "\\operatorname{Im}",
-    "grad": "\\operatorname{grad}"
+    "grad": "\\operatorname{grad}",
+    "id": "\\operatorname{id}"
 };
 
 function tex_export_tex(buffer,s){
