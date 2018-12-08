@@ -267,7 +267,8 @@ var macro_tab_mathml = {
     "Ua": "<mo>⇑</mo>",
     "Da": "<mo>⇓</mo>",
     "re": "<mi>Re</mi>",
-    "im": "<mi>Im</mi>"
+    "im": "<mi>Im</mi>",
+    "grad": "<mi>grad</mi>"
 };
 
 function object_update(x,y,f){
@@ -1005,7 +1006,8 @@ var tex_substitution_table = {
     "ul": "\\underline",
     "n": "\\operatorname",
     "re": "\\operatorname{Re}",
-    "im": "\\operatorname{Im}"
+    "im": "\\operatorname{Im}",
+    "grad": "\\operatorname{grad}"
 };
 
 function tex_export_tex(buffer,s){
