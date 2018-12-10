@@ -114,6 +114,37 @@ function mouse_up_handler(e){
     }
 }
 
+function touch_move(e){
+    if(e.touches.length!=0){
+        e = e.touches[0];
+        move_mode = true;
+        var gx = graphics;
+        pid_stack = [];
+        var dx = e.clientX-clientXp;
+        var dy = e.clientY-clientYp;
+        gx.phi += 0.004*dx;
+        gx.theta = clamp(gx.theta+0.004*dy,theta_min,theta_max);
+        clientXp = e.clientX;
+        clientYp = e.clientY;
+        update(gx);
+    }
+}
+
+function touch_start(e){
+    if(e.touches.length!=0){
+        e = e.touches[0];
+        clientXp = e.clientX;
+        clientYp = e.clientY;
+    }
+}
+
+function touch_end(){
+    if(move_mode){
+        move_mode = false;
+        update(graphics);
+    }
+}
+
 function new_system_xyz(last_gx){
     var canvas = document.getElementById("canvas1");
     var w = window.innerWidth;
@@ -125,6 +156,9 @@ function new_system_xyz(last_gx){
     if(last_gx==undefined){
         canvas.addEventListener("mousemove", mouse_move_handler, false);
         canvas.addEventListener("mouseup", mouse_up_handler, false);
+        canvas.addEventListener("touchstart", touch_start, false);
+        canvas.addEventListener("touchend", touch_end, false);
+        canvas.addEventListener("touchmove", touch_move, false);
         gx.phi = 0.5*Math.PI;
         gx.theta = 0;
     }else{
