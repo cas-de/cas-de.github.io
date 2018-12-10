@@ -2090,24 +2090,28 @@ function mouse_up_handler(e){
 }
 
 function touch_move(e){
-    e = e.touches[0];
-    moved = true;
-    var gx = graphics;
-    pid_stack = [];
-    var dx = e.clientX-clientXp;
-    var dy = e.clientY-clientYp;
-    gx.px0 = gx.px0+dx;
-    gx.py0 = gx.py0+dy;
-    gx.pos = get_pos(gx);
-    clientXp = e.clientX;
-    clientYp = e.clientY;
-    refresh(gx);
+    if(touches.length!=0){
+        e = e.touches[0];
+        moved = true;
+        var gx = graphics;
+        pid_stack = [];
+        var dx = e.clientX-clientXp;
+        var dy = e.clientY-clientYp;
+        gx.px0 = gx.px0+dx;
+        gx.py0 = gx.py0+dy;
+        gx.pos = get_pos(gx);
+        clientXp = e.clientX;
+        clientYp = e.clientY;
+        refresh(gx);
+    }
 }
 
 function touch_start(e){
-    e = e.touches[0];
-    clientXp = e.clientX;
-    clientYp = e.clientY;
+    if(touches.length!=0){
+        e = e.touches[0];
+        clientXp = e.clientX;
+        clientYp = e.clientY;
+    }
 }
 
 function touch_end(){
