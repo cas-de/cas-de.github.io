@@ -2090,7 +2090,7 @@ function mouse_up_handler(e){
 }
 
 function touch_move(e){
-    if(touches.length!=0){
+    if(e.touches.length!=0){
         e = e.touches[0];
         moved = true;
         var gx = graphics;
@@ -2107,7 +2107,7 @@ function touch_move(e){
 }
 
 function touch_start(e){
-    if(touches.length!=0){
+    if(e.touches.length!=0){
         e = e.touches[0];
         clientXp = e.clientX;
         clientYp = e.clientY;
