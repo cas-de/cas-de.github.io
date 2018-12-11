@@ -1903,8 +1903,8 @@ function get_value(id){
 }
 
 function system(gx,grid,alpha,alpha_axes){
-    var px0 = gx.px0;
-    var py0 = gx.py0;
+    var px0 = Math.round(gx.px0); // On chrome, touch clientX
+    var py0 = Math.round(gx.py0); // returns also fractional part.
     var xcount = Math.ceil(0.5*gx.w/gx.mx)+1;
     var ycount = Math.ceil(0.5*gx.h/gx.mx)+1;
     var xshift = Math.round((0.5*gx.w-px0)/gx.mx);
@@ -1980,8 +1980,8 @@ function labels(gx){
     var context = gx.context;
     var w = gx.w;
     var h = gx.h;
-    var px0 = gx.px0;
-    var py0 = gx.py0;
+    var px0 = Math.round(gx.px0);
+    var py0 = Math.round(gx.py0);
     var ycount = Math.ceil(0.5*gx.h/gx.mx);
     var xcount = Math.ceil(0.5*gx.w/gx.mx);
     var xshift = Math.round((0.5*gx.w-px0)/gx.mx);
@@ -2097,6 +2097,7 @@ function touch_move(e){
         pid_stack = [];
         var dx = e.clientX-clientXp;
         var dy = e.clientY-clientYp;
+        console.log(e.clientX);
         gx.px0 = gx.px0+dx;
         gx.py0 = gx.py0+dy;
         gx.pos = get_pos(gx);
