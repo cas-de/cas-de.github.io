@@ -2097,7 +2097,6 @@ function touch_move(e){
         pid_stack = [];
         var dx = e.clientX-clientXp;
         var dy = e.clientY-clientYp;
-        console.log(e.clientX);
         gx.px0 = gx.px0+dx;
         gx.py0 = gx.py0+dy;
         gx.pos = get_pos(gx);
