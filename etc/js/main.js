@@ -307,7 +307,9 @@ var macro_tab_mathml = {
 "Eig": "<mi>Eig</mi>",
 "lcm": "<mi>lcm</mi>",
 "ggT": "<mi>ggT</mi>",
-"kgV": "<mi>kgV</mi>"
+"kgV": "<mi>kgV</mi>",
+"ord": "<mi>ord</mi>",
+"const": "<mi>const</mi>"
 };
 
 function object_update(x,y,f){
@@ -1067,7 +1069,9 @@ var tex_substitution_table = {
 "Eig": "\\operatorname{Eig}",
 "lcm": "\\operatorname{lcm}",
 "ggT": "\\operatorname{ggT}",
-"kgV": "\\operatorname{kgV}"
+"kgV": "\\operatorname{kgV}",
+"const": "\\operatorname{const}",
+"ord": "\\operatorname{ord}"
 };
 
 function tex_export_tex(buffer,s){

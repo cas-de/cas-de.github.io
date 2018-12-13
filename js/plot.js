@@ -1903,7 +1903,7 @@ function get_value(id){
 }
 
 function system(gx,grid,alpha,alpha_axes){
-    var px0 = Math.round(gx.px0); // On chrome, touch clientX
+    var px0 = Math.round(gx.px0); // On Chrome, touch clientX
     var py0 = Math.round(gx.py0); // returns also fractional part.
     var xcount = Math.ceil(0.5*gx.w/gx.mx)+1;
     var ycount = Math.ceil(0.5*gx.h/gx.mx)+1;
