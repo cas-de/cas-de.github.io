@@ -30,7 +30,7 @@ var argc_table = {
     "ol": 1,
     "ul": 1,
     "operatorname": 1,
-    "n": 1,
+    "op": 1,
     "binom": 2,
     "left": 1,
     "right": 1,
@@ -269,6 +269,7 @@ var macro_tab_mathml = {
 
 "N": "<mi mathvariant='bold'>N</mi>",
 "Z": "<mi mathvariant='bold'>Z</mi>",
+"Q": "<mi mathvariant='bold'>Q</mi>",
 "R": "<mi mathvariant='bold'>R</mi>",
 "C": "<mi mathvariant='bold'>C</mi>",
 "H": "<mi mathvariant='bold'>H</mi>",
@@ -819,7 +820,7 @@ function tex_macro_mathml(buffer,id,a,opt,context){
         tex_export_mathml(buffer,a[0],context);
         buffer.push("<mo stretchy='true'>&UnderBar;</mo>");
         buffer.push("</munder>");
-    }else if(id=="n" || id=="operatorname"){
+    }else if(id=="op" || id=="operatorname"){
         buffer.push("<mstyle mathvariant='normal'>");
         tex_export_mathml(buffer,a[0],context);
         buffer.push("</mstyle><mspace width='4px'/>");
@@ -1030,6 +1031,7 @@ function into_html(s){
 var tex_substitution_table = {
 "N": "\\mathbb N",
 "Z": "\\mathbb Z",
+"Q": "\\mathbb Q",
 "R": "\\mathbb R",
 "C": "\\mathbb C",
 "H": "\\mathbb H",
@@ -1050,7 +1052,7 @@ var tex_substitution_table = {
 "da": "\\downarrow",
 "ol": "\\overline",
 "ul": "\\underline",
-"n": "\\operatorname",
+"op": "\\operatorname",
 "re": "\\operatorname{Re}",
 "im": "\\operatorname{Im}",
 "grad": "\\operatorname{grad}",
@@ -1216,6 +1218,18 @@ function button_sqrt(){
 
 function button_parens(){
     insert_text("\\left(\\right)",7);
+}
+
+function button_brackets(){
+    insert_text("\\left[\\right]",7);
+}
+
+function button_braces(){
+    insert_text("\\{\\}",2);
+}
+
+function button_angles(){
+    insert_text("\\langle\\rangle",7);
 }
 
 function button_frac(){

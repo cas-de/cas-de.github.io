@@ -21,7 +21,17 @@ h2{
   font-weight: normal;
   border-bottom: 2px solid #b4b4b0;
 }
-a{color: #20506a; text-decoration: none;}
+a{
+  color: #20506a;
+  text-decoration: none;
+  background-image: linear-gradient(#ffffff,#ebebea);  
+  border: 1px solid #bababa;
+  border-radius: 5px;
+  padding-bottom: 3px;
+  padding-top: 3px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
 a:hover{color: #102a40; text-decoration: underline;}
 pre, code{
   font-family: "DejaVu Sans Mono", "Menlo", "Consolas", monospace;
