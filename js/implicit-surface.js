@@ -67,6 +67,10 @@ function buffer_zip(a00,a01,a11,a10,epsilon){
     return a;
 }
 
+function exterior_product(ax,ay,bx,by){
+    return ax*by-bx*ay;
+}
+
 function plot_implicit_sf(gx,f,d,xstep,ystep,epsilon){
     var x,y,z,w00,v;
     var kx,ky,kz;
@@ -190,7 +194,7 @@ function plot_implicit_sf(gx,f,d,xstep,ystep,epsilon){
     var proj = gx.proj;
     var tile_buffer = gx.tile_buffer;
     var p00,p01,p11,p10;
-    var p0,p1,p2,p3;
+    var p0,p1,p2,p3,sign;
     for(var i=0; i<zip_buffer.length; i++){
         t = zip_buffer[i];
         p00=t[0]; p01=t[1]; p11=t[2]; p10=t[3];
@@ -205,6 +209,14 @@ function plot_implicit_sf(gx,f,d,xstep,ystep,epsilon){
             p10[0]-p00[0],p10[1]-p00[1],p10[2]-p00[2],
             p01[0]-p00[0],p01[1]-p00[1],p01[2]-p00[2]
         );
+
+        sign = Math.sign(exterior_product(
+            p1[0]-p0[0], p1[1]-p0[1],
+            p3[0]-p0[0], p3[1]-p0[1]
+        ));
+        v[0] = sign*v[0];
+        v[1] = sign*v[1];
+        v[2] = sign*v[2];
 
         tile_buffer.push([TILE,s*p00[1]-c*p00[0],p0,p1,p2,p3,p00[2],
             mesh_cond(kx/xstep),mesh_cond(ky/ystep),v]);
