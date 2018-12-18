@@ -2095,13 +2095,13 @@ function touch_move(e){
         moved = true;
         var gx = graphics;
         pid_stack = [];
-        var dx = e.clientX-clientXp;
-        var dy = e.clientY-clientYp;
+        var dx = e.pageX-clientXp;
+        var dy = e.pageY-clientYp;
         gx.px0 = gx.px0+dx;
         gx.py0 = gx.py0+dy;
         gx.pos = get_pos(gx);
-        clientXp = e.clientX;
-        clientYp = e.clientY;
+        clientXp = e.pageX;
+        clientYp = e.pageY;
         refresh(gx);
     }
 }
@@ -2109,8 +2109,8 @@ function touch_move(e){
 function touch_start(e){
     if(e.touches.length!=0){
         e = e.touches[0];
-        clientXp = e.clientX;
-        clientYp = e.clientY;
+        clientXp = e.pageX;
+        clientYp = e.pageY;
     }
 }
 
