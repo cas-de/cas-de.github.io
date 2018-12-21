@@ -36,7 +36,8 @@ var argc_table = {
     "right": 1,
     "begin": 1,
     "end": 1,
-    "tilde": 1
+    "tilde": 1,
+    "hat": 1
 };
 
 var opt_table = {
@@ -814,6 +815,11 @@ function tex_macro_mathml(buffer,id,a,opt,context){
         buffer.push("<mover accent='true'>");
         tex_export_mathml(buffer,a[0],context);
         buffer.push("<mo stretchy='true'>~</mo>");
+        buffer.push("</mover>");
+    }else if(id=="hat"){
+        buffer.push("<mover accent='true'>");
+        tex_export_mathml(buffer,a[0],context);
+        buffer.push("<mo stretchy='false'>ˆ</mo>");
         buffer.push("</mover>");
     }else if(id=="ul" || id=="underline"){
         buffer.push("<munder accent='true'>");
