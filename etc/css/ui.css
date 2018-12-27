@@ -105,3 +105,8 @@ button::-moz-focus-inner {
 button:focus{
   outline: none;
 }
+
+blockquote{
+  border-left: 6px solid #4080a0;
+  padding-left: 8px;
+}

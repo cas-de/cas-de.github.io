@@ -1014,6 +1014,10 @@ function export_html_node(buffer,t){
                 tex_export_mathml(buffer,tex_parse(t[1]),standard_context);
                 buffer.push("</math>");
             }
+        }else if(op=="quote"){
+            buffer.push("<blockquote>");
+            export_html_node(buffer,t[1]);
+            buffer.push("</blockquote>");
         }else{
             throw "unknown function: "+t[1];
         }
@@ -1140,6 +1144,10 @@ function export_mb_node(buffer,t){
             buffer.push("[l]");
             tex_export_tex(buffer,t[1]);
             buffer.push("[/l]");
+        }else if(op=="quote"){
+            buffer.push("[quote]");
+            tex_export_tex(buffer,t[1]);
+            buffer.push("[/quote]");
         }else{
             throw "unknown function: "+t[1];
         }
