@@ -1146,7 +1146,7 @@ function export_mb_node(buffer,t){
             buffer.push("[/l]");
         }else if(op=="quote"){
             buffer.push("[quote]");
-            tex_export_tex(buffer,t[1]);
+            export_mb_node(buffer,t[1]);
             buffer.push("[/quote]");
         }else{
             throw "unknown function: "+t[1];
