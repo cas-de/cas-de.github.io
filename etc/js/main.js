@@ -37,7 +37,8 @@ var argc_table = {
     "begin": 1,
     "end": 1,
     "tilde": 1,
-    "hat": 1
+    "hat": 1,
+    "text": 1
 };
 
 var opt_table = {
@@ -260,6 +261,8 @@ var macro_tab_mathml = {
 "psi": "<mi>&psi;</mi>",
 "omega": "<mi>&omega;</mi>",
 ",": "<mspace width='3px'/>",
+":": "<mspace width='4px'/>",
+";": "<mspace width='5px'/>",
 "{": "<mo>{</mo>",
 "}": "<mo>}</mo>",
 "|": "<mo stretchy='false'>||</mo>",
@@ -758,7 +761,8 @@ var brackets_table = {
     "vmatrix": ["|","|"],
     "Bmatrix": ["{","}"],
     "Vmatrix": ["‖","‖"],
-    "matrix": ["",""]
+    "matrix": ["",""],
+    "cases": ["{",""]
 };
 
 function tex_macro_mathml(buffer,id,a,opt,context){
@@ -771,8 +775,9 @@ function tex_macro_mathml(buffer,id,a,opt,context){
         buffer.push("</mfrac>");
     }else if(
         id=="mathrm" || id=="mathbf" || id=="mathbb" ||
-        id=="mathsf" || id=="mathcal"
+        id=="mathsf" || id=="mathcal" || id=="text"
     ){
+        if(id=="text") id="mathrm";
         buffer.push("<mrow>");
         tex_export_mathml(buffer,a[0],{font_extra: true, font_type: id});
         buffer.push("</mrow>");
@@ -835,10 +840,7 @@ function tex_macro_mathml(buffer,id,a,opt,context){
         tex_export_mathml(buffer,a[0],context);
         tex_export_mathml(buffer,a[1],context);
         buffer.push("</mfrac><mo>)</mo></mrow>");
-    }else if(
-        id=="pmatrix" || id=="bmatrix" || id=="vmatrix" ||
-        id=="Bmatrix" || id=="Vmatrix" || id=="matrix"
-    ){
+    }else if(brackets_table.hasOwnProperty(id)){
         var brackets = brackets_table[id];
         tex_matrix_mathml(buffer,a[0],context,brackets[0],brackets[1]);
     }else{
