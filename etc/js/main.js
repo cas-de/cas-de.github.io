@@ -263,8 +263,8 @@ var macro_tab_mathml = {
 ",": "<mspace width='3px'/>",
 ":": "<mspace width='4px'/>",
 ";": "<mspace width='5px'/>",
-"{": "<mo>{</mo>",
-"}": "<mo>}</mo>",
+"{": "<mo stretchy='false'>{</mo>",
+"}": "<mo stretchy='false'>}</mo>",
 "|": "<mo stretchy='false'>||</mo>",
 "%": "<mo>%</mo>",
 "#": "<mo>#</mo>",
@@ -315,6 +315,12 @@ var macro_tab_mathml = {
 "kgV": "<mi>kgV</mi>",
 "ord": "<mi>ord</mi>",
 "const": "<mi>const</mi>"
+};
+
+var macro_operator_table = {
+  "over": "frac",
+  "atop": "_atop_",
+  "above": "_above_"
 };
 
 function object_update(x,y,f){
@@ -423,7 +429,12 @@ function tex_scan(s){
                 if(i<n && isalpha(s[i])){
                     var j = i;
                     while(i<n && isalpha(s[i])) i++;
-                    a.push([Macro,s.slice(j,i)]);
+                    var u = s.slice(j,i);
+                    if(macro_operator_table.hasOwnProperty(u)){
+                        a.push([Symbol,u]);
+                    }else{
+                        a.push([Macro,u]);
+                    }
                 }else if(i<n){
                     a.push([Macro,s[i]]);
                     i++;
@@ -604,7 +615,12 @@ function tex_ast(i,stop){
             break;
         }else if(t[0]==Macro && t[1]=="end"){
             break;
-        }else{
+        }else if(t[0]==Symbol && macro_operator_table.hasOwnProperty(t[1])){
+            i.index++;
+            var b = tex_ast(i);
+            var op = macro_operator_table[t[1]];
+            a = ["{}",["\\",op,[a,b],[]]];
+        }else{1
             a.push(tex_sub_sup(i));
         }
     }
@@ -765,6 +781,22 @@ var brackets_table = {
     "cases": ["{",""]
 };
 
+function bracket_symbol(buffer,a){
+    var t = a[0];
+    if(Array.isArray(t) && t[0]==="\\"){
+        var op = t[1];
+        if(op==="{"){buffer.push("<mo>{</mo>");}
+        else if(op=="}"){buffer.push("<mo>}</mo>");}
+        else if(op=="|"){buffer.push("<mo>‖</mo>");}
+        else if(op=="langle"){buffer.push("<mo>&lang;</mo>");}
+        else if(op=="rangle"){buffer.push("<mo>&rang;</mo>");}
+    }else if(Array.isArray(t)){
+        buffer.push("<mo>"+t[0]+"</mo>");
+    }else{
+        buffer.push("<mo>"+t+"</mo>");
+    }
+}
+
 function tex_macro_mathml(buffer,id,a,opt,context){
     if(macro_tab_mathml.hasOwnProperty(id)){
         buffer.push(macro_tab_mathml[id]);
@@ -798,19 +830,26 @@ function tex_macro_mathml(buffer,id,a,opt,context){
         buffer.push("<mo mathsize='60%'>&rarr;</mo>"); // &#8407;
         buffer.push("</mover>");
     }else if(id=="left"){
+        buffer.push("<mrow>");
+        bracket_symbol(buffer,a);
+        /*
         if(Array.isArray(a[0])){
             var t = a[0];
             buffer.push("<mo>"+t[0]+"</mo>");
         }else{
             buffer.push("<mo>"+a[0]+"</mo>");
-        }
+        }*/
     }else if(id=="right"){
+        bracket_symbol(buffer,a);
+        buffer.push("</mrow>");
+        /*
         if(Array.isArray(a[0])){
             var t = a[0];
             buffer.push("<mo>"+t[0]+"</mo>");
         }else{
             buffer.push("<mo>"+a[0]+"</mo>");
         }
+        */
     }else if(id=="bar" || id=="ol" || id=="overline"){
         buffer.push("<mover accent='true'>");
         tex_export_mathml(buffer,a[0],context);
@@ -836,13 +875,18 @@ function tex_macro_mathml(buffer,id,a,opt,context){
         tex_export_mathml(buffer,a[0],context);
         buffer.push("</mstyle><mspace width='4px'/>");
     }else if(id=="binom"){
-        buffer.push("<mrow><mo>(</mo><mfrac linethickness='0'>");
+        buffer.push("<mrow><mo>(</mo><mfrac linethickness='0pt'>");
         tex_export_mathml(buffer,a[0],context);
         tex_export_mathml(buffer,a[1],context);
         buffer.push("</mfrac><mo>)</mo></mrow>");
     }else if(brackets_table.hasOwnProperty(id)){
         var brackets = brackets_table[id];
         tex_matrix_mathml(buffer,a[0],context,brackets[0],brackets[1]);
+    }else if(id=="_atop_"){
+        buffer.push("<mfrac linethickness='0pt'>");
+        tex_export_mathml(buffer,a[0],context);
+        tex_export_mathml(buffer,a[1],context);
+        buffer.push("</mfrac>");
     }else{
         buffer.push("<mo>\\"+id+"</mo>");
     }
@@ -1013,6 +1057,7 @@ function export_html_node(buffer,t){
                 buffer.push("\\)");
             }else{
                 buffer.push("<math displaystyle='true'>");
+                console.log(JSON.stringify(tex_parse(t[1])));
                 tex_export_mathml(buffer,tex_parse(t[1]),standard_context);
                 buffer.push("</math>");
             }
@@ -1241,11 +1286,11 @@ function button_brackets(){
 }
 
 function button_braces(){
-    insert_text("\\{\\}",2);
+    insert_text("\\left\\{\\right\\}",8);
 }
 
 function button_angles(){
-    insert_text("\\langle\\rangle",7);
+    insert_text("\\left\\langle\\right\\rangle",13);
 }
 
 function button_frac(){
