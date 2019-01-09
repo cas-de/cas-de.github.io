@@ -29,11 +29,17 @@ var argc_table = {
     "underline": 1,
     "ol": 1,
     "ul": 1,
+    "overset": 2,
+    "underset": 2,
     "operatorname": 1,
     "op": 1,
     "binom": 2,
     "left": 1,
     "right": 1,
+    "big": 1,
+    "bigg": 1,
+    "Big": 1,
+    "Bigg": 1,
     "begin": 1,
     "end": 1,
     "tilde": 1,
@@ -785,15 +791,15 @@ function bracket_symbol(buffer,a){
     var t = a[0];
     if(Array.isArray(t) && t[0]==="\\"){
         var op = t[1];
-        if(op==="{"){buffer.push("<mo>{</mo>");}
-        else if(op=="}"){buffer.push("<mo>}</mo>");}
-        else if(op=="|"){buffer.push("<mo>‖</mo>");}
-        else if(op=="langle"){buffer.push("<mo>&lang;</mo>");}
-        else if(op=="rangle"){buffer.push("<mo>&rang;</mo>");}
+        if(op==="{"){buffer.push("{");}
+        else if(op=="}"){buffer.push("}");}
+        else if(op=="|"){buffer.push("‖");}
+        else if(op=="langle"){buffer.push("&lang;");}
+        else if(op=="rangle"){buffer.push("&rang;");}
     }else if(Array.isArray(t)){
-        buffer.push("<mo>"+t[0]+"</mo>");
+        buffer.push(t[0]);
     }else{
-        buffer.push("<mo>"+t+"</mo>");
+        buffer.push(t);
     }
 }
 
@@ -830,26 +836,29 @@ function tex_macro_mathml(buffer,id,a,opt,context){
         buffer.push("<mo mathsize='60%'>&rarr;</mo>"); // &#8407;
         buffer.push("</mover>");
     }else if(id=="left"){
-        buffer.push("<mrow>");
+        buffer.push("<mrow><mo>");
         bracket_symbol(buffer,a);
-        /*
-        if(Array.isArray(a[0])){
-            var t = a[0];
-            buffer.push("<mo>"+t[0]+"</mo>");
-        }else{
-            buffer.push("<mo>"+a[0]+"</mo>");
-        }*/
+        buffer.push("</mo>");
     }else if(id=="right"){
+        buffer.push("<mo>");
         bracket_symbol(buffer,a);
-        buffer.push("</mrow>");
-        /*
-        if(Array.isArray(a[0])){
-            var t = a[0];
-            buffer.push("<mo>"+t[0]+"</mo>");
-        }else{
-            buffer.push("<mo>"+a[0]+"</mo>");
-        }
-        */
+        buffer.push("</mrow></mo>");
+    }else if(id=="big"){
+        buffer.push("<mo minsize='1.2em' maxsize='1.2em'>");
+        bracket_symbol(buffer,a);
+        buffer.push("</mo>");
+    }else if(id=="Big"){
+        buffer.push("<mo minsize='1.7em' maxsize='1.7em'>");
+        bracket_symbol(buffer,a);
+        buffer.push("</mo>");
+    }else if(id=="bigg"){
+        buffer.push("<mo minsize='2.2em' maxsize='2.2em'>");
+        bracket_symbol(buffer,a);
+        buffer.push("</mo>");
+    }else if(id=="Bigg"){
+        buffer.push("<mo minsize='2.6em' maxsize='2.6em'>");
+        bracket_symbol(buffer,a);
+        buffer.push("</mo>");
     }else if(id=="bar" || id=="ol" || id=="overline"){
         buffer.push("<mover accent='true'>");
         tex_export_mathml(buffer,a[0],context);
@@ -887,6 +896,16 @@ function tex_macro_mathml(buffer,id,a,opt,context){
         tex_export_mathml(buffer,a[0],context);
         tex_export_mathml(buffer,a[1],context);
         buffer.push("</mfrac>");
+    }else if(id=="overset"){
+        buffer.push("<mover>");
+        tex_export_mathml(buffer,a[1],context);
+        tex_export_mathml(buffer,a[0],context);
+        buffer.push("</mover>");
+    }else if(id=="underset"){
+        buffer.push("<munder>");
+        tex_export_mathml(buffer,a[1],context);
+        tex_export_mathml(buffer,a[0],context);
+        buffer.push("</munder>");
     }else{
         buffer.push("<mo>\\"+id+"</mo>");
     }
