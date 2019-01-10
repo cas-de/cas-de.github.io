@@ -16,35 +16,43 @@ var standard_context = {
 };
 
 var argc_table = {
-    "frac": 2,
-    "mathrm": 1,
-    "mathbf": 1,
-    "mathbb": 1,
-    "mathsf": 1,
-    "mathcal": 1,    
-    "sqrt": 1,
-    "vec": 1,
-    "bar": 1,
-    "overline": 1,
-    "underline": 1,
-    "ol": 1,
-    "ul": 1,
-    "overset": 2,
-    "underset": 2,
-    "operatorname": 1,
-    "op": 1,
-    "binom": 2,
-    "left": 1,
-    "right": 1,
-    "big": 1,
-    "bigg": 1,
-    "Big": 1,
-    "Bigg": 1,
-    "begin": 1,
-    "end": 1,
-    "tilde": 1,
-    "hat": 1,
-    "text": 1
+"frac": 2,
+"mathrm": 1,
+"mathbf": 1,
+"mathbb": 1,
+"mathsf": 1,
+"mathcal": 1,    
+"sqrt": 1,
+"vec": 1,
+"bar": 1,
+"dot": 1,
+"ddot": 1,
+"dddot": 1,
+"ddddot": 1,
+"overline": 1,
+"underline": 1,
+"ol": 1,
+"ul": 1,
+"overset": 2,
+"underset": 2,
+"underbrace": 1,
+"overbrace": 1,
+"ub":1,
+"ob":1,
+"operatorname": 1,
+"op": 1,
+"binom": 2,
+"left": 1,
+"right": 1,
+"big": 1,
+"bigg": 1,
+"Big": 1,
+"Bigg": 1,
+"begin": 1,
+"end": 1,
+"tilde": 1,
+"hat": 1,
+"text": 1
 };
 
 var opt_table = {
@@ -320,7 +328,8 @@ var macro_tab_mathml = {
 "ggT": "<mi>ggT</mi>",
 "kgV": "<mi>kgV</mi>",
 "ord": "<mi>ord</mi>",
-"const": "<mi>const</mi>"
+"const": "<mi>const</mi>",
+"proj": "<mi>proj</mi>"
 };
 
 var macro_operator_table = {
@@ -874,6 +883,26 @@ function tex_macro_mathml(buffer,id,a,opt,context){
         tex_export_mathml(buffer,a[0],context);
         buffer.push("<mo stretchy='false'>ˆ</mo>");
         buffer.push("</mover>");
+    }else if(id=="dot"){
+        buffer.push("<mover accent='true'>");
+        tex_export_mathml(buffer,a[0],context);
+        buffer.push("<mo>.</mo>");
+        buffer.push("</mover>");
+    }else if(id=="ddot"){
+        buffer.push("<mover accent='true'>");
+        tex_export_mathml(buffer,a[0],context);
+        buffer.push("<mo>..</mo>");
+        buffer.push("</mover>");
+    }else if(id=="dddot"){
+        buffer.push("<mover accent='true'>");
+        tex_export_mathml(buffer,a[0],context);
+        buffer.push("<mo>...</mo>");
+        buffer.push("</mover>");
+    }else if(id=="ddddot"){
+        buffer.push("<mover accent='true'>");
+        tex_export_mathml(buffer,a[0],context);
+        buffer.push("<mo>....</mo>");
+        buffer.push("</mover>");
     }else if(id=="ul" || id=="underline"){
         buffer.push("<munder accent='true'>");
         tex_export_mathml(buffer,a[0],context);
@@ -906,6 +935,14 @@ function tex_macro_mathml(buffer,id,a,opt,context){
         tex_export_mathml(buffer,a[1],context);
         tex_export_mathml(buffer,a[0],context);
         buffer.push("</munder>");
+    }else if(id=="underbrace" || id=="ub"){
+        buffer.push("<munder>");
+        tex_export_mathml(buffer,a[0],context);
+        buffer.push("<mo stretchy='true'>&UnderBrace;</mo></munder>");
+    }else if(id=="overbrace" || id=="ob"){
+        buffer.push("<mover>");
+        tex_export_mathml(buffer,a[0],context);
+        buffer.push("<mo stretchy='true'>&OverBrace;</mo></mover>");
     }else{
         buffer.push("<mo>\\"+id+"</mo>");
     }
@@ -913,7 +950,8 @@ function tex_macro_mathml(buffer,id,a,opt,context){
 
 var under_over_table = {
     "sum":0, "lim":0, "coprod":0,
-    "bigcap":0, "bigcup":0, "bigwedge":0, "bigvee":0
+    "bigcap":0, "bigcup":0, "bigwedge":0, "bigvee":0,
+    "underbrace":0, "overbrace":0, "ub":0, "ob":0
 };
 
 function is_under_over(t){
@@ -1128,6 +1166,8 @@ var tex_substitution_table = {
 "da": "\\downarrow",
 "ol": "\\overline",
 "ul": "\\underline",
+"ob": "\\overbrace",
+"ub": "\\underbrace",
 "op": "\\operatorname",
 "re": "\\operatorname{Re}",
 "im": "\\operatorname{Im}",
@@ -1149,7 +1189,8 @@ var tex_substitution_table = {
 "ggT": "\\operatorname{ggT}",
 "kgV": "\\operatorname{kgV}",
 "const": "\\operatorname{const}",
-"ord": "\\operatorname{ord}"
+"ord": "\\operatorname{ord}",
+"proj": "\\operatorname{proj}"
 };
 
 function tex_export_tex(buffer,s){
