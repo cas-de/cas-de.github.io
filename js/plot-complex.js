@@ -641,7 +641,7 @@ function color_lb_repeat(w){
     var r = cabs(w);
     var phi = carg_positive(w);
     var iso_phi = 0.5*pulse(6*phi/Math.PI,100);
-    return hsl_to_rgb_u8(phi,0.9,Math.tanh(0.25+0.5*smod(ld(r),1)+iso_phi));
+    return hsl_to_rgb_u8(phi,0.9,Math.tanh(0.25+0.2*smod(ld(r),1)+iso_phi));
 }
 
 var color_method_tab = {
@@ -729,7 +729,7 @@ function global_definition(t){
 }
 
 function calc(){
-    calculate(ccompile);
+    calculate("complex");
 }
 
 function cplot_img(w,h){

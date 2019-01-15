@@ -259,8 +259,103 @@ function cLi(z){
     return {re: w.re-1.04516378011749278484, im: w.im};
 }
 
+var B2ndivfac2n = [
+1.0,
+0.08333333333333333,
+-0.001388888888888889,
+3.306878306878307e-5,
+-8.267195767195768e-7,
+2.08767569878681e-8,
+-5.284190138687493e-10,
+1.3382536530684679e-11,
+-3.3896802963225827e-13,
+8.586062056277845e-15,
+-2.174868698558062e-16,
+5.50900282836023e-18,
+-1.3954464685812525e-19,
+3.534707039629468e-21,
+-8.953517427037547e-23,
+2.2679524523376833e-24,
+-5.744790668872202e-26,
+1.455172475614865e-27,
+-3.68599494066531e-29,
+9.336734257095045e-31,
+-2.36502241570063e-32,
+5.990671762482134e-34,
+-1.5174548844682903e-35,
+3.843758125454189e-37,
+-9.736353072646691e-39,
+];
+
+function new_czeta(N,m){
+    var lnN = Math.log(N);
+    var ln_one_half = Math.log(0.5);
+    var coeff = [0];
+    for(var n=1; n<=m; n++){
+        coeff.push(B2ndivfac2n[n]*Math.pow(N,1-2*n));
+    }
+
+    var Euler_MacLaurin_term = function(s,N,m){
+        var y = {re: 0, im: 0};
+        for(var n=1; n<=m; n++){
+            var p = s;
+            var kmax = 2*n-2;
+            for(var k=1; k<=kmax; k++){
+                p = cmul(p,caddr(s,k));
+            }
+            y.re += p.re*coeff[n];
+            y.im += p.im*coeff[n];
+        }
+        return y;
+    };
+    return function(s){
+        var y = {re: 0, im: 0};
+        for(var k=1; k<N; k++){
+            var x = crdiv(1,cexp(cmulr(s,Math.log(k))));
+            y.re += x.re;
+            y.im += x.im;
+        }
+        var term = cadd(
+            caddr(crdiv(N,csubr(s,1)),0.5),
+            Euler_MacLaurin_term(s,N,m)
+        );
+        return cadd(y,cmul(cexp({re: -lnN*s.re, im: -lnN*s.im}),term));
+    };
+}
+
+var czetaN6m0 = new_czeta(6,0);
+var czetaN18m0 = new_czeta(18,0);
+var czetaN36m10 = new_czeta(36,10);
+
+function czeta_re_positive(s){
+    if(s.re>50){
+        return {re: 1, im: 0};
+    }else if(s.re>30){
+        return czetaN6m0(s);
+    }else if(s.re>15){
+        return czetaN18m0(s);
+    }else{
+        return czetaN36m10(s);
+    }
+}
+
+var lnpi = Math.log(Math.PI);
+function czeta(s){
+    if(s.re<0){
+        var one_minus_s = {re: 1-s.re, im: -s.im};
+        var exponent = cadd(cmulr(s,Math.LN2),{re: lnpi*(s.re-1), im: lnpi*s.im});
+        return cmul(cmul(
+            cmul(cexp(exponent),csin(cmulr(s,0.5*Math.PI))),
+            cgamma(one_minus_s)
+        ), czeta_re_positive(one_minus_s));    
+    }else{
+        return czeta_re_positive(s);
+    }
+}
+
 var ftab_extension = {
     Si: "cSi", Ci: "cCi", Ci90: "cCi90", Cin: "cCin",
-    E1: "cE1", Ei: "cEi", Ein: "cEin", li: "cli", Li: "cLi"
+    E1: "cE1", Ei: "cEi", Ein: "cEin", li: "cli", Li: "cLi",
+    zeta: "czeta",
 };
 

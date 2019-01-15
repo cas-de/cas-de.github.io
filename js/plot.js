@@ -2784,30 +2784,34 @@ function plot(gx){
     }
 }
 
-function calculate_eval(t){
+function calculate_eval(t,conf){
     if(Array.isArray(t) && t[0]===";"){
         var a = [];
         for(var i=2; i<t.length; i++){
-            var y = calculate_eval(t[i]);
+            var y = calculate_eval(t[i],conf);
             if(y!=undefined) a.push(y);
         }
-        return calculate_eval(t[1]);
+        return calculate_eval(t[1],conf);
     }else if(Array.isArray(t) && t[0]==="block"){
         var a = [];
         for(var i=1; i<t.length; i++){
-            var y = calculate_eval(t[i]);
+            var y = calculate_eval(t[i],conf);
             if(y!=undefined) a.push(y);
         }
         if(a.length>0) return a;
     }else if(Array.isArray(t) && t[0]===":="){
         global_definition(t);
     }else{
-        infer_type(t);
-        return compile(t,[])();
+        if(conf==="complex"){
+            return ccompile(t,[])();
+        }else{
+            infer_type(t);
+            return compile(t,[])();
+        }
     }
 }
 
-function calculate(compile){
+function calculate(conf){
     var input = get_value("input-calc");
     var out = document.getElementById("calc-out");
     if(input.length==0){
@@ -2816,7 +2820,7 @@ function calculate(compile){
     }
     try{
         var t = ast(input);
-        var value = calculate_eval(t);
+        var value = calculate_eval(t,conf);
         // out.innerHTML = "<p><code>"+str(t)+"</code>";
         // var t0 = performance.now();
         if(value==undefined){
@@ -2838,7 +2842,7 @@ function calculate(compile){
 }
 
 function calc(){
-    calculate(compile);
+    calculate();
 }
 
 function get_pos(gx){
