@@ -1,4 +1,8 @@
 
+// Todo:
+// * \left(\right)^a as {\left(\right)}^a
+// * x_12 as {x_1}2
+
 var update_needed = true;
 var export_input = false;
 var mathjax_mode = false;
@@ -135,7 +139,7 @@ var macro_tab_mathml = {
 "emptyset": "<mi>&empty;</mi>",
 "varnothing": "<mi>&empty;</mi>",
 "colon": ":<mspace width='4px'/>",
-"infty": "<mo>&infin;</mo>",
+"infty": "<mi>&infin;</mi>",
 "div": "<mo>&divide;</mo>",
 "surd": "<mo>√</mo>",
 "backslash": "<mo>\\</mo>",
@@ -333,9 +337,11 @@ var macro_tab_mathml = {
 };
 
 var macro_operator_table = {
-  "over": "frac",
-  "atop": "_atop_",
-  "above": "_above_"
+  "over": [2,"frac"],
+  "atop": [2,"_atop_"],
+  "above": [2,"_above_"],
+  "limits": [1,"_limits_"],
+  "nolimits": [1,"_nolimits_"]
 };
 
 function object_update(x,y,f){
@@ -458,6 +464,10 @@ function tex_scan(s){
         }else if(i+1<n && s[i]==':' && s[i+1]=='='){
             a.push([Symbol,":="]);
             i+=2;
+        }else if(s[i]=="'"){
+            var j = i;
+            while(i<n && s[i]=="'") i++;
+            a.push([Symbol,s.slice(j,i)]);
         }else{
             a.push([Symbol,s[i]]);
             i++;
@@ -545,13 +555,25 @@ function tex_node(i){
     }
 }
 
-function tex_sub_sup(i){
+function tex_postfix(i){
     var x = tex_node(i);
+    var t = i.a[i.index];
+    if(t[0]==Symbol && t[1]=="limits" || t[1]=="nolimits"){
+        i.index++;
+        var op = macro_operator_table[t[1]];
+        return ["\\",op[1],[x],[]];
+    }else{
+        return x;
+    }
+}
+
+function tex_sub_sup(i){
+    var x = tex_postfix(i);
     while(1){
         var t = i.a[i.index];
         if(t[0]==Symbol && (t[1]=='_' || t[1]=='^')){
             i.index++;
-            var y = tex_node(i);
+            var y = tex_postfix(i);
             x = [t[1],x,y];
         }else{
             break;
@@ -631,10 +653,10 @@ function tex_ast(i,stop){
         }else if(t[0]==Macro && t[1]=="end"){
             break;
         }else if(t[0]==Symbol && macro_operator_table.hasOwnProperty(t[1])){
+            var op = macro_operator_table[t[1]];
             i.index++;
             var b = tex_ast(i);
-            var op = macro_operator_table[t[1]];
-            a = ["{}",["\\",op,[a,b],[]]];
+            a = ["{}",["\\",op[1],[a,b],[]]];
         }else{1
             a.push(tex_sub_sup(i));
         }
@@ -851,7 +873,7 @@ function tex_macro_mathml(buffer,id,a,opt,context){
     }else if(id=="right"){
         buffer.push("<mo>");
         bracket_symbol(buffer,a);
-        buffer.push("</mrow></mo>");
+        buffer.push("</mo></mrow>");
     }else if(id=="big"){
         buffer.push("<mo minsize='1.2em' maxsize='1.2em'>");
         bracket_symbol(buffer,a);
@@ -911,7 +933,7 @@ function tex_macro_mathml(buffer,id,a,opt,context){
     }else if(id=="op" || id=="operatorname"){
         buffer.push("<mstyle mathvariant='normal'>");
         tex_export_mathml(buffer,a[0],context);
-        buffer.push("</mstyle><mspace width='4px'/>");
+        buffer.push("<mspace width='4px'/></mstyle>");
     }else if(id=="binom"){
         buffer.push("<mrow><mo>(</mo><mfrac linethickness='0pt'>");
         tex_export_mathml(buffer,a[0],context);
@@ -943,6 +965,8 @@ function tex_macro_mathml(buffer,id,a,opt,context){
         buffer.push("<mover>");
         tex_export_mathml(buffer,a[0],context);
         buffer.push("<mo stretchy='true'>&OverBrace;</mo></mover>");
+    }else if(id=="_limits_" || id=="_nolimits_"){
+        tex_export_mathml(buffer,a[0],context);
     }else{
         buffer.push("<mo>\\"+id+"</mo>");
     }
@@ -951,7 +975,8 @@ function tex_macro_mathml(buffer,id,a,opt,context){
 var under_over_table = {
     "sum":0, "lim":0, "coprod":0,
     "bigcap":0, "bigcup":0, "bigwedge":0, "bigvee":0,
-    "underbrace":0, "overbrace":0, "ub":0, "ob":0
+    "underbrace":0, "overbrace":0, "ub":0, "ob":0,
+    "_limits_":0
 };
 
 function is_under_over(t){
@@ -1076,6 +1101,10 @@ function tex_export_mathml(buffer,t,context){
                 tex_export_mathml(buffer,t[i],context);
                 buffer.push("<mspace linebreak='newline'/>");
             }
+        }else if(op.length>0 && op[0]=="'"){
+            buffer.push("<mo lspace='0em' rspace='0em'>");
+            buffer.push(Array(op.length+1).join("′"));
+            buffer.push("</mo>");
         }else{
             buffer.push("<mo>");
             buffer.push(op);
@@ -1114,7 +1143,7 @@ function export_html_node(buffer,t){
                 buffer.push("\\)");
             }else{
                 buffer.push("<math displaystyle='true'>");
-                console.log(JSON.stringify(tex_parse(t[1])));
+                // console.log(JSON.stringify(tex_parse(t[1])));
                 tex_export_mathml(buffer,tex_parse(t[1]),standard_context);
                 buffer.push("</math>");
             }
