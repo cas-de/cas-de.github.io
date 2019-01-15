@@ -1,0 +1,33 @@
+
+
+$x_{1,2} = -\frac{p}{2}\pm \sqrt{\left(\frac{p}{2}\right)^2-q}= \frac{-b \pm \sqrt{b^2-4ac} }{2a}$
+
+$\lim_{x\to\infty} \lim\nolimits_{x\to\infty}\sum_{k=1}^n  \sum\nolimits_{k=1}^n \int_a^b f(x)\,\mathrm dx \int\limits_a^b f(x)\,\mathrm dx$
+
+${}_pF_q(a_1, \dotsc, a_p; c_1, \dotsc, c_q; z) =
+\sum_{n=0}^\infty \frac{(a_1)_n \cdots (a_p)_n}{(c_1)_n \cdots (c_q)_n} \frac{z^n}{n!}$
+
+$\begin{pmatrix}
+a_{11} & a_{12}\\
+a_{21} & a_{22}
+\end{pmatrix}\begin{pmatrix}x \\ y\end{pmatrix}\begin{pmatrix}
+a_{11} & a_{12} & a_{13}\\
+a_{21} & a_{22} & a_{23}\\
+a_{31} & a_{32} & a_{33}
+\end{pmatrix}\begin{pmatrix}x \\ y\\ z\end{pmatrix}$
+
+$\begin{pmatrix}
+a_{11} & \\
+& a_{22}
+\end{pmatrix} \begin{pmatrix}
+a_{11} & & \\
+& a_{22} & \\
+& & a_{33}
+\end{pmatrix}$
+
+$\left[\left\{\left\langle\begin{matrix}
+a_{11} & a_{12}\\
+a_{21} & a_{22}
+\end{matrix}\right\rangle_a\right\}_b\right]_c$
+
+

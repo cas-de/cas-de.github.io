@@ -1,6 +1,5 @@
 
 // Todo:
-// * \left(\right)^a as {\left(\right)}^a
 // * x_12 as {x_1}2
 
 var update_needed = true;
@@ -46,8 +45,6 @@ var argc_table = {
 "operatorname": 1,
 "op": 1,
 "binom": 2,
-"left": 1,
-"right": 1,
 "big": 1,
 "bigg": 1,
 "Big": 1,
@@ -288,6 +285,7 @@ var macro_tab_mathml = {
 "#": "<mo>#</mo>",
 "&": "<mo>&amp;</mo>",
 "_": "<mo>_</mo>",
+"!": "",
 
 "N": "<mi mathvariant='bold'>N</mi>",
 "Z": "<mi mathvariant='bold'>Z</mi>",
@@ -334,6 +332,12 @@ var macro_tab_mathml = {
 "ord": "<mi>ord</mi>",
 "const": "<mi>const</mi>",
 "proj": "<mi>proj</mi>"
+};
+
+var macro_symbol_table = {
+  "over": 1, "atop": 1, "above": 1,
+  "limits": 1, "nolimits": 1,
+  "left": 1, "right": 1
 };
 
 var macro_operator_table = {
@@ -451,7 +455,7 @@ function tex_scan(s){
                     var j = i;
                     while(i<n && isalpha(s[i])) i++;
                     var u = s.slice(j,i);
-                    if(macro_operator_table.hasOwnProperty(u)){
+                    if(macro_symbol_table.hasOwnProperty(u)){
                         a.push([Symbol,u]);
                     }else{
                         a.push([Macro,u]);
@@ -538,6 +542,17 @@ function tex_node(i){
             var t = i.a[i.index];
             if(t[0]==Symbol && t[1]=="}"){i.index++;}
             return y;
+        }else if(op=="left"){
+            i.index++;
+            var a = tex_node(i);
+            if(a===undefined) a = "";
+            var x = tex_ast(i,"right");
+            var t = i.a[i.index];
+            if(t[0]==Symbol && t[1]=="right"){i.index++;}
+            var t = i.a[i.index];
+            var b = tex_node(i);
+            if(b===undefined) b = "";
+            return ["\\","_brackets_",[x,a,b],[]];
         }else{
             i.index++;
             return [op];
@@ -818,8 +833,7 @@ var brackets_table = {
     "cases": ["{",""]
 };
 
-function bracket_symbol(buffer,a){
-    var t = a[0];
+function bracket_symbol(buffer,t){
     if(Array.isArray(t) && t[0]==="\\"){
         var op = t[1];
         if(op==="{"){buffer.push("{");}
@@ -828,7 +842,7 @@ function bracket_symbol(buffer,a){
         else if(op=="langle"){buffer.push("&lang;");}
         else if(op=="rangle"){buffer.push("&rang;");}
     }else if(Array.isArray(t)){
-        buffer.push(t[0]);
+        if(t[0]!==".") buffer.push(t[0]);
     }else{
         buffer.push(t);
     }
@@ -866,13 +880,13 @@ function tex_macro_mathml(buffer,id,a,opt,context){
         tex_export_mathml(buffer,a[0],context);
         buffer.push("<mo mathsize='60%'>&rarr;</mo>"); // &#8407;
         buffer.push("</mover>");
-    }else if(id=="left"){
+    }else if(id=="_brackets_"){
         buffer.push("<mrow><mo>");
-        bracket_symbol(buffer,a);
+        bracket_symbol(buffer,a[1]);
         buffer.push("</mo>");
-    }else if(id=="right"){
+        tex_export_mathml(buffer,a[0],context);
         buffer.push("<mo>");
-        bracket_symbol(buffer,a);
+        bracket_symbol(buffer,a[2]);
         buffer.push("</mo></mrow>");
     }else if(id=="big"){
         buffer.push("<mo minsize='1.2em' maxsize='1.2em'>");
