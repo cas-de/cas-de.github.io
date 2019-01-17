@@ -150,6 +150,30 @@ function zeta(s,a){
     }
 }
 
+function bernoulliB(n){
+    return n==0?1:-n*zeta(1-n);
+}
+
+function bernoulliBm(n){
+    return n==1?-0.5:bernoulliB(n);
+}
+
+function Beta(x,y){
+    if(x<0 || y<0){
+        return gamma(x)*gamma(y)/gamma(x+y);
+    }else{
+        return Math.exp(lngammapx(x)+lngammapx(y)-lngammapx(x+y));
+    }
+}
+
+function Bvariadic(x,y){
+    if(y==undefined){
+        return bernoulliB(x);
+    }else{
+        return Beta(x,y);
+    }
+}
+
 function digamma(x){
     return gamma_diff(x)/gamma(x);
 }
@@ -313,6 +337,47 @@ function ipp(a){
         }
         return y;
     };
+}
+
+function stirling1(n,k){
+    if(n==k){
+        return 1;
+    }else if(n<=0 || k<=0){
+        return 0;
+    }else{
+        return (n-1)*stirling1(n-1,k)+stirling1(n-1,k-1);
+    }
+}
+
+function stirling2(n,k){
+    if(n==k){
+        return 1;
+    }else if(n<=0 || k<=0){
+        return 0;
+    }else{
+        return k*stirling2(n-1,k)+stirling2(n-1,k-1);
+    }
+}
+
+function s1(n,k){
+    n = Math.round(n);
+    k = Math.round(k);
+    if(n<0 && k<0){
+        return s2(-k,-n);
+    }else{
+        return n<k?0:stirling1(n,k);
+    }
+}
+
+function s2(n,k){
+    n = Math.round(n);
+    k = Math.round(k);
+    if(n<0 && k<0){
+        return s1(-k,-n);
+    }else{
+        return n<k?0:stirling2(n,k);
+    }
+
 }
 
 function trailing_zero_count(s){
@@ -765,9 +830,9 @@ function slider(id,a,b){
 
 var ftab_extension = {
   PT: ChebyshevT, PU: ChebyshevU, PH: Hermite, 
-  PP: Legendre, PL: Laguerre, bc: bc,
+  PP: Legendre, PL: Laguerre, bc: bc, s1: s1, s2: s2,
   psi: psi, digamma: digamma,
-  zeta: zeta, ipp: ipp,
+  zeta: zeta, B: Bvariadic, Bm: bernoulliBm, ipp: ipp,
   table: table, Wertetabelle: table,
   Si: Si, Ci: Ci, det: det, unit: unit_vector, I: idm,
   diag: diag_variadic, _matrix_pow_: matrix_pow,

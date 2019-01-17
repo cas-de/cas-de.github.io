@@ -477,9 +477,16 @@ function tanh(x){
     return 1-2/(Math.exp(2*x)+1);
 }
 
+function log(x,b){
+    if(b==undefined){
+        return Math.log(x);
+    }else{
+        return Math.log(x)/Math.log(b);
+    }
+}
+
 function lg(x){return 0.43429448190325176*Math.log(x);}
 function ld(x){return 1.4426950408889634*Math.log(x);}
-function log(x,b){return Math.log(x)/Math.log(b);}
 function cot(x){return 1/Math.tan(x);}
 function sec(x){return 1/Math.cos(x);}
 function csc(x){return 1/Math.sin(x);}
