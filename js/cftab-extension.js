@@ -353,6 +353,52 @@ function czeta(s){
     }
 }
 
+function chzeta(s,a,N,M){
+    var y={re: 0, im: 0};
+    for(var k=0; k<N; k++){
+        y = cadd(y,cpow({re: a.re+k, im: a.im},{re: -s.re, im: -s.im}));
+    }
+    var Npa = caddr(a,N);
+    var p = s;
+    var x = cmulr(cdiv(p,Npa),B2ndivfac2n[1]);
+    for(var n=2; n<=M; n++){
+        var kmax = 2*n-2;
+        p = cmul(p,caddr(s,kmax-1));
+        p = cmul(p,caddr(s,kmax));
+        x = cadd(x,cmulr(
+            cmul(p,cpow(Npa,{re: 1-2*n, im: 0})),
+            B2ndivfac2n[n]
+        ));
+    }
+    return cadd(y,cmul(
+        cpow(Npa,{re: -s.re, im: -s.im}),
+        cadd(caddr(cdiv(Npa,caddr(s,-1)),0.5),x)
+    ));
+};
+
+function czeta_variadic(s,a){
+    if(a==undefined){
+        return czeta(s);
+    }else{
+        var N = a.re>-10?18:Math.floor(Math.abs(a.re))+4;
+        return chzeta(s,a,N,6);
+    }
+}
+
+function cpolygamma(m,z){
+    var N = z.re>-10?18:Math.floor(Math.abs(z.re))+4;
+    var m = m.re;
+    if(m==0){
+        return cdiv(csub(
+            cgamma({re: z.re+0.0001, im: z.im}),
+            cgamma({re: z.re-0.0001, im: z.im})
+        ),cmulr(cgamma(z),0.0002));
+    }else{
+        var mp1 = {re: m+1, im: 0};
+        return cmulr(chzeta(mp1,z,N,6),Math.pow(-1,m+1)*cgamma(mp1).re);
+    }
+}
+
 function isprime(n){
     n = Math.round(n);
     if(n<2) return 0;
@@ -387,6 +433,7 @@ function cprime_sequence(n){
 var ftab_extension = {
     Si: "cSi", Ci: "cCi", Ci90: "cCi90", Cin: "cCin",
     E1: "cE1", Ei: "cEi", Ein: "cEin", li: "cli", Li: "cLi",
-    zeta: "czeta", pseq: "cprime_sequence"
+    zeta: "czeta_variadic", pseq: "cprime_sequence",
+    psi: "cpolygamma"
 };
 
