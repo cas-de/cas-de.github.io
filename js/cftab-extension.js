@@ -288,6 +288,7 @@ var B2ndivfac2n = [
 ];
 
 function new_czeta(N,m){
+    if(m==0){m=1;}
     var lnN = Math.log(N);
     var ln_one_half = Math.log(0.5);
     var coeff = [0];
@@ -296,13 +297,12 @@ function new_czeta(N,m){
     }
 
     var Euler_MacLaurin_term = function(s,N,m){
-        var y = {re: 0, im: 0};
-        for(var n=1; n<=m; n++){
-            var p = s;
+        var y = {re: s.re*coeff[1], im: s.im*coeff[1]};
+        var p = s;
+        for(var n=2; n<=m; n++){
             var kmax = 2*n-2;
-            for(var k=1; k<=kmax; k++){
-                p = cmul(p,caddr(s,k));
-            }
+            p = cmul(p,caddr(s,kmax-1));
+            p = cmul(p,caddr(s,kmax));
             y.re += p.re*coeff[n];
             y.im += p.im*coeff[n];
         }
@@ -353,9 +353,40 @@ function czeta(s){
     }
 }
 
+function isprime(n){
+    n = Math.round(n);
+    if(n<2) return 0;
+    var m = Math.floor(Math.sqrt(n));
+    for(var k=2; k<=m; k++){
+        if(n%k==0) return 0;
+    }
+    return 1;
+}
+
+function nextprime(n){
+    while(!isprime(n))n++;
+    return n;
+}
+
+var pseq_tab = [0,2];
+
+function cprime_sequence(n){
+    n = Math.round(n.re);
+    if(n<pseq_tab.length){
+        return {re: pseq_tab[n], im: 0};
+    }else{
+        var p = pseq_tab[pseq_tab.length-1];
+        while(n>=pseq_tab.length){
+            p = nextprime(p+1);
+            pseq_tab.push(p);
+        }
+        return {re: p, im: 0};
+    }
+}
+
 var ftab_extension = {
     Si: "cSi", Ci: "cCi", Ci90: "cCi90", Cin: "cCin",
     E1: "cE1", Ei: "cEi", Ein: "cEin", li: "cli", Li: "cLi",
-    zeta: "czeta",
+    zeta: "czeta", pseq: "cprime_sequence"
 };
 

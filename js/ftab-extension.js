@@ -122,31 +122,48 @@ function gamma_diff(x){
     }
 }
 
-function hzeta(s,a){
-    var y=0, N=18, Npa=N+a;
-    for(var k=a; k<Npa; k++){
-        y+=Math.pow(k,-s);
+var B2ndivfac2n = [
+1.0,
+0.08333333333333333,
+-0.001388888888888889,
+3.306878306878307e-5,
+-8.267195767195768e-7,
+2.08767569878681e-8,
+-5.284190138687493e-10,
+1.3382536530684679e-11,
+-3.3896802963225827e-13,
+8.586062056277845e-15,
+-2.174868698558062e-16,
+5.50900282836023e-18,
+-1.3954464685812525e-19,
+];
+
+function hzeta(s,a,N,M){
+    var y=0;
+    for(var k=0; k<N; k++){
+        y+=Math.pow(a+k,-s);
     }
-    var s2=s*(s+1)*(s+2);
-    var s4=s2*(s+3)*(s+4);
-    y+=Math.pow(Npa,1-s)/(s-1)+0.5*Math.pow(Npa,-s);
-    y+=s*Math.pow(Npa,-s-1)/12;
-    y-=s2*Math.pow(Npa,-s-3)/720;
-    y+=s4*Math.pow(Npa,-s-5)/30240;
-    y-=s4*(s+5)*(s+6)*Math.pow(Npa,-s-7)/1209600;
-    return y;
-}
+    var p = s;
+    var x = B2ndivfac2n[1]*Math.pow(N+a,-1)*p;
+    for(var n=2; n<=M; n++){
+        var kmax = 2*n-2;
+        p = p*(s+kmax-1)*(s+kmax);
+        x+=B2ndivfac2n[n]*Math.pow(N+a,1-2*n)*p;
+    }
+    return y+Math.pow(N+a,-s)*((N+a)/(s-1)+0.5+x);
+};
 
 function zeta(s,a){
     if(a==undefined){
         if(s>-1){
-            return hzeta(s,1);
+            return s>60?1:hzeta(s,1,18,6);
         }else{
             var a = 2*Math.pow(2*Math.PI,s-1)*Math.sin(Math.PI*s/2);
-            return a*gamma(1-s)*hzeta(1-s,1);
+            return a*gamma(1-s)*hzeta(1-s,1,18,6);
         }
     }else{
-        return hzeta(s,a);
+        var N = a>-10?18:Math.floor(Math.abs(a))+4;
+        return hzeta(s,a,N,6);
     }
 }
 
@@ -182,15 +199,25 @@ function polygamma(m,x){
     if(m==0){
         return digamma(x);
     }else{
-        return Math.pow(-1,m+1)*gamma(m+1)*hzeta(m+1,x);
+        var N = x>-10?18:Math.floor(Math.abs(x))+4;
+        return Math.cos(Math.PI*(m+1))*gamma(m+1)*hzeta(m+1,x,N,6);
     }
+}
+
+function generalized_polygamma(s,x){
+    var f = function(s){
+        return Math.exp(GAMMA*s)*hzeta(s+1,x,18,6)/gamma(-s);
+    };
+    return Math.exp(-GAMMA*s)*diff(f,s);
 }
 
 function psi(x,y){
     if(y==undefined){
         return digamma(x);
-    }else{
+    }else if(x>=0 && x==Math.round(x)){
         return polygamma(x,y);
+    }else{
+        return generalized_polygamma(x,y);
     }
 }
 
@@ -778,6 +805,21 @@ function pcf(x){
     return y;
 }
 
+var pseq_tab = [0,2];
+
+function prime_sequence(n){
+    if(n<pseq_tab.length){
+        return pseq_tab[n];
+    }else{
+        var p = pseq_tab[pseq_tab.length-1];
+        while(n>=pseq_tab.length){
+            p = nextprime(p+1);
+            pseq_tab.push(p);
+        }
+        return p;
+    }
+}
+
 function sigma(k,n){
     k = Math.round(k);
     n = Math.round(n);
@@ -842,6 +884,7 @@ var ftab_extension = {
   lcm: lcm_variadic, kgV: lcm_variadic,
   isprime: isprime, prim: isprime, pcf: pcf, factor: factor,
   phi: euler_phi, lambda: carmichael_lambda, sigma: sigma,
+  pseq: prime_sequence,
   slider: slider, Regler: slider
 };
 
