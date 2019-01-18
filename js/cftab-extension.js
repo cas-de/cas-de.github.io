@@ -386,7 +386,6 @@ function czeta_variadic(s,a){
 }
 
 function cpolygamma(m,z){
-    var N = z.re>-10?18:Math.floor(Math.abs(z.re))+4;
     var m = m.re;
     if(m==0){
         return cdiv(csub(
@@ -394,8 +393,17 @@ function cpolygamma(m,z){
             cgamma({re: z.re-0.0001, im: z.im})
         ),cmulr(cgamma(z),0.0002));
     }else{
+        var N = z.re>-10?18:Math.floor(Math.abs(z.re))+4;
         var mp1 = {re: m+1, im: 0};
         return cmulr(chzeta(mp1,z,N,6),Math.pow(-1,m+1)*cgamma(mp1).re);
+    }
+}
+
+function cpsi(x,y){
+    if(y==undefined){
+        return cpolygamma({re: 0, im: 0},x);
+    }else{
+        return cpolygamma(x,y);
     }
 }
 
@@ -434,6 +442,6 @@ var ftab_extension = {
     Si: "cSi", Ci: "cCi", Ci90: "cCi90", Cin: "cCin",
     E1: "cE1", Ei: "cEi", Ein: "cEin", li: "cli", Li: "cLi",
     zeta: "czeta_variadic", pseq: "cprime_sequence",
-    psi: "cpolygamma"
+    psi: "cpsi"
 };
 
