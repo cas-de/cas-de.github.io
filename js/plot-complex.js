@@ -18,7 +18,8 @@ asin: "casin", acos: "cacos", atan: "catan", acot: "cacot",
 arcsin: "casin", arccos: "cacos", arctan: "catan", arccot: "cacot",
 asinh: "casinh", acosh: "cacosh", atanh: "catanh", acoth: "cacoth",
 arsinh: "casinh", arcosh: "cacosh", artanh: "catanh", arcoth: "cacoth",
-gamma: "cgamma", fac: "cfac", sum: "csum", prod: "cprod",
+gamma: "cgamma_variadic", fac: "cfac", "Gamma": "ciGamma",
+sum: "csum", prod: "cprod",
 diff: "cdiff", int: "cint", iter: "citerate", img: "cplot_img"
 };
 
@@ -280,6 +281,59 @@ function cgamma(z){
 
 function cfac(z){
     return cgamma(caddr(z,1));
+}
+
+function ccfGamma(a,x,n){
+    var y = {re:0,im:0};
+    for(var k=n; k>=1; k--){
+        y = cdiv(
+            cmulr(csub({re:k,im:0},a),k),
+            caddr(csub(csub(x,y),a),2*k+1)
+        );
+    }
+    return cdiv(
+        cmul(cexp(cneg(x)),cpow(x,a)),
+        caddr(csub(csub(x,y),a),1)
+    );
+}
+
+function cpsgamma(a,x,n){
+    var y = {re:0,im:0};
+    var p = crdiv(1,a);
+    for(var k=1; k<n; k++){
+        y = cadd(y,p);
+        p = cdiv(cmul(p,x),caddr(a,k));
+    }
+    return cmul(cmul(y,cexp(cneg(x))),cpow(x,a));
+}
+
+function ciGamma(a,x){
+    if(cabs(x)>cabs(a)+1){
+        if(x.re>0 || Math.abs(x.im)>0){
+            return ccfGamma(a,x,20);
+        }
+    }
+    if(a.im==0 && a.re<=0 && a.re==Math.round(a.re)){
+        a = cadd(a,{re:0,im:1E-5});
+    }
+    return csub(cgamma(a),cpsgamma(a,x,20));
+}
+
+function cigamma(a,x){
+    if(cabs(x)>cabs(a)+1){
+        if(x.re>0 || Math.abs(x.im)>0){
+            return csub(cgamma(a),ccfGamma(a,x,20));
+        }
+    }
+    return cpsgamma(a,x,20);
+}
+
+function cgamma_variadic(x,y){
+    if(y==undefined){
+        return cgamma(x);
+    }else{
+        return cigamma(x,y);
+    }
 }
 
 function csum(a,b,f){

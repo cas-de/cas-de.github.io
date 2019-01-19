@@ -407,6 +407,48 @@ function cpsi(x,y){
     }
 }
 
+function cffac(z,n){
+    return cdiv(cgamma(caddr(z,1)),cgamma(caddr(csub(z,n),1)));
+}
+
+function crfac(z,n){
+    return cdiv(cgamma(cadd(z,n)),cgamma(z));
+}
+
+function cerf(x){
+    var a = {re:0.5,im:0};
+    var b = cmul(x,x);
+    var y;
+    if(cabs(x)<1.7){
+        y = cmulr(cpsgamma(a,b,24),1/Math.sqrt(Math.PI));
+    }else if(Math.abs(x.re)<1 && Math.abs(x.im)<4){
+        y = cmulr(cpsgamma(a,b,60),1/Math.sqrt(Math.PI));
+    }else{
+        y = cmulr(csub(cgamma(a),ccfGamma(a,b,24)),1/Math.sqrt(Math.PI));
+    }
+    if(x.re==0 && x.im<0){
+        return cneg(y);
+    }else if(x.re<0){
+        return cneg(y);
+    }else{
+        return y;
+    }
+}
+
+function cerfc(z){
+    return crsub(1,cerf(z));
+}
+
+/*
+function cEn(n,x){
+    return mpy(cpow(x,addr(n,-1)),ciGamma(sub({re:1,im:0},n),x));
+}
+
+function cEi(x){
+    return neg(ciGamma({re:0,im:0},neg(x)));
+}
+*/
+
 function isprime(n){
     n = Math.round(n);
     if(n<2) return 0;
@@ -442,6 +484,7 @@ var ftab_extension = {
     Si: "cSi", Ci: "cCi", Ci90: "cCi90", Cin: "cCin",
     E1: "cE1", Ei: "cEi", Ein: "cEin", li: "cli", Li: "cLi",
     zeta: "czeta_variadic", pseq: "cprime_sequence",
-    psi: "cpsi"
+    psi: "cpsi", ff: "cffac", rf: "crfac",
+    erf: "cerf", erfc: "cerfc",
 };
 
