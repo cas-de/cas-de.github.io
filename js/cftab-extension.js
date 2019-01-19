@@ -449,6 +449,23 @@ function cEi(x){
 }
 */
 
+function cbc(z,k){
+    if(k.im!=0 || k.re!=Math.round(k.re)){
+        return cdiv(cgamma(caddr(z,1)),cmul(
+            cgamma(caddr(k,1)),
+            cgamma({re: z.re-k.re+1, im: z.im-k.im})
+        ));
+    }else if(k.re<0){
+        return 0;
+    }
+    k = k.re;
+    var y = {re: 1, im: 0};
+    for(var i=1; i<=k; i++){
+        y = cmul(y,{re: (z.re-i+1)/i, im: z.im/i});
+    }
+    return y;
+}
+
 function isprime(n){
     n = Math.round(n);
     if(n<2) return 0;
@@ -484,7 +501,7 @@ var ftab_extension = {
     Si: "cSi", Ci: "cCi", Ci90: "cCi90", Cin: "cCin",
     E1: "cE1", Ei: "cEi", Ein: "cEin", li: "cli", Li: "cLi",
     zeta: "czeta_variadic", pseq: "cprime_sequence",
-    psi: "cpsi", ff: "cffac", rf: "crfac",
+    psi: "cpsi", ff: "cffac", rf: "crfac", bc: "cbc",
     erf: "cerf", erfc: "cerfc",
 };
 

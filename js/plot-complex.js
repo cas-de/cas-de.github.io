@@ -9,7 +9,7 @@ var cglobal_ftab = {
 "<": "clt", ">": "cgt", "<=": "cle", ">=": "cge",
 abs: "ccabs", arg: "ccarg", sgn: "csgn", conj: "conj",
 re: "cre", im: "cim", Re: "cre", Im: "cim",
-floor: "cfloor", ceil: "cceil", rd: "crd", frac: "cfrac",
+floor: "cfloor", ceil: "cceil", mod: "cmod", rd: "crd", frac: "cfrac",
 exp: "cexp", sqrt: "csqrt", root: "croot", rt: "croot",
 ln: "cln", lg: "clg", ld: "cld", lb: "cld", log: "clog",
 sin: "csin", cos: "ccos", tan: "ctan", cot: "ccot",
@@ -19,7 +19,8 @@ arcsin: "casin", arccos: "cacos", arctan: "catan", arccot: "cacot",
 asinh: "casinh", acosh: "cacosh", atanh: "catanh", acoth: "cacoth",
 arsinh: "casinh", arcosh: "cacosh", artanh: "catanh", arcoth: "cacoth",
 gamma: "cgamma_variadic", fac: "cfac", "Gamma": "ciGamma",
-sum: "csum", prod: "cprod",
+sum: "csum", prod: "cprod", range: "crange",
+map: "map", filter: "cfilter", 
 diff: "cdiff", int: "cint", iter: "citerate", img: "cplot_img"
 };
 
@@ -36,6 +37,7 @@ function complex(x,y){
     return {re: x, im: y};
 }
 
+function ceq(a,b){return {re: a.re==b.re&a.im==b.im?1:0,im:0};}
 function clt(a,b){return {re: a.re<b.re?1:0,im:0};}
 function cgt(a,b){return {re: a.re>b.re?1:0,im:0};}
 function cle(a,b){return {re: a.re<=b.re?1:0,im:0};}
@@ -106,6 +108,7 @@ function cfloor(z){return {re:Math.floor(z.re),im:Math.floor(z.im)};}
 function cceil(z){return {re:Math.ceil(z.re),im:Math.ceil(z.im)};}
 function crd(z){return {re:Math.round(z.re),im:Math.round(z.im)};}
 function cfrac(z){return {re:frac(z.re),im:frac(z.im)};}
+function cmod(z,m){return csub(z,cmul(m,cfloor(cdiv(z,m))));}
 
 function cexp(z){
     var r = Math.exp(z.re);
@@ -354,6 +357,19 @@ function cprod(a,b,f){
         y = cmul(y,f({re: k, im: 0}));
     }
     return y;
+}
+
+function crange(a,b,step){
+    var r = range(a.re,b.re,step==undefined?undefined:step.re);
+    return r.map(function(x){return {re: x, im: 0};});
+}
+
+function cfilter(p,a){
+    var b = [];
+    for(var k=0; k<a.length; k++){
+        if(p(a[k]).re>0.5) b.push(a[k]);
+    }
+    return b;
 }
 
 var cdiff_tab = [

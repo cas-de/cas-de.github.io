@@ -466,7 +466,11 @@ function table(f,a,prec){
     for(var i=0; i<a.length; i++){
         b.push("<tr><td style='text-align: right'>");
         b.push(ax[i]);
-        b.push("<td style='text-align: right'>");
+        if(ay[i].length>0 && ay[i][0]=='['){
+            b.push("<td>");
+        }else{
+            b.push("<td style='text-align: right'>");
+        }
         b.push(ay[i]);
     }
     b.push("</table>");
