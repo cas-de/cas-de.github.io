@@ -835,6 +835,14 @@ function sigma(k,n){
     return y;
 }
 
+function divisors(n){
+    var a = [];
+    for(var d=1; d<=n; d++){
+        if(n%d==0) a.push(d);
+    }
+    return a;
+}
+
 var slider_table = {};
 
 function slider(id,a,b){
@@ -888,7 +896,7 @@ var ftab_extension = {
   lcm: lcm_variadic, kgV: lcm_variadic,
   isprime: isprime, prim: isprime, pcf: pcf, factor: factor,
   phi: euler_phi, lambda: carmichael_lambda, sigma: sigma,
-  pseq: prime_sequence,
+  pseq: prime_sequence, divisors: divisors, Teiler: divisors,
   slider: slider, Regler: slider
 };
 

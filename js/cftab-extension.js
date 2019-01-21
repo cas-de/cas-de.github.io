@@ -385,6 +385,18 @@ function czeta_variadic(s,a){
     }
 }
 
+function cbernoulliB(n){
+    if(n.re==0 && n.im==0){
+        return {re: 1, im: 0};
+    }else{
+        return cneg(cmul(n,czeta(crsub(1,n))));
+    }
+}
+
+function cbernoulliBm(n){
+    return n.re==1 && n.im==0? {re:-0.5,im:0} : cbernoulliB(n);
+}
+
 function cpolygamma(m,z){
     var m = m.re;
     if(m==0){
@@ -497,11 +509,26 @@ function cprime_sequence(n){
     }
 }
 
+function ctable(f,a){
+    var buffer = ["<table class='bt'>"];
+    for(var k=0; k<a.length; k++){
+        var x = a[k];
+        var y = f(x);
+        buffer.push("<tr><td>");
+        buffer.push(str(x));
+        buffer.push("<td>");
+        buffer.push(str(y));
+    }
+    buffer.push("</table>");
+    return buffer.join("");
+}
+
 var ftab_extension = {
     Si: "cSi", Ci: "cCi", Ci90: "cCi90", Cin: "cCin",
     E1: "cE1", Ei: "cEi", Ein: "cEin", li: "cli", Li: "cLi",
     zeta: "czeta_variadic", pseq: "cprime_sequence",
     psi: "cpsi", ff: "cffac", rf: "crfac", bc: "cbc",
-    erf: "cerf", erfc: "cerfc",
+    erf: "cerf", erfc: "cerfc", B: "cbernoulliB", Bm: "cbernoulliBm",
+    table: "ctable", Wertetabelle: "ctable"
 };
 

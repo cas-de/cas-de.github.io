@@ -101,7 +101,7 @@ var lang = {
     expected_right_paren: "')' wurde erwartet.",
     expected_right_sq: "']' wurde erwartet.",
     expected_operand: "ein Operand wurde erwartet.",
-    expected_comman_or_bracket: function(i,bracket){
+    expected_comma_or_bracket: function(i,bracket){
         syntax_error(i,"',' oder '"+bracket+"' wurde erwartet.");
     },
     unexpected_symbol: function(i,x){
@@ -205,7 +205,20 @@ function res(f,x,a,b){return a<=x && x<=b? f(x): NaN;}
 function map(f,a){return a.map(function(x){return f(x);});}
 function filter(f,a){return a.filter(f);}
 
+function list_sum(a){
+    var y = 0;
+    for(var i=0; i<a.length; i++){y+=a[i];}
+    return y;
+}
+
+function list_prod(a){
+    var y = 1;
+    for(var i=0; i<a.length; i++){y*=a[i];}
+    return y;
+}
+
 function sum(a,b,f){
+    if(b==undefined){return list_sum(a);}
     a = Math.round(a);
     b = Math.round(b);
     var y = 0;
@@ -216,6 +229,7 @@ function sum(a,b,f){
 }
 
 function prod(a,b,f){
+    if(b==undefined){return list_prod(a);}
     a = Math.round(a);
     b = Math.round(b);
     var y = 1;
@@ -814,10 +828,14 @@ function isspace(s){
     return s==' ' || s=='\t' || s=='\n';
 }
 
-function str(x,ftos){
+function str(x,ftos,newline){
     if(Array.isArray(x)){
         var f = function(t){return str(t);};
-        return "["+x.map(f).join(", ")+"]";
+        if(newline && x.length>0 && Array.isArray(x[0])){
+            return "<br>["+x.map(f).join(",<br>&nbsp;")+"]";
+        }else{
+            return "["+x.map(f).join(", ")+"]";
+        }
     }else if(x instanceof Function){
         return lang.a_function;
     }else if(typeof x == "string"){
@@ -2833,7 +2851,7 @@ function calculate(conf){
         if(value==undefined){
             out.innerHTML = "";
         }else{
-            out.innerHTML = "<p><code>= "+str(value)+"</code>";
+            out.innerHTML = "<p><code>= "+str(value,undefined,true)+"</code>";
         }
         // var t1 = performance.now();
         // out.innerHTML += "<p><code>time: "+(t1-t0)+"ms</code>";

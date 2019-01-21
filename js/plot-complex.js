@@ -339,7 +339,20 @@ function cgamma_variadic(x,y){
     }
 }
 
+function clist_sum(a){
+    var y = {re: 0, im: 0};
+    for(var i=0; i<a.length; i++){y = cadd(y,a[i]);}
+    return y;
+}
+
+function clist_prod(a){
+    var y = {re: 1, im: 0};
+    for(var i=0; i<a.length; i++){y = cmul(y,a[i]);}
+    return y;
+}
+
 function csum(a,b,f){
+    if(b==undefined){return clist_sum(a);}
     a = Math.round(a.re);
     b = Math.round(b.re);
     var y = {re: 0, im: 0};
@@ -350,6 +363,7 @@ function csum(a,b,f){
 }
 
 function cprod(a,b,f){
+    if(b==undefined){return clist_prod(a);}
     a = Math.round(a.re);
     b = Math.round(b.re);
     var y = {re: 1, im: 0};
