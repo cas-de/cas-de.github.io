@@ -2742,6 +2742,11 @@ function global_definition(t){
     }
 }
 
+function eval_node(t){
+    var value = compile(t,[]);
+    value();
+}
+
 function eval_statements(t){
     if(Array.isArray(t) && (t[0]==="block" || t[0]===";")){
         for(var i=1; i<t.length; i++){
@@ -2751,8 +2756,7 @@ function eval_statements(t){
         if(Array.isArray(t) && t[0]===":="){
             global_definition(t);
         }else{
-            var value = compile(t,[]);
-            value();
+            eval_node(t);
         }
     }
 }

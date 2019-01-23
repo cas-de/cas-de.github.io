@@ -54,11 +54,18 @@ function plot_vector_field(gx,f){
 }
 
 function plot_node(gx,t,color){
-    var T = infer_type(t);
-    if(T==TypeVector){
-        var f = compile(t,["x","y"]);
-        plot_vector_field(gx,f);
+    if(Array.isArray(t) && t[0]==="Kurve"){
+        infer_type(t[1]);
+        var f = compile(t[1],["t"]);
+        vplot_async(gx,f,color);
     }else{
-        plot_node_basic(gx,t,color);
+        var T = infer_type(t);
+        if(T==TypeVector){
+            var f = compile(t,["x","y"]);
+            plot_vector_field(gx,f);
+        }else{
+            plot_node_basic(gx,t,color);
+        }
     }
 }
+
