@@ -630,7 +630,20 @@ function nablah(h){
                 (f(x[0],x[1],x[2]+h)-f(x[0],x[1],x[2]-h))/(2*h)
             ];
         }
-    }
+    };
+}
+
+function divoph(h){
+    return function divop(F,x){
+        if(x.length==2){
+            return (
+                (F(x[0]+h,x[1])[0]-F(x[0]-h,x[1])[0])/(2*h)+
+                (F(x[0],x[1]+h)[1]-F(x[0],x[1]-h)[1])/(2*h)
+            );
+        }else{
+            return NaN;
+        }
+    };
 }
 
 function rotation_matrix(phi){
@@ -890,7 +903,8 @@ var ftab_extension = {
   table: table, Wertetabelle: table,
   Si: Si, Ci: Ci, det: det, unit: unit_vector, I: idm,
   diag: diag_variadic, _matrix_pow_: matrix_pow,
-  nabla: nablah(0.001), apply: apply, rot: rotation_matrix,
+  nabla: nablah(0.001), divop: divoph(0.001),
+  apply: apply, rot: rotation_matrix,
   pli: pli_general, L: laplace_transform, delta: delta,
   gcd: gcd_variadic, ggT: gcd_variadic,
   lcm: lcm_variadic, kgV: lcm_variadic,

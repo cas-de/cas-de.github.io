@@ -1,4 +1,19 @@
 
+var vec_min = 0.7;
+var vec_scale = 0.3;
+
+function scale_vec(a){
+    if(a==0){
+        vec_min = 0.7;
+        vec_scale = 0.3;
+    }else{
+        vec_min=0;
+        vec_scale = a;
+    }
+}
+
+ftab["vec"] = scale_vec;
+
 function line(gx,color,x1,y1,x2,y2){
     var x,y;
     var d = 1/Math.hypot(x2-x1,y2-y1);
@@ -16,10 +31,10 @@ function vector(gx,color,x,y,vx,vy,L){
     var x2 = x1+m*vx;
     var y2 = y1-m*vy;
     line(gx,color,x1,y1,x2,y2);
-    var a = 0.6*m;
+    var a = 0.4*m;
     var b = 0.2*m;
-    line(gx,color,x2,y2,x1+a*vx-b*vy,y1-a*vy-b*vx);
-    line(gx,color,x2,y2,x1+a*vx+b*vy,y1-a*vy+b*vx);
+    line(gx,color,x2,y2,x2-a*vx-b*vy,y2+a*vy-b*vx);
+    line(gx,color,x2,y2,x2-a*vx+b*vy,y2+a*vy+b*vx);
 }
 
 function plot_vector_field(gx,f){
@@ -46,7 +61,7 @@ function plot_vector_field(gx,f){
             color[1] = (1-alpha)*color0[1]+alpha*color1[1];
             color[2] = (1-alpha)*color0[2]+alpha*color1[2];
             color[3] = (1-alpha)*color0[3]+alpha*color1[3];
-            vector(gx,color,x,y,v[0],v[1],0.7+0.3*alpha);
+            vector(gx,color,x,y,v[0],v[1],vec_min+vec_scale*alpha);
         }
     }
     flush(gx);

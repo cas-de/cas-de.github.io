@@ -1,4 +1,5 @@
 
+
 ftab["tw"] = 10;
 ftab["step"] = 0.001;
 
@@ -93,18 +94,20 @@ function ode_system(t){
     }
 }
 
-function eval_node(t){
-    if(Array.isArray(t) && t[0]==="="){
-        if(Array.isArray(t[1]) && t[1][0]==="D"){
-            var term = t[1][1];
-            if(Array.isArray(term) && term[0]==="[]"){
-                ode_system(t);
-                return;
-            }
+function equation(t){
+    if(Array.isArray(t[1]) && t[1][0]==="D"){
+        var term = t[1][1];
+        if(Array.isArray(term) && term[0]==="[]"){
+            ode_system(t);
+            return;
         }
     }
-    var value = compile(t,[]);
-    value();
+    eval_node(t);
 }
+
+var cmd_extension = {
+    "=": equation
+};
+
 
 

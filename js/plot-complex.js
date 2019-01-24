@@ -589,7 +589,7 @@ function ccompile_expression(a,t,context){
             a.push(cglobal_ftab[t]);
         }else if(!ftab_extension_loaded){
             async_continuation = "await";
-            load_ftab_extension(cglobal_ftab,"js/cftab-extension.js");
+            load_ftab_extension(cglobal_ftab,"js/ext-cftab.js");
             throw new Repeat();
         }else{
             throw lang.undefined_variable(t);

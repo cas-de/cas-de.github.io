@@ -14,6 +14,7 @@ var GAMMA = 0.57721566490153286;
 var PHI = 1.618033988749895;
 var dark = false;
 var ftab_extension_loaded = false;
+var cmd_extension_loaded = false;
 var async_continuation = undefined;
 var recursion_table = {};
 var post_app_stack = [];
@@ -80,12 +81,16 @@ var ftab = {
     RF: RF, RC: RC, RJ: RJ, RD: RD,
     P: set_position, scale: set_scale,
     zeroes: zeroes, roots: zeroes,
-    map: map, filter: filter, freq: set_freq,
-    img: plot_img, calc: calc_cmd, len: list_length, not: not,
+    map: map, filter: filter, freq: set_freq, not: not,
+    img: plot_img, calc: calc_cmd, len: list_length, cat: list_cat,
     _addtt_: add_tensor_tensor, _subtt_: sub_tensor_tensor,
     _mulst_: mul_scalar_tensor, _mulmv_: mul_matrix_vector,
     _mulmm_: mul_matrix_matrix, _mulvv_: scalar_product,
     _vabs_: abs_vec
+};
+
+var cmd_tab = {
+    "=": 0
 };
 
 var keyword_table = {
@@ -159,7 +164,23 @@ function load_ftab_extension(ftab,path){
     });
 }
 
+function load_cmd_extension(cmd_tab,path){
+    load_async(path,async function(){
+        var t = cmd_extension;
+        var a = Object.keys(t);
+        for(var i=0; i<a.length; i++){
+            cmd_tab[a[i]] = t[a[i]];
+        }
+        cmd_extension_loaded = true;
+        while(async_continuation == "await"){
+            await sleep(100);
+        }
+        async_continuation();
+    });
+}
+
 function list_length(a){return a.length;}
+function list_cat(a,b){return a.concat(b);}
 function not(a){return 1-a;}
 
 function rand(a,b){
@@ -1593,7 +1614,7 @@ function compile_expression(a,t,context,type){
             a.push(t);
         }else if(!ftab_extension_loaded){
             async_continuation = "await";
-            load_ftab_extension(ftab,"js/ftab-extension.js");
+            load_ftab_extension(ftab,"js/ext-ftab.js");
             throw new Repeat();
         }else{
             throw lang.undefined_variable(t);
@@ -2699,15 +2720,14 @@ function plot_node_basic(gx,t,color){
         infer_type(t);
         f = compile(t,["x","y"]);
         plot_bool(gx,f,color,1);
-    }else if(contains_variable(t,"y")){
-        infer_type(t);
-        f = compile(t,["x","y"]);
-        plot_level_async(gx,f,color);
     }else{
         var T = infer_type(t);
         if(T==TypeVector){
             f = compile(t,["t"]);
             vplot_async(gx,f,color);
+        }else if(contains_variable(t,"y")){
+            f = compile(t,["x","y"]);
+            plot_level_async(gx,f,color);
         }else{
             f = compile(t,["x"]);
             plot_async(gx,f,color);
@@ -2755,6 +2775,16 @@ function eval_statements(t){
     }else{
         if(Array.isArray(t) && t[0]===":="){
             global_definition(t);
+        }else if(Array.isArray(t) && typeof t[0]=="string" &&
+            cmd_tab.hasOwnProperty(t[0])
+        ){
+            if(cmd_extension_loaded){
+                cmd_tab[t[0]](t);
+            }else{
+                async_continuation = "await";
+                load_cmd_extension(cmd_tab,"js/ext-cmd.js");
+                throw new Repeat();
+            }
         }else{
             eval_node(t);
         }
