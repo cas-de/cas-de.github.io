@@ -755,7 +755,7 @@ function plot(gx){
     if(a[0].length>0){
         t = ast(a[0]);
         if(Array.isArray(t) && t[0]===";"){
-            for(var i=2; i<t.length; i++){
+            for(var i=t.length-1; i>=2; i--){
                 eval_statements(t[i]);
             }
             t = t[1];

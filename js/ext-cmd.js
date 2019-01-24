@@ -94,11 +94,139 @@ function ode_system(t){
     }
 }
 
+
+
+// ====
+
+
+
+function pli_vec(x0,d,y){
+    var n = y.length;
+    var m = y[0].length;
+    return function(x){
+        var k = Math.floor((x-x0)/d);
+        var v = [];
+        if(k<0 || k+1>=n){
+            for(var i=0; i<m; i++){v.push(NaN);}
+        }else{
+            var a = 1/d*(x-x0-k*d);
+            for(var i=0; i<m; i++){
+                v.push(y[k][i]+a*(y[k+1][i]-y[k][i]));
+            }
+        }
+        return v;
+    };
+}
+
+function vadd_scaled(n,m,v,x,a,y){
+    for(var i=0; i<n; i++){
+        for(var j=0; j<m; j++){
+            v[i][j] = x[i][j]+a*y[i][j];
+        }
+    }
+    return v;
+}
+
+function clone_matrix(a){
+    return a.map(function(x){return x.slice();});
+}
+
+function runge_kutta_vec_unilateral(f,h,N,x0,y0){
+    var n = y0.length;
+    var size = y0[0].length;
+    var m = n-1;
+    var F = function(v,x,y){
+        for(var i=0; i<m; i++) v[i] = y[i+1].slice();
+        v[m] = f(x,y);
+    };
+    var x = x0;
+    var y = clone_matrix(y0);
+    var yt = clone_matrix(y);
+    var k1 = clone_matrix(y);
+    var k2 = clone_matrix(y);
+    var k3 = clone_matrix(y);
+    var k4 = clone_matrix(y);
+    var a = [y[0].slice()];
+    for(var k=1; k<=N; k++){
+        F(k1,x,y);
+        F(k2,x+0.5*h,vadd_scaled(n,size,yt,y,0.5*h,k1));
+        F(k3,x+0.5*h,vadd_scaled(n,size,yt,y,0.5*h,k2));
+        F(k4,x+h,vadd_scaled(n,size,yt,y,h,k3));
+        for(var i=0; i<n; i++){
+            for(var j=0; j<size; j++){
+                y[i][j] = y[i][j]+h/6*(k1[i][j]+2*(k2[i][j]+k3[i][j])+k4[i][j]);
+            }
+        }
+        x = x0+k*h;
+        a.push(y[0].slice());
+    }
+    return pli_vec(x0,h,a);
+}
+
+function runge_kutta_vec(f,h,wm,wp,x0,y0){
+    var gm = runge_kutta_vec_unilateral(f,-h,Math.abs(wm/h),x0,y0);
+    var gp = runge_kutta_vec_unilateral(f,h,Math.abs(wp/h),x0,y0);
+    return function(x){return x<x0?gm(x):gp(x);};
+}
+
+function vec_ode_as_fn_rec(v,t){
+    if(Array.isArray(t)){
+        if(t[0]==="D" && t[1]===v){
+            return ["index","_x_",t[2]];
+        }else{
+            var a = [];
+            for(var i=0; i<t.length; i++){
+                a.push(vec_ode_as_fn_rec(v,t[i]));
+            }
+            return a;        
+        }
+    }else if(t===v){
+        return ["index","_x_",0];
+    }else{
+        return t;
+    }
+}
+
+function vec_ode_as_fn(t,v,order){
+    var u = vec_ode_as_fn_rec(v,t[2]);
+    id_type_table["_x_"] = TypeMatrix;
+    infer_type(u);
+    return compile(u,["t","_x_"]);
+}
+
+function ode_vec(t){
+    var v = t[1][1];
+    var order = t[1][2];
+    var f = vec_ode_as_fn(t,v,order);
+    var p = ftab["p"];
+    if(!ftab.hasOwnProperty("p") || !Array.isArray(p)){
+        throw lang.initial_value_problem_msg();
+    }
+    if(p.length<order+1){
+        throw new Err(lang.p_to_short);
+    }else{
+        p = p.slice(0,order+1);
+    }
+    var w = ftab["tw"];
+    var h = ftab["step"];
+    var fv = runge_kutta_vec(f,h,-w,w,p[0],p.slice(1));
+    ftab[v] = fv;
+    fn_type_table[v] = TypeVector;
+}
+
+
+// ====
+
+
+
 function equation(t){
     if(Array.isArray(t[1]) && t[1][0]==="D"){
         var term = t[1][1];
         if(Array.isArray(term) && term[0]==="[]"){
             ode_system(t);
+            return;
+        }else{
+            ode_vec(t);
             return;
         }
     }

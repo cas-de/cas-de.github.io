@@ -86,7 +86,7 @@ var ftab = {
     _addtt_: add_tensor_tensor, _subtt_: sub_tensor_tensor,
     _mulst_: mul_scalar_tensor, _mulmv_: mul_matrix_vector,
     _mulmm_: mul_matrix_matrix, _mulvv_: scalar_product,
-    _vabs_: abs_vec
+    _vabs_: abs_vec, _negt_: neg_tensor
 };
 
 var cmd_tab = {
@@ -1383,6 +1383,10 @@ function mul_scalar_tensor(r,a){
     return b;
 }
 
+function neg_tensor(a){
+    return mul_scalar_tensor(-1,a);
+}
+
 function mul_matrix_vector(A,v){
     var m = A.length;
     var n = v.length;
@@ -1440,7 +1444,8 @@ var TypeNumber = 0;
 var TypeVector = 1;
 var TypeMatrix = 2;
 var type_op_table = {
-    "[]":0, "+":0, "-":0, "*":0, "/":0, "^":0, "abs":0
+    "[]":0, "+":0, "-":0, "*":0, "/":0, "^":0, "abs":0, "index":0,
+    "~":0,
 };
 var fn_type_table = {
     "unit": TypeVector,
@@ -1493,7 +1498,7 @@ function infer_type(t){
                 }
             }else if(t[0]==="/"){
                 if(T[1]!=TypeNumber){
-                    t[0] = "_mulsv_";
+                    t[0] = "_mulst_";
                     var v = t[1];
                     t[1] = ["/",1,t[2]];
                     t[2] = v;
@@ -1504,9 +1509,18 @@ function infer_type(t){
                     t[0] = "_matrix_pow_";
                     return TypeMatrix;
                 }
+            }else if(t[0]==="~"){
+                if(T[1]!=TypeNumber){
+                    t[0] = "_negt_";
+                    return T[1];
+                }
             }else if(t[0]==="abs"){
                 if(T[1]==TypeVector){
                     t[0] = "_vabs_";
+                }
+            }else if(t[0]==="index"){
+                if(T[1]==TypeMatrix){
+                    return TypeVector;
                 }
             }
         }else if(fn_type_table.hasOwnProperty(t[0])){
@@ -2457,7 +2471,8 @@ function plot_level_async(gx,f,color){
         return r-1-Math.floor(r-0.5);
     };
     plot_level(gx,f,1,false);
-    plot_zero_set_async(gx,g,color);
+    labels(gx);
+    // plot_zero_set_async(gx,g,color);
 }
 
 function bisection_bool(state,f,a,b){
@@ -2818,7 +2833,7 @@ function plot(gx){
     if(a[0].length>0){
         var t = ast(a[0]);
         if(Array.isArray(t) && t[0]===";"){
-            for(var i=2; i<t.length; i++){
+            for(var i=t.length-1; i>=2; i--){
                 eval_statements(t[i]);
             }
             t = t[1];
