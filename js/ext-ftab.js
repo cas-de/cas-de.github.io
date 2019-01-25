@@ -709,6 +709,29 @@ function rotation_matrix(phi){
     ];
 }
 
+function matrix_mul_add_inplace(m,n,A,x,B){
+    for(var i=0; i<m; i++){
+        for(var j=0; j<n; j++){
+            A[i][j] = A[i][j]+x*B[i][j];
+        }
+    }
+}
+
+function expm(A){
+    var X = mul_scalar_tensor(1/1024,A);
+    var n = X.length;
+    var M = X;
+    var Y = idm(n);
+    var p = 1;
+    matrix_mul_add_inplace(n,n,Y,1,M);
+    for(var k=2; k<6; k++){
+        p = p*k;
+        M = mul_matrix_matrix(M,X);
+        matrix_mul_add_inplace(n,n,Y,1/p,M);
+    }
+    return matrix_pow(Y,1024);
+}
+
 function apply(f,v){
     return f.apply(null,v);
 }
@@ -980,7 +1003,7 @@ var ftab_extension = {
   zeta: zeta, B: Bvariadic, Bm: bernoulliBm, ipp: ipp,
   table: table, Wertetabelle: table,
   Si: Si, Ci: Ci, det: det, unit: unit_vector, I: idm,
-  diag: diag_variadic, _matrix_pow_: matrix_pow,
+  diag: diag_variadic, _matrix_pow_: matrix_pow, expm: expm,
   nabla: nablah(0.001), divop: divoph(0.001),
   apply: apply, rot: rotation_matrix, tr: trace, tp: transpose,
   pli: pli_general, L: laplace_transform, delta: delta,

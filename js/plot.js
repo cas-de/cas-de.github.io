@@ -1453,7 +1453,8 @@ var fn_type_table = {
     "rot": TypeMatrix,
     "I": TypeMatrix,
     "diag": TypeMatrix,
-    "tp": TypeMatrix
+    "tp": TypeMatrix,
+    "expm": TypeMatrix
 };
 var id_type_table = {};
 
