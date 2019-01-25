@@ -95,11 +95,6 @@ function ode_system(t){
 }
 
 
-
-// ====
-
-
-
 function pli_vec(x0,d,y){
     var n = y.length;
     var m = y[0].length;
@@ -215,10 +210,6 @@ function ode_vec(t){
 }
 
 
-// ====
-
-
-
 function equation(t){
     if(Array.isArray(t[1]) && t[1][0]==="D"){
         var term = t[1][1];
@@ -226,7 +217,13 @@ function equation(t){
             ode_system(t);
             return;
         }else{
-            ode_vec(t);
+            var p = ftab["p"];
+            if(Array.isArray(p) && p.length>1 && Array.isArray(p[1])){
+                ode_vec(t);
+            }else{
+                var f = from_ode(graphics,t);
+                ftab[term] = f;
+            }
             return;
         }
     }
@@ -236,6 +233,5 @@ function equation(t){
 var cmd_extension = {
     "=": equation
 };
-
 
 

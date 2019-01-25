@@ -484,14 +484,29 @@
 <th>Funktion
 <th>Erklärung
 <tr>
+<td><code>[a,b]</code>
+<td>Ein Koordinatenvektor.
+<tr>
+<td><code>[[a,b],[c,d]]</code>
+<td>Eine Matrix.
+<tr>
+<td><code>v*w</code>
+<td>Skalarprodukt von v und&nbsp;w.
+<tr>
 <td><code>I(n)</code>
 <td>Die n&times;n Einheitsmatrix.
 <tr>
 <td><code>rot(phi)</code>
-<td>Rotationsmatrix zum Winkel &phi;.
+<td>Rotationsmatrix 2&times;2 zum Winkel &phi;.
 <tr>
 <td><code>det(A)</code>
 <td>Determinante der Matrix A.
+<tr>
+<td><code>tr(A)</code>
+<td>Spur der Matrix A.
+<tr>
+<td><code>tp(A)</code>
+<td>Transponierte der Matrix A.
 <tr>
 <td><code>diag(x1,...,xn)</code>
 <td>Diagonalmatrix.
@@ -624,7 +639,18 @@
 <tr>
 <td><code>filter(p,a)</code>
 <td>Die Elemente aus a, die das Prädikat&nbsp;p erfüllen.
-<br>Beispiel: <code>filter(k.mod(k,2)=1,1:10)</code>.
+<br>Beispiel: <code>filter(n.prim(n)&amp;prim(n+2),1:100)</code>.
+<tr>
+<td><code>all(p,a)</code>
+<td>Allquantor, ist nur dann wahr wenn alle Elemente aus a das
+Prädikat&nbsp;p erfüllen.
+<tr>
+<td><code>any(p,a)</code>
+<td>Existenzquantor, ist schon dann wahr wenn irgendein Element aus a
+das Prädikat&nbsp;p erfüllt.
+<tr>
+<td><code>count(p,a)</code>
+<td>Zählt wie viele Elemente aus a das Prädikat&nbsp;p erfüllen.
 <tr>
 <td><code>pli(f,a,b,d)</code>
 <td>Piecewise linear interpolation. Interpoliert die Funktion&nbsp;f

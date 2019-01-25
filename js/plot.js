@@ -1444,15 +1444,16 @@ var TypeNumber = 0;
 var TypeVector = 1;
 var TypeMatrix = 2;
 var type_op_table = {
-    "[]":0, "+":0, "-":0, "*":0, "/":0, "^":0, "abs":0, "index":0,
-    "~":0,
+    "[]":0, "+":0, "-":0, "*":0, "/":0, "^":0, "~":0,
+    "abs":0, "index":0,
 };
 var fn_type_table = {
     "unit": TypeVector,
     "nabla": TypeVector,
     "rot": TypeMatrix,
     "I": TypeMatrix,
-    "diag": TypeMatrix
+    "diag": TypeMatrix,
+    "tp": TypeMatrix
 };
 var id_type_table = {};
 
@@ -2628,7 +2629,6 @@ function from_ode(gx,t){
     var wm = Math.abs(p[0]+gx.px0/gx.mx/ax);
     var wp = Math.abs(p[0]-(gx.w-gx.px0)/gx.mx/ax);
     var fv = runge_kutta(f,0.001,wm,wp,p[0],p.slice(1));
-    if(v!=="y") ftab[v]=fv;
     return fv;
 }
 
@@ -2719,7 +2719,9 @@ function plot_node_basic(gx,t,color){
         }
     }else if(Array.isArray(t) && t[0]==="="){
         if(Array.isArray(t[1]) && t[1][0]==="D"){
+            var v = t[1][1];
             f = from_ode(gx,t);
+            if(v!=="y") ftab[v] = f;
             plot_async(gx,f,color);
         }else if(t[1]==="y" && !contains_variable(t[2],"y")){
             infer_type(t);

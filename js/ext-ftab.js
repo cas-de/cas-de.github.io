@@ -505,21 +505,6 @@ function diag_variadic(){
     }
 }
 
-function det(A){
-    var n = A.length;
-    if(n==2){
-        return A[0][0]*A[1][1]-A[0][1]*A[1][0];
-    }else if(n==3){
-        return (
-            A[0][0]*(A[1][1]*A[2][2]-A[1][2]*A[2][1]) -
-            A[1][0]*(A[0][1]*A[2][2]-A[0][2]*A[2][1]) +
-            A[2][0]*(A[0][1]*A[1][2]-A[0][2]*A[1][1])
-        );
-    }else{
-        return NaN;
-    }
-}
-
 function copy_array(a){
     var b = [];
     for(var i=0; i<a.length; i++){
@@ -609,6 +594,77 @@ function matrix_pow(A,n){
         n = Math.floor(n/2);
     }
     return M;
+}
+
+function pivoting_det(A,n,j){
+    var m = Math.abs(A[j][j]);
+    var k = j;
+    for(var i=j+1; i<n; i++){
+        if(m<Math.abs(A[i][j])){
+            m = Math.abs(A[i][j]);
+            k = i;
+        }
+    }
+    if(k==j){
+        return false;
+    }else{
+        swap(A,k,j);
+        return true;
+    }
+}
+
+function gauss_det(A,n){
+    A = copy_array(A);
+    var y = 1;
+    for(var j=0; j<n; j++){
+        if(pivoting_det(A,n,j)){y = -y;}
+        for(var i=j+1; i<n; i++){
+            if(A[i][j]!=0){
+                y = y/A[j][j];
+                mul_add_inplace(A[j][j],A[i],-A[i][j],A[j]);
+            }
+        }
+        y = y*A[j][j];
+    }
+    return y;
+}
+
+function det(A){
+    var n = A.length;
+    if(n==2){
+        return A[0][0]*A[1][1]-A[0][1]*A[1][0];
+    }else if(n==3){
+        return (
+            A[0][0]*(A[1][1]*A[2][2]-A[1][2]*A[2][1]) -
+            A[1][0]*(A[0][1]*A[2][2]-A[0][2]*A[2][1]) +
+            A[2][0]*(A[0][1]*A[1][2]-A[0][2]*A[1][1])
+        );
+    }else{
+        return gauss_det(A,n);
+    }
+}
+
+function trace(A){
+    var n = A.length;
+    var y = 0;
+    for(var i=0; i<n; i++){
+        y+=A[i][i];
+    }
+    return y;
+}
+
+function transpose(A){
+    var m = A.length;
+    var n = A[0].length;
+    var B = [];
+    for(var j=0; j<n; j++){
+        var v = [];
+        for(var i=0; i<m; i++){
+            v.push(A[i][j]);
+        }
+        B.push(v);
+    }
+    return B;
 }
 
 function unit_vector(v){
@@ -856,6 +912,28 @@ function divisors(n){
     return a;
 }
 
+function all(p,a){
+    for(var i=0; i<a.length; i++){
+        if(p(a[i])==0) return 0;
+    }
+    return 1;
+}
+
+function any(p,a){
+    for(var i=0; i<a.length; i++){
+        if(p(a[i])==1) return 1;
+    }
+    return 0;
+}
+
+function count(p,a){
+    var y = 0;
+    for(var i=0; i<a.length; i++){
+        if(p(a[i])==1) y++;
+    }
+    return y;
+}
+
 var slider_table = {};
 
 function slider(id,a,b){
@@ -904,14 +982,14 @@ var ftab_extension = {
   Si: Si, Ci: Ci, det: det, unit: unit_vector, I: idm,
   diag: diag_variadic, _matrix_pow_: matrix_pow,
   nabla: nablah(0.001), divop: divoph(0.001),
-  apply: apply, rot: rotation_matrix,
+  apply: apply, rot: rotation_matrix, tr: trace, tp: transpose,
   pli: pli_general, L: laplace_transform, delta: delta,
   gcd: gcd_variadic, ggT: gcd_variadic,
   lcm: lcm_variadic, kgV: lcm_variadic,
   isprime: isprime, prim: isprime, pcf: pcf, factor: factor,
   phi: euler_phi, lambda: carmichael_lambda, sigma: sigma,
   pseq: prime_sequence, divisors: divisors, Teiler: divisors,
-  slider: slider, Regler: slider
+  slider: slider, Regler: slider, all: all, any: any, count: count
 };
 
 
