@@ -633,14 +633,59 @@
 <th>Nomenklatur
 <th>Erklärung
 <tr>
-<td><code>cdf</code>
-<td>Verteilungsfunktion, engl. cumulative distribution function.
+<td><code>pmf</code>
+<td>Wahrscheinlichkeitsfunktion, engl. probability mass function.
 <tr>
 <td><code>pdf</code>
 <td>Dichtefunktion, engl. propability density function.
+<tr>
+<td><code>cdf</code>
+<td>Verteilungsfunktion, engl. cumulative distribution function.
+<tr>
+<td><code>qf</code>
+<td>Quantilfunktion.
 </table>
 
 <br>
+<h4>Diskrete Verteilungen</h4>
+<table class="bt">
+<tr>
+<th>Funktion
+<th>Erklärung
+<tr>
+<td><code>cdfB(x,n,p)</code>
+<td>Binomialverteilung.
+<tr>
+<td><code>pmfB(x,n,p)</code>
+<td>Wf. der Binomialverteilung.
+<tr>
+<td><code>cdfG(x,p)</code>
+<td>Geometrische Verteilung.
+<tr>
+<td><code>pmfG(x,p)</code>
+<td>Wf. der geometrischen Verteilung.
+<tr>
+<td><code>cdfH(x,N,K,n)</code>
+<td>Hypergeometrische Verteilung.
+<tr>
+<td><code>pmfH(x,N,K,n)</code>
+<td>Wf. der hypergeometrischen Verteilung.
+<tr>
+<td><code>cdfP(x,lambda)</code>
+<td>Poisson-Verteilung.
+<tr>
+<td><code>pmfP(x,lambda)</code>
+<td>Wf. der Poisson-Verteilung.
+<tr>
+<td><code>cdfLog(x,p)</code>
+<td>Logarithmische Verteilung.
+<tr>
+<td><code>pmfLog(x,p)</code>
+<td>Wf. der logarithmischen Verteilung.
+</table>
+
+<br>
+<h4>Stetige Verteilungen</h4>
 <table class="bt">
 <tr>
 <th>Funktion
@@ -669,6 +714,54 @@
 <tr>
 <td><code>pdfN(x,mu,sigma)</code>
 <td>Dichte der Normalverteilung.
+<tr>
+<td><code>cdfLogN(x,mu,sigma)</code>
+<td>Log-Normalverteilung.
+<tr>
+<td><code>pdfLogN(x,mu,sigma)</code>
+<td>Dichte der Log-Normalverteilung.
+<tr>
+<td><code>cdfExp(x,lambda)</code>
+<td>Exponentialverteilung, <code>E=1/lambda</code>.
+<tr>
+<td><code>pdfExp(x,lambda)</code>
+<td>Dichte der Exponentialverteilung.
+<tr>
+<td><code>cdfchisq(x,n)</code>
+<td>Chi-Quadrat-Verteilung.
+<tr>
+<td><code>pdfchisq(x,n)</code>
+<td>Dichte der Chi-Quadrat-Verteilung.
+<tr>
+<td><code>cdfst(x,n)</code>
+<td>Student-t-Verteilung.
+<tr>
+<td><code>pdfst(x,n)</code>
+<td>Dichte der Student-t-Verteilung.
+<tr>
+<td><code>cdfF(x,m,n)</code>
+<td>Fisher-Verteilung.
+<tr>
+<td><code>pdfF(x,m,n)</code>
+<td>Dichte der Fisher-Verteilung.
+<tr>
+<td><code>cdfW(x,a,b)</code>
+<td>Weibull-Verteilung, <code>E=b*gamma(1+1/a)</code>.
+<tr>
+<td><code>pdfW(x,a,b)</code>
+<td>Dichte der Weibull-Verteilung.
+<tr>
+<td><code>cdfGamma(x,b,p)</code>
+<td>Gamma-Verteilung, <code>E=p/b</code>.
+<tr>
+<td><code>pdfGamma(x,b,p)</code>
+<td>Dichte der Gamma-Verteilung.
+<tr>
+<td><code>cdfBeta(x,p,q)</code>
+<td>Beta-Verteilung.
+<tr>
+<td><code>pdfBeta(x,p,q)</code>
+<td>Dichte der Beta-Verteilung.
 </table>
 
 <br>

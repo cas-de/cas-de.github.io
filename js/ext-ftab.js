@@ -981,6 +981,24 @@ function cdf(a,x){
     }
 }
 
+function F21(a1,a2,b,x){
+    var s = 1;
+    var p = 1;
+    for(var k=0; k<80; k++){
+        p = p*x*(a1+k)*(a2+k)/(b+k)/(k+1);
+        s+=p;
+    }
+    return s;
+}
+
+function iBeta(x,a,b){
+    return Math.pow(x,a)/a*F21(a,1-b,a+1,x);
+}
+
+function riBeta(x,a,b){
+    return iBeta(x,a,b)/Beta(a,b);
+}
+
 function pdfu(x,a,b){
     if(a==undefined) a=0;
     if(b==undefined) b=1;
@@ -1004,6 +1022,169 @@ function cdfN(x,mu,sigma){
     if(sigma==undefined) sigma = 1;
     if(mu==undefined) mu = 0;
     return 0.5+0.5*erf((x-mu)/(Math.SQRT2*sigma));
+}
+
+function pdfLogN(x,mu,sigma){
+    var a = 1/(x*sigma*Math.sqrt(2*Math.PI));
+    return a*Math.exp(-0.5*Math.pow((Math.log(x)-mu)/sigma,2));
+}
+
+function cdfLogN(x,mu,sigma){
+    return 0.5+0.5*erf((Math.log(x)-mu)/(sigma*Math.sqrt(2)));
+}
+
+function pdfExp(x,lambda){
+    if(x<0) return 0;
+    return lambda*Math.exp(-lambda*x);
+}
+
+function cdfExp(x,lambda){
+    if(x<0) return 0;
+    return 1-Math.exp(-lambda*x);
+}
+
+function pdfchisq(x,n){
+    if(x<=0) return 0;
+    return Math.pow(x,n/2-1)*Math.exp(-x/2)/(Math.pow(2,n/2)*gamma(n/2));
+}
+
+function cdfchisq(x,n){
+    if(x<=0) return 0;
+    return igamma(n/2,x/2)/gamma(n/2);
+}
+
+function qfchisq(p,n){
+    var F = function(x){return cdfchisq(x,n);};
+    return inv(F,p);
+}
+
+function pdfst(x,n){
+    var a = gamma((n+1)/2)/(gamma(n/2)*Math.sqrt(n*Math.PI));
+    return a*Math.pow(1+x*x/n,-(n+1)/2);
+}
+
+function cdfst(x,n){
+    var a = Math.sqrt(x*x+n);
+    return riBeta((x+a)/(2*a),n/2,n/2);
+}
+
+function pdfF(x,m,n){
+    if(x<0) return 0;
+    var a = Math.pow(m,0.5*m)*Math.pow(n,0.5*n)/Beta(0.5*m,0.5*n);
+    return a*Math.pow(x,0.5*m-1)/Math.pow(m*x+n,0.5*(m+n));
+}
+
+function cdfF(x,m,n){
+    if(x<=0) return 0;
+    return riBeta(m*x/(m*x+n),0.5*m,0.5*n);
+}
+
+function qfF(p,m,n){
+    var F = function(x){return cdfF(m,n,x);};
+    return inv(F,p);
+}
+
+function pdfW(x,a,b){
+    if(x<0) return 0;
+    return a/b*Math.pow(x/b,a-1)*Math.exp(-Math.pow(x/b,a));
+}
+
+function cdfW(x,a,b){
+    if(x<0) return 0;
+    return 1-Math.exp(-Math.pow(x/b,a));
+}
+
+function pdfGamma(x,b,p){
+    if(x<=0) return 0;
+    return Math.pow(b,p)/gamma(p)*Math.pow(x,p-1)*Math.exp(-b*x);
+}
+
+function cdfGamma(x,b,p){
+    if(x<0) return 0;
+    return igamma(p,b*x)/gamma(p);
+}
+
+function pdfBeta(x,p,q){
+    if(x<0 || x>1) return 0;
+    return Math.pow(x,p-1)*Math.pow(1-x,q-1)/Beta(p,q);
+}
+
+function cdfBeta(x,p,q){
+    if(x<0) return 0;
+    if(x>1) return 1;
+    return riBeta(x,p,q);
+}
+
+function pmfB(k,n,p){
+    k = Math.round(k);
+    if(k<0 || k>n) return 0;
+    return bc(n,k)*Math.pow(p,k)*Math.pow(1-p,n-k);
+}
+
+function cdfB(x,n,p){
+    var s = 0;
+    x = Math.round(x);
+    for(var k=0; k<=x; k++){
+      s+=bc(n,k)*Math.pow(p,k)*Math.pow(1-p,n-k);
+    }
+    return s;
+}
+
+function pmfG(k,p){
+    k = Math.round(k);
+    if(k<1) return 0;
+    return p*Math.pow(1-p,k-1);
+}
+
+function cdfG(x,p){
+    x = Math.round(x);
+    if(x<1) return 0;
+    return 1-Math.pow(1-p,x);
+}
+
+function pmfH(k,N,K,n){
+    N = Math.round(N); K = Math.round(K);
+    n = Math.round(n); k = Math.round(k);
+    if(k<Math.max(0,n+K-N) || k>Math.min(n,K)) return 0;
+    return bc(K,k)*bc(N-K,n-k)/bc(N,n);
+}
+
+function cdfH(x,N,K,n){
+    var s=0;
+    for(var k=0; k<=x; k++){
+        s+=pmfH(N,K,n,k);
+    }
+    return s;
+}
+
+function pmfP(k,lambda){
+    k = Math.round(k);
+    if(k<0) return 0;
+    return Math.exp(-lambda)*Math.pow(lambda,k)/fac(k);
+}
+
+function cdfP(x,lambda){
+    x = Math.round(x);
+    var s=0;
+    for(var k=0; k<=x; k++){
+        s+=pmfP(lambda,k);
+    }
+    return s;
+}
+
+function pmfLog(k,p){
+    k = Math.round(k);
+    if(k<1) return 0;
+    return -Math.pow(p,k)/(k*Math.log(1-p));
+}
+
+function cdfLog(x,p){
+    x = Math.round(x);
+    var s=0;
+    for(var k=1; k<=x; k++){
+        s+=pmfLog(p,k);
+    }
+    return s;
 }
 
 var slider_table = {};
@@ -1046,24 +1227,31 @@ function slider(id,a,b){
 }
 
 var ftab_extension = {
-  PT: ChebyshevT, PU: ChebyshevU, PH: Hermite, 
-  PP: Legendre, PL: Laguerre, bc: bc, s1: s1, s2: s2,
-  psi: psi, digamma: digamma,
-  zeta: zeta, B: Bvariadic, Bm: bernoulliBm, ipp: ipp,
-  table: table, Wertetabelle: table,
-  Si: Si, Ci: Ci, det: det, unit: unit_vector, I: idm,
-  diag: diag_variadic, _matrix_pow_: matrix_pow, expm: expm,
-  nabla: nablah(0.001), divop: divoph(0.001),
-  apply: apply, rot: rotation_matrix, tr: trace, tp: transpose,
-  pli: pli_general, L: laplace_transform, delta: delta,
-  gcd: gcd_variadic, ggT: gcd_variadic,
-  lcm: lcm_variadic, kgV: lcm_variadic,
-  isprime: isprime, prim: isprime, pcf: pcf, factor: factor,
-  phi: euler_phi, lambda: carmichael_lambda, sigma: sigma,
-  pseq: prime_sequence, divisors: divisors, Teiler: divisors,
-  slider: slider, Regler: slider, all: all, any: any, count: count,
-  sample: sample, samples: samples, cdf: cdf,
-  cdfu: cdfu, pdfu: pdfu, cdfN: cdfN, pdfN: pdfN
+PT: ChebyshevT, PU: ChebyshevU, PH: Hermite, 
+PP: Legendre, PL: Laguerre, bc: bc, s1: s1, s2: s2,
+psi: psi, digamma: digamma,
+zeta: zeta, B: Bvariadic, Bm: bernoulliBm, ipp: ipp,
+table: table, Wertetabelle: table,
+Si: Si, Ci: Ci, det: det, unit: unit_vector, I: idm,
+diag: diag_variadic, _matrix_pow_: matrix_pow, expm: expm,
+nabla: nablah(0.001), divop: divoph(0.001),
+apply: apply, rot: rotation_matrix, tr: trace, tp: transpose,
+pli: pli_general, L: laplace_transform, delta: delta,
+gcd: gcd_variadic, ggT: gcd_variadic,
+lcm: lcm_variadic, kgV: lcm_variadic,
+isprime: isprime, prim: isprime, pcf: pcf, factor: factor,
+phi: euler_phi, lambda: carmichael_lambda, sigma: sigma,
+pseq: prime_sequence, divisors: divisors, Teiler: divisors,
+slider: slider, Regler: slider, all: all, any: any, count: count,
+sample: sample, samples: samples, cdf: cdf,
+cdfu: cdfu, pdfu: pdfu, cdfN: cdfN, pdfN: pdfN,
+cdfLogN: cdfLogN, pdfLogN: pdfLogN, cdfExp: cdfExp, pdfExp: pdfExp,
+cdfchisq: cdfchisq, pdfchisq: pdfchisq, cdfst: cdfst, pdfst: pdfst,
+cdfF: cdfF, pdfF: pdfF, cdfW: cdfW, pdfW: pdfW,
+cdfGamma: cdfGamma, pdfGamma: pdfGamma,
+cdfBeta: cdfBeta, pdfBeta: pdfBeta, pmfB: pmfB, cdfB: cdfB,
+cmfG: pmfG, cdfG: cdfG, pmfH: pmfH, cdfH: cdfH,
+pmfP: pmfP, cdfP: cdfP, pmfLog: pmfLog, cdfLog: cdfLog
 };
 
 
