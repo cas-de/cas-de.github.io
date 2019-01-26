@@ -31,7 +31,9 @@
 <li><a href="#LA">Lineare Algebra</a>
 <li><a href="#Zahlentheorie">Zahlentheorie</a>
 <li><a href="#Kombinatorik">Kombinatorik</a>
+<li><a href="#Zufall">Verteilungen und Zufallszahlen</a>
 <li><a href="#utility-functions">Hilfsfunktionen</a>
+<li><a href="#Befehle">Befehle</a>
 <li><a href="#input-examples">Eingabe-Beispiele</a>
 </ol>
 
@@ -592,14 +594,11 @@
 </table>
 
 <br>
-<h3 id="utility-functions">Hilfsfunktionen</h3>
+<h3 id="Zufall">Verteilungen und Zufallszahlen</h3>
 <table class="bt">
 <tr>
 <th>Funktion
 <th>Erklärung
-<tr>
-<td><code>len(a)</code>
-<td>Länge der Liste a.
 <tr>
 <td><code>rand()</code>
 <td>Zufallszahl aus dem Intervall [0,1].
@@ -615,6 +614,72 @@
 <tr>
 <td><code>rand(a:b:d)</code>
 <td>Wählt zufällig ein Element aus [a,a+d,a+2d,...,b].
+<tr>
+<td><code>sample(F)</code>
+<td>Zufallszahl gemäß der Verteilungsfunktion&nbsp;F.
+<tr>
+<td><code>samples(F,n)</code>
+<td>Liste von n Zufallszahlen gemäß der Verteilungsfunktion&nbsp;F.
+<tr>
+<td><code>cdf(a)</code>
+<td>Verteilungsfunktion zu einer Liste von Zufallszahlen.
+<br>Beispiel: <code><a href="plot.htm?F(x);%20F:=cdf(samples(cdfN,10));;scale(0.5)"
+  >F(x); F:=cdf(samples(cdfN,10))</a></code>.
+</table>
+
+<br>
+<table class="bt">
+<tr>
+<th>Nomenklatur
+<th>Erklärung
+<tr>
+<td><code>cdf</code>
+<td>Verteilungsfunktion, engl. cumulative distribution function.
+<tr>
+<td><code>pdf</code>
+<td>Dichtefunktion, engl. propability density function.
+</table>
+
+<br>
+<table class="bt">
+<tr>
+<th>Funktion
+<th>Erklärung
+<tr>
+<td><code>cdfu(x)</code>
+<td>Uniforme Verteilung.
+<tr>
+<td><code>pdfu(x)</code>
+<td>Dichte der uniformen Verteilung.
+<tr>
+<td><code>cdfu(x,a,b)</code>
+<td>Uniforme Verteilung.
+<tr>
+<td><code>pdfu(x,a,b)</code>
+<td>Dichte der uniformen Verteilung.
+<tr>
+<td><code>cdfN(x)</code>
+<td>Standard-Normalverteilung.
+<tr>
+<td><code>pdfN(x)</code>
+<td>Dichte der Standard-Normalverteilung.
+<tr>
+<td><code>cdfN(x,mu,sigma)</code>
+<td>Normalverteilung.
+<tr>
+<td><code>pdfN(x,mu,sigma)</code>
+<td>Dichte der Normalverteilung.
+</table>
+
+<br>
+<h3 id="utility-functions">Hilfsfunktionen</h3>
+<table class="bt">
+<tr>
+<th>Funktion
+<th>Erklärung
+<tr>
+<td><code>len(a)</code>
+<td>Länge der Liste a.
 <tr>
 <td><code>af(x0,y0,x1,y1)</code>
 <td>Die affine Funktion durch (x<sub>0</sub>,&nbsp;y<sub>0</sub>)
@@ -673,6 +738,25 @@ stückweise linear.
 <td><code>ipp(a)</code>
 <td>Interpolationspolynom für die Stützstellen <code>t=a[k]</code>
 mit <code>x=t[0]</code> und <code>y=t[1]</code>.
+</table>
+
+<br>
+<h3 id="Befehle">Befehle</h3>
+<p>Befehle stehen hinter einem Semikolon.
+
+<table class="bt">
+<tr>
+<th>Befehl
+<th>Erklärung
+<tr>
+<td><code>scale(a)</code>
+<td>Skaliert das Koordinatensystem.
+<tr>
+<td><code>scale(x,y)</code>
+<td>Skaliert x- und y-Achse unabhängig voneinander.
+<tr>
+<td><code>P(x,y)</code>
+<td>Setzt die Bildmitte in den Punkt (x,y).
 </table>
 
 <br>

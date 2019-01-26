@@ -37,11 +37,11 @@
   >Eine Funktion</a>.
 <li><a href="plot.htm?sin(x),cos(x),tan(x),cot(x)"
   >Mehrere Funktionen</a>.
-<li><a href="plot.htm?f(x),f%27(x);f(x):=sin(x)"
+<li><a href="plot.htm?f(x),f%27(x);%20f(x):=sin(x)"
   >Eine Funktion und ihre Ableitung</a>.
-<li><a href="plot.htm?f(x),f%27(x),f%27%27(x),f%27%27%27(x);f(x):=sin(x)"
+<li><a href="plot.htm?f(x),f%27(x),f%27%27(x),f%27%27%27(x);%20f(x):=sin(x)"
   >Eine Funktion und ihre ersten drei Ableitungen</a>.
-<li><a href="plot.htm?f(x),%20f(a)+f%27(a)*(x-a);%20a:=1,%20f(x):=sin(x)"
+<li><a href="plot.htm?f(x),%20f(a)+f%27(a)*(x-a);%20a:=1;%20f(x):=sin(x)"
   >Tangente an eine Funktion</a>.
 <li><a href="plot.htm?int(0,x,t.sin(t)/t)"
   >Eine Integralfunktion</a>.
@@ -87,7 +87,7 @@
   >Die Lemniskate von Gerono</a>.
 <li><a href="plot.htm?%5bt*cos(pi*t),t*sin(pi*t)%5d;t0:=0,t1:=4"
   >Eine Spirale</a>.
-<li><a href="plot.htm?%5bint(0,t,t.cos(t%5e2)),int(0,t,t.sin(t%5e2))%5d;t0:=-10,t1:=10;;scale(0.2)"
+<li><a href="plot.htm?%5bint(0,t,t.cos(t%5e2)),int(0,t,t.sin(t%5e2))%5d;%20t0:=-10;%20t1:=10;;scale(0.2)"
   >Eine Klothoide</a>.
 <li><a href="plot-bivariat.htm?%5bcos(t),sin(t),t%5d;;scale(0.5)"
   >Eine Helix</a>.
@@ -162,7 +162,7 @@
   >Phasenraumportrait des gedämpften Pendels</a>.
 <li><a href="plot.htm?x(t);%20x%27%27=-x/abs(x)%5e3;%20p:=%5b0,%5b4,0%5d,%5b0,0.2%5d%5d;%20t1:=20;%20tw:=20"
   >Das Einkörperproblem</a>.
-  <a href="plot.htm?Punkte(x,0:20:0.5);%20x%27%27=-x/abs(x)%5e3;%20p:=%5b0,%5b4,0%5d,%5b0,0.2%5d%5d;%20t1:=20;%20tw:=20;;P(-0.0,0.0)"
+  <a href="plot.htm?Punkte(x,0:20:0.5);%20x%27%27=-x/abs(x)%5e3;%20p:=%5b0,%5b4,0%5d,%5b0,0.2%5d%5d;%20t1:=20;%20tw:=20"
   >Stroboskop</a>.
 <li><a href="plot.htm?%5bx(t),y(t)%5d;%20%5bx,y,vx,vy%5d%27=%5bvx,vy,-x/abs(%5bx,y%5d)%5e3,-y/abs(%5bx,y%5d)%5e3%5d;%20p:=%5b0,4,0,0,0.2%5d;%20t1:=20;%20tw:=20"
   >Das Einkörperproblem als System erster Ordnung</a>.
@@ -268,12 +268,15 @@
 <ul>
 <li><a href="Fraktal.htm?z%5e2+c;;scale(0.2)"
   >Die Mandelbrot-Menge</a>.
+<li><a href="Fraktal.htm?z%5e2+c;%20N:=2000;%20n:=10;;scale(0.2)"
+  >Die Mandelbrot-Menge</a>. Mit N Iterationen und n Samples.
+<br>Nimmt etwas Rechenzeit in Anspruch.
 <li><a href="Fraktal.htm?z%5e2+c;N:=400,P(-0.20436,1.10358),scale(0.000005)"
-  >Die Mandelbrot-Menge</a> mit Angabe von Stelle und Maßstab.
+  >Die Mandelbrot-Menge</a>. Angabe von Stelle und Maßstab.
 <li><a href="Fraktal.htm?z%5e2-0.8+0.2i;%20z0(c):=c;;scale(0.2)"
   >Eine Julia-Menge</a>.
 <li><a href="Fraktal.htm?z%5e2-0.8+0.2i;%20z0(c):=c,%20P(-0.06,0.8),scale(0.005)"
-  >Eine Julia-Menge</a> mit Angabe von Stelle und Maßstab.
+  >Eine Julia-Menge</a>. Angabe von Stelle und Maßstab.
 <li><a href="Newton.htm"
   >Ein Newton-Fraktal</a>.
 <li><a href="Newton.htm?z-f(z,c)/(z.f(z,c))%27(z);f(z,c):=z%5e3+(c-1)*z-c,z0(c):=0;;scale(0.02),P(0.31396,1.63954)"

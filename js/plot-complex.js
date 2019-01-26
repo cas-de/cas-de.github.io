@@ -789,7 +789,7 @@ async function cplot_async(gx,f){
 
 var plot_refresh = false;
 
-function refresh(gx){
+function move_refresh(gx){
     plot_refresh = true;
     update(gx);
 }

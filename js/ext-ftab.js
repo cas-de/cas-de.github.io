@@ -957,6 +957,55 @@ function count(p,a){
     return y;
 }
 
+function sample(F){
+    return invab(F,Math.random(),-100,100);
+}
+
+function samples(F,n){
+    var a = [];
+    for(var i=0; i<n; i++){
+        a.push(sample(F));
+    }
+    return a;
+}
+
+function cdf(a,x){
+    if(x==undefined){
+        return function(x){return cdf(a,x);};
+    }else{
+        var y = 0;
+        for(var k=0; k<a.length; k++){
+            if(a[k]<=x) y++;
+        }
+        return y/a.length;
+    }
+}
+
+function pdfu(x,a,b){
+    if(a==undefined) a=0;
+    if(b==undefined) b=1;
+    return a<=x && x<=b? 1/(b-a):0;
+}
+
+function cdfu(x,a,b){
+    if(a==undefined) a=0;
+    if(b==undefined) b=1;
+    return x<a? 0:(x<=b? (x-a)/(b-a):1);
+}
+
+function pdfN(x,mu,sigma){
+    if(sigma==undefined) sigma = 1;
+    if(mu==undefined) mu = 0;
+    var a = (x-mu)/sigma;
+    return Math.exp(-0.5*a*a)/(Math.sqrt(2*Math.PI)*sigma);
+}
+
+function cdfN(x,mu,sigma){
+    if(sigma==undefined) sigma = 1;
+    if(mu==undefined) mu = 0;
+    return 0.5+0.5*erf((x-mu)/(Math.SQRT2*sigma));
+}
+
 var slider_table = {};
 
 function slider(id,a,b){
@@ -1012,7 +1061,9 @@ var ftab_extension = {
   isprime: isprime, prim: isprime, pcf: pcf, factor: factor,
   phi: euler_phi, lambda: carmichael_lambda, sigma: sigma,
   pseq: prime_sequence, divisors: divisors, Teiler: divisors,
-  slider: slider, Regler: slider, all: all, any: any, count: count
+  slider: slider, Regler: slider, all: all, any: any, count: count,
+  sample: sample, samples: samples, cdf: cdf,
+  cdfu: cdfu, pdfu: pdfu, cdfN: cdfN, pdfN: pdfN
 };
 
 

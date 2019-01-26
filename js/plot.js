@@ -546,6 +546,8 @@ function sinc(x){
 }
 
 function invab(f,x,a,b){
+    if(a==undefined) a = -100;
+    if(b==undefined) b = 100;
     var m,s,a1,b1,d;
     a1=a; b1=b;
     s = Math.sign(f(b)-f(a));
@@ -760,10 +762,6 @@ function erf(x){
 
 function erfc(x){
     return 1-erf(x);
-}
-
-function norm(x){
-    return 0.5+0.5*erf(x/Math.SQRT2);
 }
 
 function En(n,x){
@@ -1010,23 +1008,6 @@ function scan(s){
     return a;
 }
 
-function lambda_expression(i){
-    i.index++;
-    var argv = [];
-    while(1){
-        argv.push(atom(i));
-        var t = i.a[i.index];
-        if(t[0]==Symbol && t[1]=='|'){
-            i.index++;
-            break;
-        }else if(t[0]==Symbol && t[1]==','){
-            i.index++;
-        }
-    }
-    var x = expression(i);
-    return ["fn",argv,x];
-}
-
 function atom(i){
     var t = i.a[i.index];
     if(t[0] == SymbolNumber){
@@ -1050,7 +1031,13 @@ function atom(i){
         var a = ["[]"];
         return application_list(i,a,']');
     }else if(t[0] == Symbol && t[1]=='|'){
-        return lambda_expression(i);
+        i.index++;
+        var x = conjunction(i);
+        t = i.a[i.index];
+        if(t[0]==Symbol && t[1]=='|'){
+            i.index++;
+        }
+        return ["abs",x];
     }else if(t[0] == SymbolString){
         i.index++;
         return ["_string_",t[1]];
@@ -2125,6 +2112,10 @@ function refresh(gx){
     labels(gx);
 }
 
+function move_refresh(gx){
+    refresh(gx);
+}
+
 function mouse_move_handler(e){
     if(e.buttons==1){
         moved = true;
@@ -2137,7 +2128,7 @@ function mouse_move_handler(e){
         gx.pos = get_pos(gx);
         clientXp = e.clientX;
         clientYp = e.clientY;
-        refresh(gx);
+        move_refresh(gx);
     }else{
         clientXp = e.clientX;
         clientYp = e.clientY;
@@ -2164,7 +2155,7 @@ function touch_move(e){
         gx.pos = get_pos(gx);
         clientXp = e.clientX;
         clientYp = e.clientY;
-        refresh(gx);
+        move_refresh(gx);
     }
 }
 
@@ -2202,8 +2193,7 @@ function new_system(last_gx){
         canvas.addEventListener("touchend", touch_end, false);
         canvas.addEventListener("touchmove", touch_move, false);
     }
-    clear_system(gx);
-    flush(gx);
+    refresh(gx);
 
     return gx;
 }
@@ -2829,10 +2819,6 @@ function plot(gx){
     process_statements(a);
     pid_stack = [];
 
-    clear_system(gx);
-    flush(gx);
-    labels(gx);
-
     if(a[0].length>0){
         var t = ast(a[0]);
         if(Array.isArray(t) && t[0]===";"){
@@ -2840,8 +2826,9 @@ function plot(gx){
                 eval_statements(t[i]);
             }
             t = t[1];
-            if(t===null) return;
+            if(t===null){refresh(gx); return;}
         }
+        refresh(gx);
         if(Array.isArray(t) && t[0]==="block"){
             for(var i=1; i<t.length; i++){
                 if(Array.isArray(t[i]) && t[i][0]===":="){
@@ -2858,6 +2845,8 @@ function plot(gx){
                 plot_node(gx,t,color_table[0]);
             }
         }
+    }else{
+        refresh(gx);
     }
 }
 
@@ -3154,7 +3143,6 @@ function process_post_applications(){
 window.onload = function(){
     var gx = new_system();
     graphics = gx;
-    labels(gx);
     query(window.location.href);
     main();
     update_on_resize();
