@@ -13,9 +13,9 @@ var hud_display = false;
 var GAMMA = 0.57721566490153286;
 var PHI = 1.618033988749895;
 var dark = false;
-var ftab_extension_loaded = false;
-var cmd_extension_loaded = false;
 var async_continuation = undefined;
+var extension_loaded = {};
+var extension_table = {};
 var recursion_table = {};
 var post_app_stack = [];
 var freq = 1;
@@ -90,7 +90,7 @@ var ftab = {
 };
 
 var cmd_tab = {
-    "=": 0
+    "=": 0, slider: 0, Regler: 0
 };
 
 var keyword_table = {
@@ -149,29 +149,14 @@ function load_async(URL,callback){
    head.appendChild(s);
 }
 
-function load_ftab_extension(ftab,path){
+function load_extension(table,id,path){
     load_async(path,async function(){
-        var t = ftab_extension;
+        var t = extension_table[id];
         var a = Object.keys(t);
         for(var i=0; i<a.length; i++){
-            ftab[a[i]] = t[a[i]];
+            table[a[i]] = t[a[i]];
         }
-        ftab_extension_loaded = true;
-        while(async_continuation == "await"){
-            await sleep(100);
-        }
-        async_continuation();
-    });
-}
-
-function load_cmd_extension(cmd_tab,path){
-    load_async(path,async function(){
-        var t = cmd_extension;
-        var a = Object.keys(t);
-        for(var i=0; i<a.length; i++){
-            cmd_tab[a[i]] = t[a[i]];
-        }
-        cmd_extension_loaded = true;
+        extension_loaded[id] = true;
         while(async_continuation == "await"){
             await sleep(100);
         }
@@ -1615,9 +1600,9 @@ function compile_expression(a,t,context,type){
             context.pre.push("var "+t+"=ftab[\""+t+"\"];");
             context.local[t] = true;
             a.push(t);
-        }else if(!ftab_extension_loaded){
+        }else if(!extension_loaded.ftab){
             async_continuation = "await";
-            load_ftab_extension(ftab,"js/ext-ftab.js");
+            load_extension(ftab,"ftab","js/ext-ftab.js");
             throw new Repeat();
         }else{
             throw lang.undefined_variable(t);
@@ -2786,11 +2771,11 @@ function eval_statements(t){
         }else if(Array.isArray(t) && typeof t[0]=="string" &&
             cmd_tab.hasOwnProperty(t[0])
         ){
-            if(cmd_extension_loaded){
+            if(extension_loaded.cmd){
                 cmd_tab[t[0]](t);
             }else{
                 async_continuation = "await";
-                load_cmd_extension(cmd_tab,"js/ext-cmd.js");
+                load_extension(cmd_tab,"cmd","js/ext-cmd.js");
                 throw new Repeat();
             }
         }else{

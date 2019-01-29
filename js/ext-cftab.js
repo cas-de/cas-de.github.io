@@ -523,7 +523,7 @@ function ctable(f,a){
     return buffer.join("");
 }
 
-var ftab_extension = {
+extension_table.ftab = {
     Si: "cSi", Ci: "cCi", Ci90: "cCi90", Cin: "cCin",
     E1: "cE1", Ei: "cEi", Ein: "cEin", li: "cli", Li: "cLi",
     zeta: "czeta_variadic", pseq: "cprime_sequence",

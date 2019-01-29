@@ -230,8 +230,50 @@ function equation(t){
     eval_node(t);
 }
 
-var cmd_extension = {
-    "=": equation
+var slider_table = {};
+
+function slider(t){
+    var id = t[1];
+    var a = compile(t[2],[])();
+    var b = compile(t[3],[])();
+    if(slider_table.hasOwnProperty(id)){
+        var range = slider_table[id];
+        range[0] = a;
+        range[1] = b;
+        return;
+    }
+    
+    var range = [a,b];
+    slider_table[id] = range;
+    ftab[id] = a;
+
+    var slider = document.createElement("input");
+    slider.setAttribute("type","range");
+    slider.setAttribute("min","0");
+    slider.setAttribute("max","100");
+    slider.setAttribute("value","0");
+    if(graphics.w>540){
+        slider.setAttribute("style","width: 14em;");
+    }
+    slider.addEventListener("input",function(){
+        var t = this.value/100;
+        ftab[id] = range[0]*(1-t)+range[1]*t;
+        graphics.animation = true;
+        update(graphics);
+    });
+    slider.addEventListener("change",function(){
+        graphics.animation = false;
+        update(graphics);
+    });
+    var content = document.createElement("div");
+    content.innerHTML = id+": ";
+    content.appendChild(slider);
+    var adds = document.getElementById("adds");
+    adds.appendChild(content);
+}
+
+extension_table.cmd = {
+    "=": equation, slider: slider, Regler: slider
 };
 
 

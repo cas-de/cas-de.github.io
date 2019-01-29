@@ -1187,46 +1187,7 @@ function cdfLog(x,p){
     return s;
 }
 
-var slider_table = {};
-
-function slider(id,a,b){
-    if(slider_table.hasOwnProperty(id)){
-        var range = slider_table[id];
-        range[0] = a;
-        range[1] = b;
-        return;
-    }
-    
-    var range = [a,b];
-    slider_table[id] = range;
-    ftab[id] = a;
-
-    var slider = document.createElement("input");
-    slider.setAttribute("type","range");
-    slider.setAttribute("min","0");
-    slider.setAttribute("max","100");
-    slider.setAttribute("value","0");
-    if(graphics.w>540){
-        slider.setAttribute("style","width: 14em;");
-    }
-    slider.addEventListener("input",function(){
-        var t = this.value/100;
-        ftab[id] = range[0]*(1-t)+range[1]*t;
-        graphics.animation = true;
-        update(graphics);
-    });
-    slider.addEventListener("change",function(){
-        graphics.animation = false;
-        update(graphics);
-    });
-    var content = document.createElement("div");
-    content.innerHTML = id+": ";
-    content.appendChild(slider);
-    var adds = document.getElementById("adds");
-    adds.appendChild(content);
-}
-
-var ftab_extension = {
+extension_table.ftab = {
 PT: ChebyshevT, PU: ChebyshevU, PH: Hermite, 
 PP: Legendre, PL: Laguerre, bc: bc, s1: s1, s2: s2,
 psi: psi, digamma: digamma,
@@ -1242,7 +1203,7 @@ lcm: lcm_variadic, kgV: lcm_variadic,
 isprime: isprime, prim: isprime, pcf: pcf, factor: factor,
 phi: euler_phi, lambda: carmichael_lambda, sigma: sigma,
 pseq: prime_sequence, divisors: divisors, Teiler: divisors,
-slider: slider, Regler: slider, all: all, any: any, count: count,
+all: all, any: any, count: count,
 sample: sample, samples: samples, cdf: cdf,
 cdfu: cdfu, pdfu: pdfu, cdfN: cdfN, pdfN: pdfN,
 cdfLogN: cdfLogN, pdfLogN: pdfLogN, cdfExp: cdfExp, pdfExp: pdfExp,
