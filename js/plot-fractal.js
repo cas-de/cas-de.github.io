@@ -7,35 +7,17 @@ cftab["N"] = {re:200,im:0};
 cftab["n"] = {re:1,im:0};
 cftab["ctab"] = [[1,1,1], [1,0.8,0], [0,0.2,0.6]];
 cftab["r"] = {re:10,im:0};
-ftab["sys"] = sys;
 ftab["debug"] = debug_mode;
-var submit = submit_grid_on;
 var debug = false;
 
 function debug_mode(){
     debug = true;
 }
 
-function submit_grid_off(gx){
-    system(gx,false,0.02,0.2);
+function submit(gx){
+    system(gx,0.02,0.2);
     flush(gx);
     labels(gx);
-}
-
-function submit_grid_on(gx){
-    system(gx,true,0.02,0.2);
-    flush(gx);
-    labels(gx);
-}
-
-function sys(n){
-    if(n==0){
-        submit = flush;
-    }else if(n==1){
-        submit = submit_grid_off;
-    }else{
-        submit = submit_grid_on;
-    }
 }
 
 function index_color(t,i){

@@ -37,7 +37,7 @@ async function plot_net(gx,f,d,cond){
         if(cancel(pid,index,pid_stack)) return;
     }
 
-    system(gx,true,0.02,0.2);
+    system(gx,0.02,0.2);
     flush(gx);
     labels(gx);
     busy = false;

@@ -19,6 +19,7 @@ var extension_table = {};
 var recursion_table = {};
 var post_app_stack = [];
 var freq = 1;
+var sys_mode = 2;
 
 var color_bg = [255,255,255,255];
 var color_axes = [160,160,160];
@@ -26,7 +27,7 @@ var color_grid = [228,228,228];
 
 var color_dark_bg = [0,0,0,255];
 var color_dark_axes = [40,40,40];
-var color_dark_grid = [10,10,10];
+var color_dark_grid = [14,14,14];
 
 var color_table = [
     [0,0,140,255],
@@ -86,7 +87,7 @@ var ftab = {
     _addtt_: add_tensor_tensor, _subtt_: sub_tensor_tensor,
     _mulst_: mul_scalar_tensor, _mulmv_: mul_matrix_vector,
     _mulmm_: mul_matrix_matrix, _mulvv_: scalar_product,
-    _vabs_: abs_vec, _negt_: neg_tensor
+    _vabs_: abs_vec, _negt_: neg_tensor, sys: sys
 };
 
 var cmd_tab = {
@@ -1914,7 +1915,10 @@ function init(canvas,w,h){
     gx.color = [0,0,0,255];
 
     /* gx.mx = 36; */
-    if(w<600){
+    var grid = ftab["grid"];
+    if(grid!=undefined){
+        gx.mx = 50*grid;
+    }else if(w<600){
         gx.mx = w/1300*110;
     }else if(w<800){
         gx.mx = w/1300*72.5;
@@ -1936,7 +1940,9 @@ function get_value(id){
     return document.getElementById(id).value;
 }
 
-function system(gx,grid,alpha,alpha_axes){
+function system(gx,alpha,alpha_axes){
+    if(sys_mode==0) return;
+    var grid = sys_mode>1;
     var px0 = Math.round(gx.px0); // On Chrome, touch clientX
     var py0 = Math.round(gx.py0); // returns also fractional part.
     var xcount = Math.ceil(0.5*gx.w/gx.mx)+1;
@@ -1969,7 +1975,7 @@ function system(gx,grid,alpha,alpha_axes){
 
 function clear_system(gx){
     clear(gx,gx.color_bg);
-    system(gx,true);
+    system(gx);
 }
 
 function clamp(x,a,b){
@@ -2011,6 +2017,7 @@ function ftos_strip(x,m){
 }
 
 function labels(gx){
+    if(sys_mode==0) return;
     var context = gx.context;
     var w = gx.w;
     var h = gx.h;
@@ -2025,11 +2032,10 @@ function labels(gx){
     context.fillStyle = gx.font_color;
     context.textAlign = "center";
 
-
     var bulky_pred = false;
     var char_max = gx.char_max;
     var bulky2 = false;
-    
+
     var xmargin = 26;
     var ymargin = 12;
 
@@ -2059,7 +2065,7 @@ function labels(gx){
     for(var y=yshift-ycount; y<=yshift+ycount; y++){
         if(y!=0){
             py = py0+Math.floor(mx*y);
-            if(py<ymargin || py>h-ymargin) continue;            
+            if(py<ymargin || py>h-ymargin) continue;
             s = ftos(-y/ay,ay/4,1);
             if(ay<2){s=strip_zeroes(s);}
             context.fillText(s,clamp(px0-10,28+10*(s.length-2),w-16),py+6);
@@ -2984,6 +2990,10 @@ function yscale_dec(){
     ay = scale_dec(yscale,ay);
     set_pos(graphics,graphics.pos);
     update(graphics);
+}
+
+function sys(n){
+    sys_mode = n;
 }
 
 function switch_hud(){

@@ -430,13 +430,15 @@ function flush_tile_buffer(gx,alpha,lw){
     }
 }
 
-function system_xyz(gx,proj,wx){
+function system_xyz(gx){
+    if(sys_mode==0) return;
     var context = gx.context;
     var proj = gx.proj;
+    var wx = 10/ax;
+
     context.strokeStyle = "#00000060";
     context.fillStyle = "#000000a0";
     context.lineWidth = 4;
-    wx = 10/ax;
 
     // The lines are split into parts so that only the nearest
     // parts are affected when proj returns NaN.
@@ -794,7 +796,7 @@ function plot(gx){
     var lw = gtile<0.4?(gtile<0.15?2.4:1.8):1.4;
     var alpha = Math.round(float_re(pftab["alpha"])*255);
     flush_tile_buffer(gx,alpha,lw);
-    system_xyz(gx,10/ax);
+    system_xyz(gx);
 }
 
 function plot_img(w,h){

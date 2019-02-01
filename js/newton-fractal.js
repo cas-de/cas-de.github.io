@@ -6,29 +6,11 @@ cftab["N"] = {re:40,im:0};
 cftab["r"] = {re:10,im:0};
 cftab["L"] = {re:1,im:0};
 cftab["z0"] = function(c){return c;}
-ftab["sys"] = sys;
-var submit = submit_grid_on;
 
-function submit_grid_off(gx){
-    system(gx,false,0.02,0.2);
+function submit(gx){
+    system(gx,0.02,0.2);
     flush(gx);
     labels(gx);
-}
-
-function submit_grid_on(gx){
-    system(gx,true,0.02,0.2);
-    flush(gx);
-    labels(gx);
-}
-
-function sys(n){
-    if(n==0){
-        submit = flush;
-    }else if(n==1){
-        submit = submit_grid_off;
-    }else{
-        submit = submit_grid_on;
-    }
 }
 
 function index_color(z,a,N,i){
