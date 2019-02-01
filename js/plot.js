@@ -90,7 +90,7 @@ var ftab = {
 };
 
 var cmd_tab = {
-    "=": 0, slider: 0, Regler: 0
+    "=": 0, slider: 0, Regler: 0, ani: 0
 };
 
 var keyword_table = {
@@ -2014,12 +2014,13 @@ function labels(gx){
     var context = gx.context;
     var w = gx.w;
     var h = gx.h;
+    var mx = gx.mx;
     var px0 = Math.round(gx.px0);
     var py0 = Math.round(gx.py0);
-    var ycount = Math.ceil(0.5*gx.h/gx.mx);
-    var xcount = Math.ceil(0.5*gx.w/gx.mx);
-    var xshift = Math.round((0.5*gx.w-px0)/gx.mx);
-    var yshift = Math.round((0.5*gx.h-py0)/gx.mx);
+    var xcount = Math.ceil(0.5*w/mx);
+    var ycount = Math.ceil(0.5*h/mx);
+    var xshift = Math.round((0.5*w-px0)/mx);
+    var yshift = Math.round((0.5*h-py0)/mx);
     var px,py,s,px_adjust,py_adjust;
     context.fillStyle = gx.font_color;
     context.textAlign = "center";
@@ -2028,9 +2029,14 @@ function labels(gx){
     var bulky_pred = false;
     var char_max = gx.char_max;
     var bulky2 = false;
+    
+    var xmargin = 26;
+    var ymargin = 12;
+
     for(var x=xshift-xcount; x<=xshift+xcount; x++){
         if(x!=0){
-            px = px0+Math.floor(gx.mx*x);
+            px = px0+Math.floor(mx*x);
+            if(px<xmargin || px>w-xmargin) continue;
             s = strip_zeroes(ftos(x/ax,ax,1));
             if(s.length>9) bulky2 = true;
             if(bulky2){
@@ -2052,7 +2058,8 @@ function labels(gx){
     context.textAlign = "right";
     for(var y=yshift-ycount; y<=yshift+ycount; y++){
         if(y!=0){
-            py = py0+Math.floor(gx.mx*y);
+            py = py0+Math.floor(mx*y);
+            if(py<ymargin || py>h-ymargin) continue;            
             s = ftos(-y/ay,ay/4,1);
             if(ay<2){s=strip_zeroes(s);}
             context.fillText(s,clamp(px0-10,28+10*(s.length-2),w-16),py+6);

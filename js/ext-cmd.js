@@ -272,8 +272,40 @@ function slider(t){
     adds.appendChild(content);
 }
 
+var ani_on = false;
+
+function ani(t){
+    if(ani_on) return;
+    ani_on = true;
+    var id = t[1];
+    var fp,a;
+    if(t.length<3){
+        a = 0;
+    }else{
+        a = compile(t[2],[])();
+    }
+    if(t.length<4){
+        fp = function(t){return a+t;};
+    }else{
+        var b = compile(t[3],[])();
+        fp  = function(t){return 0.5*(a+b+(b-a)*Math.sin(t));};
+    }
+    var tstep = 0;
+    var animation = async function(){
+        while(1){
+            ftab[id] = fp(tstep);
+            tstep+=0.04;
+            graphics.animation = true;
+            update(graphics);
+            await sleep(20);
+        }
+    };
+    animation();
+}
+
 extension_table.cmd = {
-    "=": equation, slider: slider, Regler: slider
+    "=": equation, slider: slider, Regler: slider,
+    ani: ani
 };
 
 
