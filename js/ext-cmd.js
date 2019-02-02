@@ -206,7 +206,7 @@ function ode_vec(t){
     var h = ftab["step"];
     var fv = runge_kutta_vec(f,h,-w,w,p[0],p.slice(1));
     ftab[v] = fv;
-    fn_type_table[v] = TypeVector;
+    id_type_table[v] = [TypeVector];
 }
 
 

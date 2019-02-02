@@ -87,7 +87,7 @@ var ftab = {
     _addtt_: add_tensor_tensor, _subtt_: sub_tensor_tensor,
     _mulst_: mul_scalar_tensor, _mulmv_: mul_matrix_vector,
     _mulmm_: mul_matrix_matrix, _mulvv_: scalar_product,
-    _vabs_: abs_vec, _negt_: neg_tensor, sys: sys
+    _vabs_: abs_vec, _negt_: neg_tensor, _vdiff_: vdiff, sys: sys
 };
 
 var cmd_tab = {
@@ -291,6 +291,12 @@ function diffh_curry(h){
     return function(f,n){
         return function(x){return diff(f,x,n);};
     };
+}
+
+function vdiff(f,t){
+    return mul_scalar_tensor(500,
+        sub_tensor_tensor(f(t+0.001),f(t-0.001))
+    );
 }
 
 var GL64 = [
@@ -1418,52 +1424,52 @@ var TypeVector = 1;
 var TypeMatrix = 2;
 var type_op_table = {
     "[]":0, "+":0, "-":0, "*":0, "/":0, "^":0, "~":0,
-    "abs":0, "index":0,
+    "abs":0, "index":0, "fn":0, "diff":0
 };
-var fn_type_table = {
-    "unit": TypeVector,
-    "nabla": TypeVector,
-    "rot": TypeMatrix,
-    "I": TypeMatrix,
-    "diag": TypeMatrix,
-    "tp": TypeMatrix,
-    "expm": TypeMatrix
+
+var id_type_table = {
+    "unit": [TypeVector],
+    "nabla": [TypeVector],
+    "rot": [TypeMatrix],
+    "I": [TypeMatrix],
+    "diag": [TypeMatrix],
+    "tp": [TypeMatrix],
+    "expm": [TypeMatrix]
 };
-var id_type_table = {};
 
 function infer_type(t){
     if(Array.isArray(t)){
         var T = t.map(infer_type);
         if(type_op_table.hasOwnProperty(t[0])){
             if(t[0]==="[]"){
-                if(T.length>1 && T[1]==TypeVector){
+                if(T.length>1 && T[1]===TypeVector){
                     return TypeMatrix;
                 }else{
                     return TypeVector;
                 }
             }else if(t[0]==="+"){
-                if(T[1]!=TypeNumber){
+                if(T[1]===TypeVector || T[1]===TypeMatrix){
                     t[0] = "_addtt_";
                     return T[1];
                 }
             }else if(t[0]==="-"){
-                if(T[1]!=TypeNumber){
+                if(T[1]===TypeVector || T[1]===TypeMatrix){
                     t[0] = "_subtt_";
                     return T[1];
                 }
             }else if(t[0]==="*"){
-                if(T[2]==TypeVector){
-                    if(T[1]==TypeMatrix){
+                if(T[2]===TypeVector){
+                    if(T[1]===TypeMatrix){
                         t[0] = "_mulmv_";
                         return TypeVector;
-                    }else if(T[1]==TypeVector){
+                    }else if(T[1]===TypeVector){
                         t[0] = "_mulvv_";
                     }else{
                         t[0] = "_mulst_";
                         return TypeVector;
                     }
-                }else if(T[2]==TypeMatrix){
-                    if(T[1]==TypeMatrix){
+                }else if(T[2]===TypeMatrix){
+                    if(T[1]===TypeMatrix){
                         t[0] = "_mulmm_";
                         return TypeMatrix;
                     }else{
@@ -1472,7 +1478,7 @@ function infer_type(t){
                     }
                 }
             }else if(t[0]==="/"){
-                if(T[1]!=TypeNumber){
+                if(T[1]===TypeVector || T[1]===TypeMatrix){
                     t[0] = "_mulst_";
                     var v = t[1];
                     t[1] = ["/",1,t[2]];
@@ -1480,26 +1486,33 @@ function infer_type(t){
                     return T[1];
                 }
             }else if(t[0]==="^"){
-                if(T[1]==TypeMatrix){
+                if(T[1]===TypeMatrix){
                     t[0] = "_matrix_pow_";
                     return TypeMatrix;
                 }
             }else if(t[0]==="~"){
-                if(T[1]!=TypeNumber){
+                if(T[1]===TypeVector || T[1]===TypeMatrix){
                     t[0] = "_negt_";
                     return T[1];
                 }
             }else if(t[0]==="abs"){
-                if(T[1]==TypeVector){
+                if(T[1]===TypeVector){
                     t[0] = "_vabs_";
                 }
             }else if(t[0]==="index"){
-                if(T[1]==TypeMatrix){
+                if(T[1]===TypeMatrix){
+                    return TypeVector;
+                }
+            }else if(t[0]==="fn"){
+                return T[2];
+            }else if(t[0]==="diff"){
+                if(Array.isArray(T[1]) && T[1][0]===TypeVector){
+                    t[0] = "_vdiff_";
                     return TypeVector;
                 }
             }
-        }else if(fn_type_table.hasOwnProperty(t[0])){
-            return fn_type_table[t[0]];
+        }else if(Array.isArray(T[0])){
+            return T[0][0];
         }
     }else if(typeof t=="string"){
         if(id_type_table.hasOwnProperty(t)){
@@ -2728,7 +2741,7 @@ function plot_node_basic(gx,t,color){
         plot_bool(gx,f,color,1);
     }else{
         var T = infer_type(t);
-        if(T==TypeVector){
+        if(T===TypeVector){
             f = compile(t,["t"]);
             vplot_async(gx,f,color);
         }else if(contains_variable(t,"y")){
@@ -2756,13 +2769,13 @@ function global_definition(t){
             }
             recursion_table[name][app[1]] = compile(t[2],[])();
         }else{
-            if(T!=TypeNumber) fn_type_table[name] = T;
+            if(T!==TypeNumber){id_type_table[name] = [T];}
             var value = compile(t[2],app.slice(1),"",name);
             ftab[name] = value;
         }
     }else{
         var T = infer_type(t[2]);
-        if(T!=TypeNumber) id_type_table[t[1]] = T;
+        if(T!==TypeNumber) id_type_table[t[1]] = T;
         var value = compile(t[2],[]);
         ftab[t[1]] = value();
     }
