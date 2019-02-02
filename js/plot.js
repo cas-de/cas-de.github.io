@@ -87,7 +87,7 @@ var ftab = {
     _addtt_: add_tensor_tensor, _subtt_: sub_tensor_tensor,
     _mulst_: mul_scalar_tensor, _mulmv_: mul_matrix_vector,
     _mulmm_: mul_matrix_matrix, _mulvv_: scalar_product,
-    _vabs_: abs_vec, _negt_: neg_tensor, _vdiff_: vdiff, sys: sys
+    _vabs_: abs_vec, _negt_: neg_tensor, sys: sys
 };
 
 var cmd_tab = {
@@ -291,12 +291,6 @@ function diffh_curry(h){
     return function(f,n){
         return function(x){return diff(f,x,n);};
     };
-}
-
-function vdiff(f,t){
-    return mul_scalar_tensor(500,
-        sub_tensor_tensor(f(t+0.001),f(t-0.001))
-    );
 }
 
 var GL64 = [

@@ -672,6 +672,19 @@ function unit_vector(v){
     return mul_scalar_vector(1/r,v);
 }
 
+function vdiff(f,t,n){
+    if(n==undefined || n==1){
+        return mul_scalar_tensor(500,
+            sub_tensor_tensor(f(t+0.001),f(t-0.001))
+        );
+    }else{
+        var h = n<3? 0.001:(n<4? 0.01:0.1);
+        return mul_scalar_tensor(0.5/h,
+            sub_tensor_tensor(vdiff(f,t+h,n-1),vdiff(f,t-h,n-1))
+        );
+    }
+}
+
 function nablah(h){
     return function nabla(f,x){
         if(x.length==2){
@@ -1195,7 +1208,7 @@ zeta: zeta, B: Bvariadic, Bm: bernoulliBm, ipp: ipp,
 table: table, Wertetabelle: table,
 Si: Si, Ci: Ci, det: det, unit: unit_vector, I: idm,
 diag: diag_variadic, _matrix_pow_: matrix_pow, expm: expm,
-nabla: nablah(0.001), divop: divoph(0.001),
+_vdiff_: vdiff, nabla: nablah(0.001), divop: divoph(0.001),
 apply: apply, rot: rotation_matrix, tr: trace, tp: transpose,
 pli: pli_general, L: laplace_transform, delta: delta,
 gcd: gcd_variadic, ggT: gcd_variadic,
