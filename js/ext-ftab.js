@@ -702,6 +702,25 @@ function nablah(h){
     };
 }
 
+function jacobih(h){
+    var sub_tt = sub_tensor_tensor;
+    var mul_st = mul_scalar_tensor;
+    return function jacobi(f,x){
+        if(x.length==2){
+            return transpose([
+                mul_st(0.5/h,sub_tt(f(x[0]+h,x[1]),f(x[0]-h,x[1]))),
+                mul_st(0.5/h,sub_tt(f(x[0],x[1]+h),f(x[0],x[1]-h))),
+            ]);
+        }else{
+            return transpose([
+                mul_st(0.5/h,sub_tt(f(x[0]+h,x[1],x[2]),f(x[0]-h,x[1],x[2]))),
+                mul_st(0.5/h,sub_tt(f(x[0],x[1]+h,x[2])-f(x[0],x[1]-h,x[2]))),
+                mul_st(0.5/h,sub_tt(f(x[0],x[1],x[2]+h)-f(x[0],x[1],x[2]-h)))
+            ]);
+        }
+    };
+}
+
 function divoph(h){
     return function divop(F,x){
         if(x.length==2){
@@ -1209,6 +1228,7 @@ table: table, Wertetabelle: table,
 Si: Si, Ci: Ci, det: det, unit: unit_vector, I: idm,
 diag: diag_variadic, _matrix_pow_: matrix_pow, expm: expm,
 _vdiff_: vdiff, nabla: nablah(0.001), divop: divoph(0.001),
+jacobi: jacobih(0.001),
 apply: apply, rot: rotation_matrix, tr: trace, tp: transpose,
 pli: pli_general, L: laplace_transform, delta: delta,
 gcd: gcd_variadic, ggT: gcd_variadic,

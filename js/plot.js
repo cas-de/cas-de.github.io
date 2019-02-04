@@ -1089,7 +1089,9 @@ function application(i){
             }
             var t = i.a[i.index];
             if(t[0]==Symbol && t[1]=='('){
-                var y = atom(i);
+                i.index++;
+                var y = application_list(i,["[]"],')');
+                if(y.length==2){y = y[1];}
                 if(count==1){
                     x = ["diff",x,y];
                 }else{
@@ -1428,7 +1430,8 @@ var id_type_table = {
     "I": [TypeMatrix],
     "diag": [TypeMatrix],
     "tp": [TypeMatrix],
-    "expm": [TypeMatrix]
+    "expm": [TypeMatrix],
+    "jacobi": [TypeMatrix]
 };
 
 function infer_type(t){
@@ -1498,10 +1501,18 @@ function infer_type(t){
                     return TypeVector;
                 }
             }else if(t[0]==="fn"){
-                return T[2];
+                return [T[2]];
             }else if(t[0]==="diff"){
                 if(Array.isArray(T[1]) && T[1][0]===TypeVector){
-                    t[0] = "_vdiff_";
+                    if(T[2]===TypeVector){
+                        t[0] = "jacobi";
+                        return TypeMatrix;
+                    }else{
+                        t[0] = "_vdiff_";
+                        return TypeVector;
+                    }
+                }else if(T[2]===TypeVector){
+                    t[0] = "nabla";
                     return TypeVector;
                 }
             }
