@@ -728,11 +728,18 @@ function color_lb_repeat(w){
     return hsl_to_rgb_u8(phi,0.9,Math.tanh(0.25+0.2*smod(ld(r),1)+iso_phi));
 }
 
+function color_rect(w){
+    var pre = 255*pulse(w.re,200);
+    var pim = 255*pulse(w.im,200);
+    return [255-Math.min(255,pim+pre),255-Math.min(255,pim+0.5*pre),255-pre];
+}
+
 var color_method_tab = {
     "0": color_hsl,
     "1": color_hsl_and_rect,
     "2": color_hsl_and_polar,
-    "3": color_lb_repeat
+    "3": color_lb_repeat,
+    "4": color_rect
 };
 
 var img_color = color_hsl;

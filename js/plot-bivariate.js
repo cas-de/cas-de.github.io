@@ -19,6 +19,9 @@ var LINE_SHADOW = 2;
 
 var position = [0,0,0];
 
+sys_xyz.line_color = "#00000060";
+sys_xyz.fill_color = "#000000a0";
+
 function set_position(x,y,z){
     if(y==undefined) y=0;
     if(z==undefined) z=0;
@@ -436,8 +439,8 @@ function system_xyz(gx){
     var proj = gx.proj;
     var wx = 10/ax;
 
-    context.strokeStyle = "#00000060";
-    context.fillStyle = "#000000a0";
+    context.strokeStyle = sys_xyz.line_color;
+    context.fillStyle = sys_xyz.fill_color;
     context.lineWidth = 4;
 
     // The lines are split into parts so that only the nearest

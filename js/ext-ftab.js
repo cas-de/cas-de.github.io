@@ -366,6 +366,16 @@ function ipp(a){
     };
 }
 
+function Delta(f,x,n){
+    if(n==undefined || n==1){
+        return f(x+1)-f(x);
+    }else if(n==0){
+        return f(x);
+    }else{
+        return Delta(f,x+1,n-1)-Delta(f,x,n-1);
+    }
+}
+
 function stirling1(n,k){
     if(n==k){
         return 1;
@@ -1224,7 +1234,7 @@ PT: ChebyshevT, PU: ChebyshevU, PH: Hermite,
 PP: Legendre, PL: Laguerre, bc: bc, s1: s1, s2: s2,
 psi: psi, digamma: digamma,
 zeta: zeta, B: Bvariadic, Bm: bernoulliBm, ipp: ipp,
-table: table, Wertetabelle: table,
+table: table, Wertetabelle: table, Delta: Delta,
 Si: Si, Ci: Ci, det: det, unit: unit_vector, I: idm,
 diag: diag_variadic, _matrix_pow_: matrix_pow, expm: expm,
 _vdiff_: vdiff, nabla: nablah(0.001), divop: divoph(0.001),

@@ -20,6 +20,7 @@ var recursion_table = {};
 var post_app_stack = [];
 var freq = 1;
 var sys_mode = 2;
+var sys_xyz = {};
 
 var color_bg = [255,255,255,255];
 var color_axes = [160,160,160];
@@ -1339,8 +1340,9 @@ function abs_vec(v){
 }
 
 function scalar_product(v,w){
+    var n = Math.min(v.length,w.length);
     var y = 0;
-    for(var i=0; i<v.length; i++){
+    for(var i=0; i<n; i++){
         y+=v[i]*w[i];
     }
     return y;
@@ -1364,10 +1366,11 @@ function neg_tensor(a){
 
 function mul_matrix_vector(A,v){
     var m = A.length;
-    var n = v.length;
+    var nv = v.length;
     var w = [];
     for(var i=0; i<m; i++){
         var y = 0;
+        var n = Math.min(nv,A[i].length);
         for(var j=0; j<n; j++){y+=A[i][j]*v[j];}
         w.push(y);
     }

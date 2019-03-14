@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Plotter</title>
+  <link rel="stylesheet" href="css/main-dark.css">
+</head>
+<body>
+
+<table class="navigation">
+<tr>
+<td><a href="index.html">Home</a>
+<td><a href="doc.htm">Anleitung</a>
+<td><a href="Plotter.htm">Tagmodus</a>
+</table>
+
+<h2>Funktionenplotter, Visualisierung</h2>
+
+<h3>Inhaltsverzeichnis</h3>
+<ol>
+<li><a href="#Reelle-Funktionen">Reelle Funktionen</a>
+<li><a href="#Implizite-Funktionen">Implizite Funktionen</a>
+<li><a href="#Parameterkurven">Parameterkurven</a>
+<li><a href="#Diskrete-Funktionen">Diskrete Funktionen</a>
+<li><a href="#Ungleichungen">Ungleichungen</a>
+<li><a href="#Anfangswertprobleme">Anfangswertprobleme</a>
+</ol>
+
+<br>
+<h3 id="Reelle-Funktionen">Reelle Funktionen</h3>
+<ul>
+<li><a href="plot-dunkel.htm?sin(x)"
+  >Eine Funktion</a>.
+<li><a href="plot-dunkel.htm?sin(x),cos(x),tan(x),cot(x)"
+  >Mehrere Funktionen</a>.
+<li><a href="plot-dunkel.htm?f(x),f%27(x);%20f(x):=sin(x)"
+  >Eine Funktion und ihre Ableitung</a>.
+<li><a href="plot-dunkel.htm?f(x),f%27(x),f%27%27(x),f%27%27%27(x);%20f(x):=sin(x)"
+  >Eine Funktion und ihre ersten drei Ableitungen</a>.
+<li><a href="plot-dunkel.htm?f(x),%20f(a)+f%27(a)*(x-a);%20a:=1;%20f(x):=sin(x)"
+  >Tangente an eine Funktion</a>.
+<li><a href="plot-dunkel.htm?int(0,x,t.sin(t)/t)"
+  >Eine Integralfunktion</a>.
+<li><a href="plot-dunkel.htm?int(0,10,t.t%5e(x-1)*e%5e(-t))"
+  >Die Gammafunktion als Parameterintegral</a>.
+<li><a href="plot-dunkel.htm?x%5en%20f%C3%BCr%20n%20in%20-4:4"
+  >Eine Schar von Funktionen</a>.
+<li><a href="plot-dunkel.htm?if(x%3c1,0,x-1)"
+  >Eine Fallunterscheidung</a>.
+<li><a href="plot-dunkel.htm?p(x);%20p:=ipp(%5b0,0%5d,%5b1,1%5d,%5b2,0%5d)"
+  >Ein Interpolationspolynom</a>.
+<li><a href="plot-dunkel.htm?(p(x);%20p:=ipp(%5b0,0%5d,%5b1,1%5d,%5bn,0%5d))%20f%C3%BCr%20n%20in%202:8"
+  >Eine Schar von Interpolationspolynomen</a>.
+<li><a href="plot-dunkel.htm?f(x);%20f(x):=x%5e2;;calc(%22Wertetabelle(f,0:4:0.5)%22)"
+  >Wertetabelle für eine Funktion</a>.
+<li><a href="plot-dunkel.htm?y=x%5ea;%20Regler(a,0,2)"
+  >Schieberegler für einen Parameter</a>.
+<li><a href="plot-dunkel.htm?y=a*sin(b*x);%20Regler(a,1,4),%20Regler(b,1,4)"
+  >Schieberegler für zwei Parameter</a>.
+</ul>
+
+<br>
+<h3 id="Implizite-Funktionen">Implizite Funktionen</h3>
+<ul>
+<li><a href="plot-dunkel.htm?x%5e2-y%5e2=1"
+  >Eine implizite Funktion</a>.
+<li><a href="plot-dunkel.htm?x%5e2-y%5e2=1,y=x,y=-x"
+  >Eine implizite Funktion mit Asymptoten</a>.
+<li><a href="plot-dunkel.htm?%7cx%7c%5en+%7cy%7c%5en=1%20f%C3%BCr%20n%20in%20%5b1/2,1,2,4%5d"
+  >Eine Schar von impliziten Funktionen</a>.
+<li><a href="plot-dunkel.htm?x%5e2+(y/x)%5e2=1;;scale(0.5)"
+  >Die Lemniskate von Gerono</a>.
+</ul>
+
+<br>
+<h3 id="Parameterkurven">Parameterkurven</h3>
+<ul>
+<li><a href="plot-dunkel.htm?%5bcos(t),sin(t)%5d"
+  >Der Kreis</a>.
+<li><a href="plot-dunkel.htm?%5bcos(t),sin(2t)/2%5d;;scale(0.5)"
+  >Die Lemniskate von Gerono</a>.
+<li><a href="plot-dunkel.htm?%5bt*cos(pi*t),t*sin(pi*t)%5d;t0:=0,t1:=4"
+  >Eine Spirale</a>.
+<li><a href="plot-dunkel.htm?%5bint(0,t,t.cos(t%5e2)),int(0,t,t.sin(t%5e2))%5d;%20t0:=-10;%20t1:=10;;scale(0.2)"
+  >Eine Klothoide</a>.
+<li><a href="plot-dunkel.htm?%5bcos(t)+cos(2pi/m*n),sin(t)+sin(2pi/m*n)%5d%20for%20n%20in%200:m-1;%20m:=6"
+  >Eine Schar von Parameterkurven</a>.
+<li><a href="plot-dunkel.htm?%5b(1-a)*(cos(t)-8)+a*(cos(t)+8),(1-a)*sin(t)+a*sin(2t)/2%5d%20for%20a%20in%200:1:0.2"
+  >Metamorphose</a>.
+<li><a href="plot-dunkel.htm?rot(45grad)*%5b4cos(t),sin(t)%5d"
+  >Eine Rotationsmatrix anwenden</a>.
+<li><a href="plot-dunkel.htm?rot(n*grad)*%5b4cos(t),sin(t)%5d%20for%20n%20in%200:360:10"
+  >Eine Schar von Rotationsmatrizen anwenden</a>.
+<li><a href="plot-dunkel.htm?(sin(5t)+4)*%5bcos(t),sin(t)%5d"
+  >Ein Stern</a>.
+</ul>
+
+<br>
+<h3 id="Diskrete-Funktionen">Diskrete Funktionen</h3>
+<ul>
+<li><a href="plot-dunkel.htm?Punkte(a,1:20);%20a(n):=1/n"
+  >Eine Zahlenfolge</a> mit expliziter Bildungsvorschrift.
+<li><a href="plot-dunkel.htm?Punkte(a,1:20);%20a(1):=1,%20a(2):=1,%20a(n):=a(n-1)+a(n-2);;scale(1,2)"
+  >Eine Zahlenfolge</a> mit rekursiver Bildungsvorschrift.
+<li><a href="plot-dunkel.htm?Punkte(a,1:20),-2,2;%20a(n):=1/n"
+  >Eine Zahlenfolge</a> mit Schranken.
+<li><a href="plot-dunkel.htm?Punkte(s,1:100);%20a(n):=1/n,%20s(n):=sum(1,n,a);;scale(5,1)"
+  >Eine Reihe</a>.
+<li><a href="plot-dunkel.htm?Punkte(f,1:2000);%20f(n):=phi(n);;scale(100)"
+  >Die eulersche Phi-Funktion</a>.
+<li><a href="plot-dunkel.htm?Punkte(a,1:1000);%20a(0):=0,%20a(n):=a(n-1)+rand()-1/2;;scale(100,5)"
+  >Ein Random Walk</a>.
+<li><a href="plot-dunkel.htm?Punkte(Q,1:4000),%20x/2;%20Q(1):=1,%20Q(2):=1,%20Q(n):=Q(n-Q(n-1))+Q(n-Q(n-2));;scale(100)"
+  >Hofstadters Q-Folge</a>.
+<li><a href="plot-dunkel.htm?Punkte(a,1:20);%20a(1):=1,%20a(2):=1,%20a(n):=a(n-1)+a(n-2);;calc(%22Wertetabelle(a,1:20)%22)"
+  >Wertetabelle einer Folge</a>.
+<li><a href="plot-dunkel.htm?Punkte(a,1:20);%20a(1):=1,%20a(2):=1,%20a(n):=a(n-1)+a(n-2);;calc(%22map(a,1:20)%22)"
+  >Werteliste einer Folge</a>.
+</ul>
+
+<br>
+<h3 id="Ungleichungen">Ungleichungen</h3>
+<ul>
+<li><a href="plot-dunkel.htm?%7cx%7c%3c1"
+  >Eine Ungleichung in einer Variablen</a>.
+<li><a href="plot-dunkel.htm?%7cx%7c+%7cy%7c%3c1"
+  >Eine Ungleichung in zwei Variablen</a>.
+<li><a href="plot-dunkel.htm?%7cx%7c+%7cy%7c%3c2,%20%7cy%7c%3c1"
+  >Ein System von Ungleichungen</a>. Überdeckung sichtbar.
+<li><a href="plot-dunkel.htm?%7cx%7c+%7cy%7c%3c2%20&%20%7cy%7c%3c1"
+  >Lösungsmenge des Systems</a>.
+</ul>
+
+<br>
+<h3 id="Anfangswertprobleme">Anfangswertprobleme</h3>
+<ul>
+<li><a href="plot-dunkel.htm?y%27=y;%20p:=%5b0,1%5d"
+  >Eine Dgl. erster Ordnung</a>. Angabe der Anfangswerte als
+  <code>p:=[x<sub>0</sub>,y(x<sub>0</sub>)]</code>.
+<li><a href="plot-dunkel.htm?y%27%27=-y;%20p:=%5b0,0,1%5d"
+  >Eine Dgl. zweiter Ordnung</a>. Angabe der Anfangswerte als
+  <code>p:=[x<sub>0</sub>,y(x<sub>0</sub>),y'(x<sub>0</sub>)]</code>.
+<li><a href="plot-dunkel.htm?f(x);%20f:=iter(y.pli(x.1+int(0,x,t.y(t)),-10,10,0.1),40,t.1)"
+  >Eine Picard-Iteration</a>.
+<li><a href="plot-dunkel.htm?f(x)%5b0%5d;%20f(x):=expm(x*A)*%5b1,0%5d;%20A:=%5b%5b0,1%5d,%5b-1,0%5d%5d"
+  >Lösung eines Systems mittels Matrix-Exponential</a>.
+<li><a href="plot-dunkel.htm?u(x),v(x);%20%5bu,v%5d%27=%5bv,-u%5d;%20p:=%5b0,1,0%5d"
+  >Ein autonomes System von zwei Dgln</a>.
+<li><a href="plot-dunkel.htm?u(x),v(x);%20%5bu,v%5d%27=%5bv,u*x%5d;%20p:=%5b0,1,0%5d"
+  >Ein nicht-autonomes System von zwei Dgln</a>.
+<li><a href="plot-dunkel.htm?x(t);%20x%27%27=-x/%7cx%7c%5e3;%20p:=%5b0,%5b4,0%5d,%5b0,0.2%5d%5d;%20t1:=20;%20tw:=20"
+  >Das Einkörperproblem</a>.
+  <a href="plot-dunkel.htm?Punkte(x,0:20:0.5);%20x%27%27=-x/%7cx%7c%5e3;%20p:=%5b0,%5b4,0%5d,%5b0,0.2%5d%5d;%20t1:=20;%20tw:=20"
+  >Stroboskop</a>.
+<li><a href="plot-dunkel.htm?%5bx(t),y(t)%5d;%20%5bx,y,vx,vy%5d%27=%5bvx,vy,-x/%7c%5bx,y%5d%7c%5e3,-y/%7c%5bx,y%5d%7c%5e3%5d;%20p:=%5b0,4,0,0,0.2%5d;%20t1:=20;%20tw:=20"
+  >Das Einkörperproblem als System erster Ordnung</a>.
+<li><a href="plot-dunkel.htm?x(t),1/%7c%5bx,y%5d%7c;%20x%27%27=x/%7cx%7c%5e3;%20p:=%5b0,%5b-10,1%5d,%5b2,0%5d%5d;%20t1:=20;%20tw:=20"
+  >Streuung am Coulomb-Potential</a>.
+<li><a href="plot-dunkel.htm?%5bx(t),z(t)%5d;%20%5bx,y,z%5d%27=%5b10(y-x),x*(28-z)-y,x*y-8/3*z%5d;%20p:=%5b0,1,0,20%5d;%20t1:=40;%20tw:=40;;scale(5),P(0,20)"
+  >Der Lorenz-Attraktor</a>. Projektion auf die xz-Ebene.
+</ul>
+
+</body>
+</html>
+
