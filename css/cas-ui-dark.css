@@ -1,0 +1,56 @@
+
+body{
+  margin-left: 16%;
+  font-size: 140%;
+  background-color: #00100a;
+  color: #d0d0d0;
+}
+
+input{
+  font-size: 90%;
+  color: #d0d0d0;
+}
+
+input[type=button]{
+  background-color: #403a2a;
+  border: 2px solid #906000;
+  border-radius: 4px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+input[type=text]{
+  background-color: #3a4030;
+  border: 2px solid #a07000;
+  border-radius: 4px;
+  font-family: "DejaVu Sans Mono", sans;
+  padding-left: 8px;
+  padding-right: 6px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+.mono{
+  font-family: "FreeMono", monospace;
+}
+
+span.frac{
+  display: inline-table;
+  vertical-align: middle;
+  margin-left: 2px;
+  margin-right: 2px;
+}
+span.tr { 
+  display:table-row;
+}
+span.fn{
+  display: table-cell;
+  border-bottom: 1px solid #404040;
+  text-align: center;
+}
+span.fd {
+  display: table-cell;
+  text-align: center;
+}
+
+
