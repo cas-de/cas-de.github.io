@@ -364,7 +364,7 @@ diff_tab: {
     },
     "*": function(t,v){
         var a = ["+"];
-        for(var i=1; i<t.length; i++){
+        for(var i=0; i+1<t.length; i++){
             var b = t.slice(1);
             b[i] = cas.diff(b[i],v);
             a.push(["*"].concat(b));
