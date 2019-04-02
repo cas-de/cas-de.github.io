@@ -54,14 +54,14 @@ prod_rest: function(a){
 },
 
 ipow: function(n){
-    n=n%4;
+    n = n%4;
     return n==0? 1: n==1? "i": n==2? -1: ["*",[-1,"i"]];
 },
 
 simplify_sum: function(a){
-    var tab={};
-    var s=0;
-    var b=[];
+    var tab = {};
+    var s = 0;
+    var b = [];
     for(var i=0; i<a.length; i++){
         if(typeof a[i]=="number"){
            s = s+a[i];
@@ -194,6 +194,8 @@ simplify: function(t){
         y = cas.simplify(t[2]);
         if(y===1){
             return x;
+        }else if(x===y){
+            return 1;
         }else{
             return ["/",x,y];
         }
