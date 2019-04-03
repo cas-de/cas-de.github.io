@@ -36,11 +36,7 @@ is_const: function(t,v){
 },
 
 hash: function hash(t){
-    if(cas.is_app(t)){
-        return ["[",t.map(hash).join(","),"]"].join("");
-    }else{
-        return String(t);
-    }
+    return JSON.stringify(t);
 },
 
 prod_rest: function(a){
@@ -151,13 +147,13 @@ simplify: function(t){
         x = cas.simplify(t[1]);
         y = cas.simplify(t[2]);
         if(cas.is_number(x)){
-          if(cas.is_number(y)){
-              return x-y;
-          }else if(x===0){
-              return ["neg",y];
-          }else{
-              return ["-",x,y];
-          }
+            if(cas.is_number(y)){
+                return x-y;
+            }else if(x===0){
+                return ["neg",y];
+            }else{
+                return ["-",x,y];
+            }
         }else if(y===0){
             return x;
         }else{
@@ -542,7 +538,7 @@ remove_minus: function(t){
 output_form: function(t){
     if(cas.is_app(t)){
         var a = t.slice(1).map(cas.output_form);
-        if(false && t[0]==="+"){
+        if(t[0]==="+"){
             var u;
             if(cas.is_negative(a[0])){
                 u = ["neg",cas.remove_minus(a[0])];
@@ -557,6 +553,14 @@ output_form: function(t){
                 }
             }
             return u;
+        }else if(false && t[0]==="*"){
+            if(typeof a[0]=="number" && a[0]==-1){
+                if(a.length==2){
+                    return ["neg",a[1]];
+                }else{
+                    return ["*",["neg",a[1]]].concat(a.slice(2));
+                }
+            }
         }
         return [t[0]].concat(a);
     }

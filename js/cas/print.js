@@ -11,7 +11,7 @@ order: {
     "^": 70,
     "neg": 60,
     "*": 50, "/": 50, "%": 50,
-    "+": 40, "-": 40,
+    "+": 40, "-": 42,
     "..": 30,
     "=": 20, "in": 20,
     "<": 10, ">": 10, "<=": 10, ">=": 10,
@@ -44,7 +44,7 @@ power: function(t,op){
         return s;
     }
 },
-mpy_invisible: function(t){
+mul_invisible: function(t){
     if(typeof t=="string"){
         return true;
     }else if(cas.is_app(t)){
@@ -53,26 +53,26 @@ mpy_invisible: function(t){
         }else if(t[0]==="*" || t[0]==="^" ||
             typeof t[0]==="string" && parser.isalpha(t[0])
         ){
-            return this.mpy_invisible(t[1]);
+            return this.mul_invisible(t[1]);
         }
     }
     return false;
 },
-mpy: function(t,op){
+mul: function(t,op){
     var a = [];
     for(var i=1; i<t.length; i++){
         a.push(this.ast(t[i],"*"));
     }
     var b = [a[0]];
     for(var i=2; i<t.length; i++){
-        if(htm_print.mpy_invisible(t[i])){
+        if(htm_print.mul_invisible(t[i])){
             if(typeof t[i-1]=="number"){
                 b.push(a[i-1]);
             }else{
-                b.push("<span class='sop'>&middot;</span>",a[i-1]);
+                b.push("<span class='hsop'>&middot;</span>",a[i-1]);
             }
         }else{
-            b.push("<span class='sop'>&middot;</span>",a[i-1]);
+            b.push("<span class='hsop'>&middot;</span>",a[i-1]);
         }
     }
     var s = b.join("");
@@ -82,15 +82,22 @@ mpy: function(t,op){
         return s;
     }
 },
-operator: function(t,op,cop,p){
+operator: function(t,op,cop,p,first){
     var a = [];
     for(var i=1; i<t.length; i++){
-        a.push(this.ast(t[i],op));
+        a.push(this.ast(t[i],op,i==1));
     }
+    console.log([cop,op,first]);
     if(this.order[cop]<=this.order[op]){
         if(this.order[cop]!=this.order[op]){
             return a.join(p);
         }else if(htm_print.associative[op]){
+            return a.join(p);
+        }else if(first && cop==="-" && op==="-"){
+            return a.join(p);
+        }
+    }else{
+        if(first && cop==="-" && op==="+"){
             return a.join(p);
         }
     }
@@ -151,7 +158,7 @@ lambda: function(t){
         "&nbsp;&mapsto;&nbsp;", this.ast(t[2],""), ")"
     ].join("");
 },
-ast: function(t,op){
+ast: function(t,op,first){
     var T;
     if(Array.isArray(t)){
         var s = t[0];
@@ -159,15 +166,15 @@ ast: function(t,op){
             if(s=="^"){
                 return this.power(t,op);
             }else if(s=="*"){
-                return this.mpy(t,op);
+                return this.mul(t,op);
             }else if(s=="/"){
                 return this.fraction(t,op);
             }else if(s=="%"){
                 return this.operator(t,"%",op,"%");
             }else if(s=="+"){
-                return this.operator(t,"+",op,"&thinsp;+&thinsp;");
+                return this.operator(t,"+",op,"&thinsp;+&thinsp;",first);
             }else if(s=="-"){
-                return this.operator(t,"-",op,"<span class='sop'>&minus;</span>");
+                return this.operator(t,"-",op,"<span class='sop'>&minus;</span>",first);
             }else if(s=="neg"){
                 return this.unary(t,"neg",op,"&minus;");
             }else if(s=="[]"){
@@ -251,14 +258,14 @@ power: function(t,op){
         return s;
     }
 },
-mpy: function(t,op){
+mul: function(t,op){
     var a = [];
     for(var i=1; i<t.length; i++){
         a.push(this.ast(t[i],"*"));
     }
     var b = [a[0]];
     for(var i=2; i<t.length; i++){
-        if(htm_print.mpy_invisible(t[i])){
+        if(htm_print.mul_invisible(t[i])){
             if(typeof t[i-1]=="number"){
                 b.push(a[i-1]);
             }else{
@@ -374,7 +381,7 @@ ast: function(t,op){
             if(s=="^"){
                 return this.power(t,op);
             }else if(s=="*"){
-                return this.mpy(t,op);
+                return this.mul(t,op);
             }else if(s=="/"){
                 return this.fraction(t,op);
             }else if(s=="%"){

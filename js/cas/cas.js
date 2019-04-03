@@ -31,7 +31,7 @@ function main_eval(){
             if(conf.debug_mode){
                 output.innerHTML += "<p><span class='mono'>"+JSON.stringify(out)+"</span>";
             }
-            output.innerHTML += "<p>"+htm_print.htm(out);
+            output.innerHTML += "<p>= "+htm_print.htm(out);
             // output.innerHTML += "<ul class='ast'><li>"+compiler.ast_tos(out)+"</ul>";
         }else{
             output.innerHTML="";
@@ -54,7 +54,7 @@ function diff(){
             t = cas.execute(["diff",t,"x"]);
             // t = cas.simplify_sf(1,t);
             var out = cas.output_form(t);
-            output.innerHTML = "<p>=&nbsp;"+htm_print.htm(out);
+            output.innerHTML = "<p>= "+htm_print.htm(out);
         }else{
             output.innerHTML = "";
         }
@@ -76,7 +76,7 @@ function expand(){
             t = cas.execute(["expand",t]);
             t = cas.simplify_sf(1,t);
             var out = cas.output_form(t);
-            output.innerHTML = "<p>=&nbsp;"+htm_print.htm(out);
+            output.innerHTML = "<p>= "+htm_print.htm(out);
         }else{
             output.innerHTML = "";
         }

@@ -80,6 +80,14 @@ span.fd {
   display: table-cell;
   text-align: center;
 }
+span.sop{
+  margin-left: 4px;
+  margin-right: 4px;
+}
+span.hsop{
+  margin-left: 2px;
+  margin-right: 2px;
+}
 
 a{color: #20506a; text-decoration: none;}
 a:hover{color: #102a40; text-decoration: underline;}
@@ -102,3 +110,4 @@ div.navi a{
 .output{
   font-size: 120%;
 }
+
