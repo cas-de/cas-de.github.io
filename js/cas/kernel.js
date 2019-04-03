@@ -67,26 +67,26 @@ simplify_sum: function(a){
            s = s+a[i];
         }else{
             var h;
-            if(cas.is_prod(a[i]) && typeof a[i][1][0]=="number"){
-                var n = a[i][1][0];
-                var rest = cas.prod_rest(a[i][1]);
+            if(cas.is_prod(a[i]) && typeof a[i][1]=="number"){
+                var n = a[i][1];
+                var rest = cas.prod_rest(a[i].slice(1));
                 h = cas.hash(rest);
                 if(tab.hasOwnProperty(h)){
                     tab[h][0]+=n;
                 }else{
-                    tab[h]=[n,rest];
+                    tab[h] = [n,rest];
                 }
             }else{
                 h = cas.hash(a[i]);
                 if(tab.hasOwnProperty(h)){
                     tab[h][0]++;
                 }else{
-                    tab[h]=[1,a[i]];
+                    tab[h] = [1,a[i]];
                 }
             }
         }
     }
-    var c=[];
+    var c = [];
     var u;
     for(var x in tab){
         u = tab[x];
@@ -101,17 +101,17 @@ simplify_sum: function(a){
 },
 
 simplify_prod: function(a){
-    var tab={};
-    var p=1;
+    var tab = {};
+    var p = 1;
     for(var i=0; i<a.length; i++){
         if(typeof a[i]=="number"){
             p = p*a[i];
             if(p==0) return 0;
         }else{
             var h;
-            if(cas.is_app(a[i]) && a[i][0]==="^" && typeof a[i][1][1]=="number"){
-                var x = a[i][1][0];
-                var n = a[i][1][1];
+            if(cas.is_app(a[i]) && a[i][0]==="^" && typeof a[i][2]=="number"){
+                var x = a[i][1];
+                var n = a[i][2];
                 h = cas.hash(x);
                 if(tab.hasOwnProperty(h)){
                     tab[h][1]+=n;
@@ -274,15 +274,14 @@ standard_form: function(t){
             return ["*"].concat(a);
         }else if(t[0]==="-"){
             var x = cas.standard_form(t[1]);
-            var y = cas.standard_form(t[2]);
+            var y = cas.standard_form(["*",-1,t[2]]);
             if(cas.is_sum(x)){
-                return ["+"].concat(x.slice(1).concat([["*",-1,y]]));
+                return ["+"].concat(x.slice(1).concat([y]));
             }else{
-                return ["+",x,["*",-1,y]];
+                return ["+",x,y];
             }
         }else if(t[0]==="neg"){
-            var x = cas.standard_form(t[1]);
-            return ["*",-1,x];
+            return cas.standard_form(["*",-1,t[1]]);
         }else{
             var a = [];
             for(var i=0; i<t.length; i++){

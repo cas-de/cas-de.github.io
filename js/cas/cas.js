@@ -66,6 +66,28 @@ function diff(){
     }
 }
 
+function expand(){
+    var input = document.getElementById("input1");
+    var output = document.getElementById("output1");
+    try{
+        var a = parser.scan(input.value);
+        if(a[0].type!="."){
+            var t = parser.ast(a,input.value);
+            t = cas.execute(["expand",t]);
+            t = cas.simplify_sf(1,t);
+            var out = cas.output_form(t);
+            output.innerHTML = "<p>=&nbsp;"+htm_print.htm(out);
+        }else{
+            output.innerHTML = "";
+        }
+    }catch(e){
+        if(typeof e=="string"){
+            output.innerHTML = "<p>"+e;
+        }
+        throw e;
+    }
+}
+
 var main = main_eval;
 
 function handle_keys(event){
