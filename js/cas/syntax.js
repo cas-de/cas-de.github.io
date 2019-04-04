@@ -220,25 +220,31 @@ function atomic_expression(i){
 
 function application(i){
     var x = atomic_expression(i);
-    var t = get_token(i);
-    while(t.type=="bracket" && t.value=="("){
-        var a = [x];
-        i.index++;
-        while(1){
-            a.push(expression(i));
-            t = get_token(i);
-            if(t.type=="bracket" && t.value==")"){
-                i.index++;
-                x = a;
-                break;
-            }else if(t.type=="sep" && t.value==","){
-                i.index++;
-                continue;
-            }else{
-                syntax_error(i,"expected ',' or ')'.");
+    while(1){
+        var t = get_token(i);
+        if(t.type=="bracket" && t.value=="("){
+            var a = [x];
+            i.index++;
+            while(1){
+                a.push(expression(i));
+                t = get_token(i);
+                if(t.type=="bracket" && t.value==")"){
+                    i.index++;
+                    x = a;
+                    break;
+                }else if(t.type=="sep" && t.value==","){
+                    i.index++;
+                    continue;
+                }else{
+                    syntax_error(i,"expected ',' or ')'.");
+                }
             }
+        }else if(t.type=="op" && t.value=="!"){
+            i.index++;
+            x = ["fac",x];        
+        }else{
+            break;
         }
-        t = get_token(i);
     }
     return x;
 }

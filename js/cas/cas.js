@@ -25,7 +25,7 @@ function main_eval(){
         if(a[0].type!="."){
             var t = parser.ast(a,input.value);
             t = cas.execute(t);
-            t = cas.simplify_sf(1,t);
+            t = cas.simplify_sf(2,t);
             var out = cas.output_form(t);
             output.innerHTML = "";
             if(conf.debug_mode){
@@ -52,7 +52,7 @@ function diff(){
         if(a[0].type!="."){
             var t = parser.ast(a,input.value);
             t = cas.execute(["diff",t,"x"]);
-            t = cas.simplify_sf(1,t);
+            t = cas.simplify_sf(2,t);
             var out = cas.output_form(t);
             output.innerHTML = "<p>= "+htm_print.htm(out);
         }else{

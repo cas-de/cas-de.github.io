@@ -87,7 +87,6 @@ operator: function(t,op,cop,p,first){
     for(var i=1; i<t.length; i++){
         a.push(this.ast(t[i],op,i==1));
     }
-    console.log([cop,op,first]);
     if(this.order[cop]<=this.order[op]){
         if(this.order[cop]!=this.order[op]){
             return a.join(p);
@@ -137,9 +136,15 @@ app: function(t){
     return [this.ast(t[0],"app"), "(", a.join(","), ")"].join("");
 },
 diff: function(t,op){
+    var n = "d";
+    var d = this.ast(t[2],"app");
+    if(t.length==4){
+        n = ["d<sup>",this.ast(t[3],""),"</sup>"].join("");
+        d = [d,"<sup>",this.ast(t[3],""),"</sup>"].join("");
+    }
     var s = ["<span class='frac'><span class='tr'>",
-      "<span class='fn'>d</span></span><span class='tr'><span class='fd'>d",
-      this.ast(t[2],"app"), "</span></span></span><span class='ts'></span>",
+      "<span class='fn'>", n, "</span></span><span class='tr'><span class='fd'>d",
+      d, "</span></span></span><span class='ts'></span>",
       this.ast(t[1],"*")].join("");
     if(this.order[op]>this.order["*"]){
         return ["(", s, ")"].join("");

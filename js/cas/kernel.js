@@ -20,7 +20,11 @@ is_app: function(t){
 },
 
 is_number: function(t){
-    return typeof t==="number";
+    return typeof t=="number";
+},
+
+is_int: function(t){
+    return typeof t=="number" && t==Math.floor(t);
 },
 
 is_const: function(t,v){
@@ -37,6 +41,14 @@ is_const: function(t,v){
 
 hash: function hash(t){
     return JSON.stringify(t);
+},
+
+fac: function(n){
+    var y = 1;
+    for(var k=1; k<=n; k++){
+        y*=k;
+    }
+    return y;
 },
 
 prod_rest: function(a){
@@ -133,8 +145,8 @@ simplify_prod: function(a){
         var u = tab[x];
         if(u[0]==="i"){
             c.push(cas.ipow(u[1]));
-        }else{
-            c.push(u[1]==1? u[0]: ["^"].concat(u));
+        }else if(u[1]!==0){
+            c.push(u[1]===1? u[0]: ["^"].concat(u));
         }
     }
     return c.length==0? 1: c.length==1? c[0]: ["*"].concat(c);
@@ -170,6 +182,16 @@ simplify: function(t){
             if(y===2) return -1; 
         }else if(typeof x=="number"){
             if(typeof y=="number") return Math.pow(x,y);
+        }else if(cas.is_app(x) && x[0]==="^"){
+            if(cas.is_int(x[2]) && cas.is_int(y)){
+                return ["^",x[1],x[2]*y];
+            }
+        }else if(cas.is_app(x) && x[0]==="*"){
+            if(cas.is_int(y)){
+                return ["*"].concat(x.slice(1).map(function(xk){
+                    return ["^",xk,y];
+                }));
+            }
         }
         return ["^",x,y];
     }else if(t[0]==="*"){
@@ -204,6 +226,13 @@ simplify: function(t){
         }else{
             return ["ln",x];
         }
+    }else if(t[0]==="fac"){
+        x = cas.simplify(t[1]);
+        if(typeof x=="number" && x>=0 && x<10){
+            return cas.fac(x);
+        }else{
+            return ["fac",x];
+        }
     }
     return [t[0]].concat(t.slice(1).map(cas.simplify));
 },
@@ -221,6 +250,8 @@ cmp_sum: function(x,y){
         return typeof y=="number"? 0: 1;
     }else if(typeof y=="number"){
         return typeof x=="number"? 0: -1;
+    }else{
+        return 0;
     }
 },
 
@@ -237,6 +268,8 @@ cmp_prod: function(x,y){
         }else{
             return 0;
         }
+    }else{
+        return 0;
     }
 },
 
@@ -326,6 +359,18 @@ expand: function(t){
                 }
                 return u;
             }
+        }else if(t[0]==="sum"){
+            var a = t[1][2];
+            var b = t[2];
+            var y = ["+"];
+            if(typeof a=="number" && typeof b=="number"){
+                var v = t[1][1];
+                for(var k=a; k<=b; k++){
+                    var vtab = {}; vtab[v]=k;
+                    y.push(cas.substitute(t[3],vtab));
+                }
+                return y;
+            }
         }
         return [t[0]].concat(t.slice(1).map(cas.expand));
     }else{
@@ -396,13 +441,16 @@ diff_tab: {
         return ["neg",cas.diff(t[1],v)];
     },
     "exp": function(t,v){
-        return ["*",t,cas.diff(t[1],v)];
+        return ["*",cas.diff(t[1],v),t];
+    },
+    "ln": function(t,v){
+        return ["*",cas.diff(t[1],v),["^",t[1],-1]];
     },
     "sin": function(t,v){
-        return ["*",["cos",t[1]],cas.diff(t[1],v)];
+        return ["*",cas.diff(t[1],v),["cos",t[1]]];
     },
     "cos": function(t,v){
-        return ["neg",["*",["sin",t[1]],cas.diff(t[1],v)]];
+        return ["neg",["*",cas.diff(t[1],v),["sin",t[1]]]];
     },
     "tan": function(t,v){
         return ["/",cas.diff(t[1],v),["^",["cos",t[1]],2]];
@@ -412,6 +460,9 @@ diff_tab: {
     },
     "sqrt": function(t,v){
         return ["*",["/",1,["*",2,t]],cas.diff(t[1],v)];
+    },
+    "sum": function(t,v){
+        return ["sum",t[1],t[2],cas.diff(t[3],v)];
     }
 },
 
@@ -446,10 +497,14 @@ evaluate: function(t){
     if(cas.is_app(t)){
         if(t[0]==="diff" && typeof t[2]=="string"){
             if(t.length==4){
-                return cas.diffn(
-                    cas.evaluate(t[1]),
-                    cas.evaluate(t[2]), t[3]
-                );
+                if(typeof t[3]=="number"){
+                    return cas.diffn(
+                        cas.evaluate(t[1]),
+                        cas.evaluate(t[2]), t[3]
+                    );
+                }else{
+                    return t;
+                }
             }else{
                 return cas.simplify(cas.diff(
                     cas.evaluate(t[1]),
@@ -468,7 +523,7 @@ evaluate: function(t){
             return cas.test_tautology(t[1]);
         }else if(t[0]==="subs"){
             var t2 = t[2];
-            var vtab={}; vtab[t2[0]]=t2[1];
+            var vtab={}; vtab[t2[1]]=t2[2];
             return cas.substitute(t[1],vtab);
         }else{
             var a = [];
