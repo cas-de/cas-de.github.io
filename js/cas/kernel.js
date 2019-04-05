@@ -213,7 +213,9 @@ simplify: function(t){
         }else if(y===0){
             return 1;
         }else if(x==="i"){
-            if(y===2) return -1; 
+            if(y===2) return -1;
+        }else if(x===1 && y===-1){
+            return 1;
         }else if(typeof x=="number"){
             if(typeof y=="number"){
                 if(y<0){
@@ -293,8 +295,12 @@ simplify: function(t){
         }
     }else if(t[0]==="cos"){
         x = cas.simplify(t[1]);
-        if(cas.is_number(x) && x<0){
-            return ["cos",-x];
+        if(cas.is_number(x)){
+            if(x==0){
+                return 1;
+            }else if(x<0){
+                return ["cos",-x];
+            }
         }else if(cas.is_app(x) && x[0]==="*" &&
             cas.is_number(x[1]) && x[1]<0
         ){
@@ -303,13 +309,16 @@ simplify: function(t){
             }else{
                 return ["cos",["*",-x[1]].concat(x.slice(2))];
             }
-        }else{
-            return ["cos",x];
         }
+        return ["cos",x];
     }else if(t[0]==="sin"){
         x = cas.simplify(t[1]);
-        if(cas.is_number(x) && x<0){
-            return ["*",-1,["sin",-x]];
+        if(cas.is_number(x)){
+            if(x==0){
+                return 0;
+            }else if(x<0){
+                return ["*",-1,["sin",-x]];
+            }
         }else if(cas.is_app(x) && x[0]==="*" &&
             cas.is_number(x[1]) && x[1]<0
         ){
@@ -318,9 +327,8 @@ simplify: function(t){
             }else{
                 return ["*",-1,["sin",["*",-x[1]].concat(x.slice(2))]];
             }
-        }else{
-            return ["sin",x];
-        }    
+        }
+        return ["sin",x];
     }
     return [t[0]].concat(t.slice(1).map(cas.simplify));
 },
@@ -639,6 +647,21 @@ diffn: function(t,v,n){
     return t;
 },
 
+taylor: function(t,v,a,n){
+    if(cas.is_int(n) && n>=0){
+        var k = 0;
+        var y = ["+"];
+        for(var k=0; k<=n; k++){
+            var vtab={}; vtab[v]=a;
+            var p = cas.substitute(cas.diffn(t,v,k),vtab);
+            y.push(["*",["^",cas.fac(k),-1],p,["^",["+",v,["*",-1,a]],k]]);
+        }
+        return cas.simplify_single(y);
+    }else{
+        return ["taylor",t,v,a,n];
+    }
+},
+
 variables_table: {
 },
 
@@ -660,6 +683,8 @@ evaluate: function(t){
                     cas.evaluate(t[2])
                 ));
             }
+        }else if(t[0]==="taylor"){
+            return cas.taylor(t[1],t[2],t[3],t[4]);
         }else if(t[0]==="simp"){
             return cas.simplify_sf(1,cas.evaluate(t[1]));
         }else if(t[0]==="expand"){
@@ -671,9 +696,22 @@ evaluate: function(t){
         }else if(t[0]==="taut"){
             return cas.test_tautology(t[1]);
         }else if(t[0]==="subs"){
-            var t2 = t[2];
-            var vtab={}; vtab[t2[1]]=t2[2];
-            return cas.substitute(t[1],vtab);
+            var expr,v,value;
+            if(cas.is_app(t[1]) && t[1][0]==="="){
+                expr = t[2];
+                v = t[1][1];
+                value = t[1][2];
+            }else{
+                expr = t[1];
+                v = t[2][1];
+                value = t[2][2];
+            }
+            var vtab={}; vtab[v]=value;
+            return cas.substitute(cas.evaluate(expr),vtab);
+        }else if(t[0]==="eval"){
+            return cas.evaluate(cas.evaluate(t[1]));
+        }else if(t[0]==="hold"){
+            return t[1];
         }else{
             var a = [];
             for(var i=0; i<t.length; i++){

@@ -15,22 +15,41 @@
 
 <h2>Anleitung zum CAS</h2>
 
-<h3 id="syntax">Befehle</h3>
+<h3 id="Befehle">Befehle</h3>
 <table class="bt">
 <tr>
 <th>Befehl
 <th>Erklärung
 <tr>
 <td><code>expand(t)</code>
-<td>Multipliziert den Ausdruck <code>t</code> aus.
+<td>Expandiert den Ausdruck <code>t</code>. Z.&nbsp;B. ausmultiplizieren.
 <tr>
 <td><code>simp(t)</code>
 <td>Vereinfacht den Ausdruck <code>t</code>. Dieser Befehl
   wird normalerweise automatisch aufgerufen.
 <tr>
-<td><code>subs(t,v=a)</code>
+<td><code>subs(v=a,t)</code>
 <td>Substituiert im Ausdruck <code>t</code> die Variable
   <code>v</code> gegen den Wert <code>a</code>.
+<tr>
+<td><code>subs(t,v=a)</code>
+<td>Substitution, alternative Schreibweise.
+<tr>
+<td><code>hold(t)</code>
+<td>Verhindert die Auswertung von Befehlen.
+<tr>
+<td><code>eval(t)</code>
+<td>Auswertung restlicher Befehle unter <code>hold</code>.
+</table>
+
+<h3 id="Analysis">Analysis</h3>
+<table class="bt">
+<tr>
+<th>Ausdruck
+<th>Erklärung
+<tr>
+<td><code>sum(k=a,b,f(k))</code>
+<td>Summe von <code>k=a</code> bis <code>b</code> über die <code>f(k)</code>.
 <tr>
 <td><code>diff(t,v)</code>
 <td>Die Ableitung von <code>t</code> nach der Variable <code>v</code>.
@@ -38,6 +57,10 @@
 <td><code>diff(t,v,n)</code>
 <td>Die <code>n</code>-te Ableitung von <code>t</code> nach der
   Variable <code>v</code>.
+<tr>
+<td><code>taylor(f(x),x,a,n)</code>
+<td>Die <code>n</code>-te Partialsumme der Taylorreihe von <code>f</code>
+  an der Stelle <code>a</code>.
 </table>
 
 

@@ -83,6 +83,26 @@ span.fd {
 sup span.frac{
   font-size: 80%;
 }
+span.grid{
+  display: inline-table;
+  vertical-align: middle;
+  margin-left: 2px;
+  margin-right: 2px;
+}
+span.cell{
+  display: table-cell;
+  text-align: center; 
+}
+span.over{
+  display: table-cell;
+  text-align: center;
+  font-size: 68%;
+}
+span.under{
+  display: table-cell;
+  text-align: center;
+  font-size: 60%;
+}
 span.sop{
   margin-left: 4px;
   margin-right: 4px;

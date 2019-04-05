@@ -32,6 +32,7 @@ alt_name: {
     "Gamma": "&Gamma;",
     "delta": "&delta;",
     "Delta": "&Delta;",
+    "pi": "&pi;",
     "phi": "&phi;",
     "psi": "&psi;",
     "sum": "&sum;",
@@ -164,6 +165,16 @@ lambda: function(t){
         "&nbsp;&mapsto;&nbsp;", this.ast(t[2],""), ")"
     ].join("");
 },
+sum: function(t,op){
+    var a = this.ast(t[1],"");
+    var b = this.ast(t[2],"");
+    var f = this.ast(t[3],"*");
+    return ["<span class='grid'><span class='tr'><span class='over'>",b,
+        "</span></span><span class='tr'><span class='cell' style='font-size: 140%'>&sum;</span></span>",
+        "<span class='tr'><span class='under'>",a,
+        "</span></span></span>",f
+    ].join("");
+},
 ast: function(t,op,first){
     var T;
     if(Array.isArray(t)){
@@ -213,6 +224,8 @@ ast: function(t,op,first){
                 return this.diff(t,op);
             }else if(s=="lambda"){
                 return this.lambda(t);
+            }else if(s=="sum"){
+                return this.sum(t,op);
             }
         }
         return this.app(t);
