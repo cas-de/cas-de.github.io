@@ -33,6 +33,7 @@ alt_name: {
     "delta": "&delta;",
     "Delta": "&Delta;",
     "phi": "&phi;",
+    "psi": "&psi;",
     "sum": "&sum;",
     "lambda": "&lambda;"
 },
@@ -179,7 +180,7 @@ ast: function(t,op,first){
             }else if(s=="+"){
                 return this.operator(t,"+",op,"&thinsp;+&thinsp;",first);
             }else if(s=="-"){
-                return this.operator(t,"-",op,"<span class='sop'>&minus;</span>",first);
+                return this.operator(t,"-",op,"&thinsp;&minus;&thinsp;",first);
             }else if(s=="neg"){
                 return this.unary(t,"neg",op,"&minus;");
             }else if(s=="[]"){

@@ -74,7 +74,7 @@ function expand(){
         if(a[0].type!="."){
             var t = parser.ast(a,input.value);
             t = cas.execute(["expand",t]);
-            t = cas.simplify_sf(1,t);
+            t = cas.simplify_sf(2,t);
             var out = cas.output_form(t);
             output.innerHTML = "<p>= "+htm_print.htm(out);
         }else{

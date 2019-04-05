@@ -80,6 +80,9 @@ span.fd {
   display: table-cell;
   text-align: center;
 }
+sup span.frac{
+  font-size: 80%;
+}
 span.sop{
   margin-left: 4px;
   margin-right: 4px;

@@ -5,6 +5,15 @@ function str(x){
     return JSON.stringify(x);
 }
 
+function log(x){
+    console.log(str(x));
+}
+
+function dbg(x){
+    log(x);
+    return x;
+}
+
 var cas = (function(){
 var cas = {
 shallow_copy: function(a){
@@ -27,6 +36,10 @@ is_int: function(t){
     return typeof t=="number" && t==Math.floor(t);
 },
 
+is_atom: function(t){
+    return cas.is_number(t) || typeof t=="string";
+},
+
 is_const: function(t,v){
     if(cas.is_app(t)){
         return undefined;
@@ -36,6 +49,19 @@ is_const: function(t,v){
         }else{
             return true;
         }
+    }
+},
+
+is_simple_product_term: function(t){
+    if(cas.is_atom(t)){
+        return true;
+    }else if(cas.is_app(t) && t[0]==="*"){
+        for(var i=1; i<t.length; i++){
+            if(!cas.is_simple_product_term(t[i])) return false;
+        }
+        return true;
+    }else{
+        return false;
     }
 },
 
@@ -152,6 +178,14 @@ simplify_prod: function(a){
     return c.length==0? 1: c.length==1? c[0]: ["*"].concat(c);
 },
 
+distribute: function(x,a){
+    var y = ["+"];
+    for(var i=1; i<a.length; i++){
+        y.push(["*",x,a[i]]);
+    }
+    return y;
+},
+
 simplify: function(t){
     if(!cas.is_app(t)) return t;
     var x,y;
@@ -181,7 +215,13 @@ simplify: function(t){
         }else if(x==="i"){
             if(y===2) return -1; 
         }else if(typeof x=="number"){
-            if(typeof y=="number") return Math.pow(x,y);
+            if(typeof y=="number"){
+                if(y<0){
+                    return ["^",Math.pow(x,Math.abs(y)),-1];
+                }else{
+                    return Math.pow(x,y);
+                }
+            }
         }else if(cas.is_app(x) && x[0]==="^"){
             if(cas.is_int(x[2]) && cas.is_int(y)){
                 return ["^",x[1],x[2]*y];
@@ -196,7 +236,23 @@ simplify: function(t){
         return ["^",x,y];
     }else if(t[0]==="*"){
         var a = t.slice(1).map(cas.simplify);
-        return cas.simplify_prod(a);
+        var y = cas.simplify_prod(a);
+        if(cas.is_app(y) && y[0]==="*"){
+            var n = y.length-1;
+            if(cas.is_app(y[n]) && y[n][0]==="+"){
+                if(y.length==3){
+                    if(cas.is_simple_product_term(y[1])){
+                        return cas.distribute(y[1],y[2]);
+                    }
+                }else{
+                    var p = y.slice(0,n);
+                    if(cas.is_simple_product_term(p)){
+                        return cas.distribute(p,y[n]);
+                    }
+                }
+            }
+        }
+        return y;
     }else if(t[0]==="+"){
         var a = t.slice(1).map(cas.simplify);
         return cas.simplify_sum(a);
@@ -210,7 +266,9 @@ simplify: function(t){
     }else if(t[0]==="/"){
         x = cas.simplify(t[1]);
         y = cas.simplify(t[2]);
-        if(y===1){
+        if(x===0 && y!==0){
+            return 0;
+        }else if(y===1){
             return x;
         }else if(x===y){
             return 1;
@@ -233,6 +291,36 @@ simplify: function(t){
         }else{
             return ["fac",x];
         }
+    }else if(t[0]==="cos"){
+        x = cas.simplify(t[1]);
+        if(cas.is_number(x) && x<0){
+            return ["cos",-x];
+        }else if(cas.is_app(x) && x[0]==="*" &&
+            cas.is_number(x[1]) && x[1]<0
+        ){
+            if(x[1]==-1){
+                return ["cos",cas.simplify_single(["*"].concat(x.slice(2)))];
+            }else{
+                return ["cos",["*",-x[1]].concat(x.slice(2))];
+            }
+        }else{
+            return ["cos",x];
+        }
+    }else if(t[0]==="sin"){
+        x = cas.simplify(t[1]);
+        if(cas.is_number(x) && x<0){
+            return ["*",-1,["sin",-x]];
+        }else if(cas.is_app(x) && x[0]==="*" &&
+            cas.is_number(x[1]) && x[1]<0
+        ){
+            if(x[1]==-1){
+                return ["*",-1,["sin",cas.simplify_single(["*"].concat(x.slice(2)))]];
+            }else{
+                return ["*",-1,["sin",["*",-x[1]].concat(x.slice(2))]];
+            }
+        }else{
+            return ["sin",x];
+        }    
     }
     return [t[0]].concat(t.slice(1).map(cas.simplify));
 },
@@ -268,6 +356,8 @@ cmp_prod: function(x,y){
         }else{
             return 0;
         }
+    }else if(Ty=="string"){
+        return 1;
     }else{
         return 0;
     }
@@ -311,6 +401,8 @@ standard_form: function(t){
             }
         }else if(t[0]==="neg"){
             return cas.standard_form(["*",-1,t[1]]);
+        }else if(t[0]==="/"){
+            return cas.standard_form(["*",t[1],["^",t[2],-1]]);
         }else{
             var a = [];
             for(var i=0; i<t.length; i++){
@@ -371,6 +463,24 @@ expand: function(t){
                 }
                 return y;
             }
+        }else if(t[0]==="sin" && cas.is_app(t[1]) &&
+            t[1][0]==="+" && t[1].length>2
+        ){
+            var a = t[1][1];
+            var b = t[1].length==3? t[1][2]: ["+"].concat(t[1].slice(2));
+            return cas.expand(["+",
+                ["*",cas.expand(["sin",a]),cas.expand(["cos",b])],
+                ["*",cas.expand(["sin",b]),cas.expand(["cos",a])]
+            ]);
+        }else if(t[0]==="cos" && cas.is_app(t[1]) &&
+            t[1][0]==="+" && t[1].length>2
+        ){
+            var a = t[1][1];
+            var b = t[1].length==3? t[1][2]: ["+"].concat(t[1].slice(2));
+            return cas.expand(["+",
+                ["*",cas.expand(["cos",a]),cas.expand(["cos",b])],
+                ["*",-1,cas.expand(["sin",a]),cas.expand(["sin",b])]
+            ]);
         }
         return [t[0]].concat(t.slice(1).map(cas.expand));
     }else{
@@ -446,6 +556,12 @@ diff_tab: {
     "ln": function(t,v){
         return ["*",cas.diff(t[1],v),["^",t[1],-1]];
     },
+    "lg": function(t,v){
+        return ["*",["/",1,["ln",10]],cas.diff(t[1],v),["^",t[1],-1]];
+    },
+    "log": function(t,v){
+        return cas.diff(["/",["ln",t[1]],["ln",t[2]]],v);
+    },
     "sin": function(t,v){
         return ["*",cas.diff(t[1],v),["cos",t[1]]];
     },
@@ -458,11 +574,44 @@ diff_tab: {
     "cot": function(t,v){
         return ["neg",["/",cas.diff(t[1],v),["^",["sin",t[1]],2]]];
     },
+    "asin": function(t,v){
+        return ["*",
+            cas.diff(t[1],v),
+            ["^",["+",1,["*",-1,["^",t[1],2]]],["*",-1,["^",2,-1]]]
+        ];
+    },
+    "acos": function(t,v){
+        return ["*",-1,
+            cas.diff(t[1],v),
+            ["^",["+",1,["*",-1,["^",t[1],2]]],["*",-1,["^",2,-1]]]
+        ];
+    },
+    "atan": function(t,v){
+        return ["*",cas.diff(t[1],v),["^",["+",["^",t[1],2],1],-1]];
+    },
+    "acot": function(t,v){
+        return ["*",-1,cas.diff(t[1],v),["^",["+",["^",t[1],2],1],-1]];
+    },
     "sqrt": function(t,v){
         return ["*",["/",1,["*",2,t]],cas.diff(t[1],v)];
     },
+    "root": function(t,v){
+        return cas.diff(["^",t[1],["/",1,t[2]]],v);
+    },
     "sum": function(t,v){
         return ["sum",t[1],t[2],cas.diff(t[3],v)];
+    },
+    "Gamma": function(t,v){
+        return ["*",cas.diff(t[1],v),["Gamma",t[1]],["psi",t[1]]];
+    },
+    "psi": function(t,v){
+        if(t.length==2){
+            return ["*",cas.diff(t[1],v),["psi",1,t[1]]];
+        }else if(cas.is_int(t[1])){
+            return ["*",cas.diff(t[2],v),["psi",t[1]+1,t[2]]];
+        }else{
+            return ["diff",t,v];
+        }
     }
 },
 
@@ -590,9 +739,42 @@ remove_minus: function(t){
     }
 },
 
-output_form: function(t){
+simplify_single: function(t){
+    return t.length==2? t[1]: t;
+},
+
+frac_form: function(a){
+    var nominator = ["*"];
+    var denominator = ["*"];
+    for(var i=0; i<a.length; i++){
+        var x = a[i];
+        if(cas.is_app(x) && x[0]==="^" &&
+           typeof x[2]=="number" && x[2]<0
+        ){
+            if(x[2]==-1){
+                denominator.push(x[1]);
+            }else{
+                denominator.push(["^",x[1],-x[2]]);
+            }
+        }else{
+            nominator.push(x);
+        }
+    }
+    if(denominator.length==1){
+        return cas.simplify_single(nominator);
+    }else if(nominator.length==1){
+        return ["/",1,cas.simplify_single(denominator)];
+    }else{
+        return ["/",
+            cas.simplify_single(nominator),
+            cas.simplify_single(denominator)
+        ];
+    }
+},
+
+output_form_rec: function(t){
     if(cas.is_app(t)){
-        var a = t.slice(1).map(cas.output_form);
+        var a = t.slice(1).map(cas.output_form_rec);
         if(t[0]==="+"){
             var u;
             if(cas.is_negative(a[0])){
@@ -608,7 +790,26 @@ output_form: function(t){
                 }
             }
             return u;
-        }else if(false && t[0]==="*"){
+        }else if(t[0]==="*"){
+            return cas.frac_form(a);
+        }
+        return [t[0]].concat(a);
+    }
+    return t;
+},
+
+output_form_residual: function(t){
+    if(cas.is_app(t)){
+        var a = t.slice(1).map(cas.output_form_residual);
+        if(t[0]==="^"){
+            if(typeof a[1]=="number" && a[1]<0){
+                if(a[1]==-1){
+                    return ["/",1,a[0]];
+                }else{
+                    return ["/",1,["^",a[0],-a[1]]];
+                }
+            }
+        }else if(t[0]==="*"){
             if(typeof a[0]=="number" && a[0]==-1){
                 if(a.length==2){
                     return ["neg",a[1]];
@@ -618,8 +819,13 @@ output_form: function(t){
             }
         }
         return [t[0]].concat(a);
+    }else{
+        return t;
     }
-    return t;
+},
+
+output_form: function(t){
+    return cas.output_form_residual(cas.output_form_rec(t));
 },
 
 update: function(a,b){
