@@ -2231,13 +2231,19 @@ async function fplot(gx,f,d,cond,color){
     pid_stack.push(pid);
     busy = true;
     var spoint = gx.spoint;
-    var wx = 0.5*gx.w/gx.mx/ax;
-    var x0 = (0.5*gx.w-gx.px0)/gx.mx/ax;
+    var wx = 0.5*gx.w/(gx.mx*ax);
+    var wy = 0.5*(gx.h+4)/(gx.mx*ax);
+    var x0 = (0.5*gx.w-gx.px0)/(gx.mx*ax);
+    var y0 = (gx.py0-0.5*gx.h)/(gx.mx*ax);
+    var ya = y0-wy;
+    var yb = y0+wy;
     var k=0;
     d = d/ax;
     for(var x=x0-wx; x<x0+wx; x+=d){
         var y = f(x);
-        spoint(color,ax*x,ay*y);
+        if(ya<y && y<yb){
+            spoint(color,ax*x,ay*y);
+        }
         if(cond && k==4000){
             k=0;
             await sleep(10);

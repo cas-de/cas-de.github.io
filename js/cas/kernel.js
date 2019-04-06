@@ -602,9 +602,10 @@ diff_tab: {
     "/": function(t,v){
         var f = t[1];
         var g = t[2];
-        return ["/",["-",
-          ["*",cas.diff(f,v),g], ["*",f,cas.diff(g,v)]
-        ],["^",g,2]];
+        return ["-",
+            ["/",cas.diff(f,v),g],
+            ["/",["*",f,cas.diff(g,v)],["^",g,2]]
+        ];
     },
     "^": function(t,v){
         var x = t[1];
