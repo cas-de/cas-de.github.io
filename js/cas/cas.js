@@ -20,10 +20,8 @@ function main_eval(){
     var input = document.getElementById("input1");
     var output = document.getElementById("output1");
     try{
-        var a = parser.scan(input.value);
-        // alert(compiler.vtoken_tos(a));
-        if(a[0].type!="."){
-            var t = parser.ast(a,input.value);
+        var t = parser.ast(input.value);
+        if(t!==null){
             t = cas.execute(t);
             t = cas.simplify_sf(2,t);
             var out = cas.output_form(t);
@@ -48,9 +46,8 @@ function diff(){
     var input = document.getElementById("input1");
     var output = document.getElementById("output1");
     try{
-        var a = parser.scan(input.value);
-        if(a[0].type!="."){
-            var t = parser.ast(a,input.value);
+        var t = parser.ast(input.value);
+        if(t!==null){
             t = cas.execute(["diff",t,"x"]);
             t = cas.simplify_sf(2,t);
             var out = cas.output_form(t);
@@ -70,9 +67,8 @@ function expand(){
     var input = document.getElementById("input1");
     var output = document.getElementById("output1");
     try{
-        var a = parser.scan(input.value);
-        if(a[0].type!="."){
-            var t = parser.ast(a,input.value);
+        var t = parser.ast(input.value);
+        if(t!==null){
             t = cas.execute(["expand",t]);
             t = cas.simplify_sf(2,t);
             var out = cas.output_form(t);

@@ -169,11 +169,16 @@ sum: function(t,op){
     var a = this.ast(t[1],"");
     var b = this.ast(t[2],"");
     var f = this.ast(t[3],"*");
-    return ["<span class='grid'><span class='tr'><span class='over'>",b,
+    var s = ["<span class='grid'><span class='tr'><span class='over'>",b,
         "</span></span><span class='tr'><span class='cell' style='font-size: 140%'>&sum;</span></span>",
         "<span class='tr'><span class='under'>",a,
         "</span></span></span>",f
     ].join("");
+    if(this.order[op]>this.order["+"]){
+        return ["(", s, ")"].join("");
+    }else{
+        return s;
+    }    
 },
 ast: function(t,op,first){
     var T;

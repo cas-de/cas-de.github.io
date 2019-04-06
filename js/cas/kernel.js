@@ -77,6 +77,18 @@ fac: function(n){
     return y;
 },
 
+gcd: function(x,y){
+    x = Math.abs(x);
+    y = Math.abs(y);
+    var h;
+    while(y>0){
+        h = x%y;
+        x = y;
+        y = h;
+    }
+    return x;
+},
+
 prod_rest: function(a){
     if(a.length==1){
         return 1;
@@ -137,6 +149,7 @@ simplify_sum: function(a){
 simplify_prod: function(a){
     var tab = {};
     var p = 1;
+    var q = 1;
     for(var i=0; i<a.length; i++){
         if(typeof a[i]=="number"){
             p = p*a[i];
@@ -144,13 +157,17 @@ simplify_prod: function(a){
         }else{
             var h;
             if(cas.is_app(a[i]) && a[i][0]==="^" && typeof a[i][2]=="number"){
-                var x = a[i][1];
-                var n = a[i][2];
-                h = cas.hash(x);
-                if(tab.hasOwnProperty(h)){
-                    tab[h][1]+=n;
+                if(typeof a[i][1]=="number" && a[i][2]==-1){
+                    q = q*a[i][1];
                 }else{
-                    tab[h] = [x,n];
+                    var x = a[i][1];
+                    var n = a[i][2];
+                    h = cas.hash(x);
+                    if(tab.hasOwnProperty(h)){
+                        tab[h][1]+=n;
+                    }else{
+                        tab[h] = [x,n];
+                    }
                 }
             }else{
                 h = cas.hash(a[i]);
@@ -162,9 +179,17 @@ simplify_prod: function(a){
             }
         }
     }
+    if(p==Math.floor(p) && q==Math.floor(q)){
+        var z = cas.gcd(p,q);
+        p = p/z;
+        q = q/z;
+    }
     var c = [];
     if(p!=1){
         c.push(p);
+    }
+    if(q!=1){
+        c.push(["^",q,-1]);
     }
     var n;
     for(var x in tab){
@@ -186,12 +211,10 @@ distribute: function(x,a){
     return y;
 },
 
-simplify: function(t){
-    if(!cas.is_app(t)) return t;
-    var x,y;
-    if(t[0]==="-"){
-        x = cas.simplify(t[1]);
-        y = cas.simplify(t[2]);
+simplify_tab: {
+    "-": function(t){
+        var x = cas.simplify(t[1]);
+        var y = cas.simplify(t[2]);
         if(cas.is_number(x)){
             if(cas.is_number(y)){
                 return x-y;
@@ -205,16 +228,17 @@ simplify: function(t){
         }else{
             return ["-",x,y];
         }
-    }else if(t[0]==="^"){
-        x = cas.simplify(t[1]);
-        y = cas.simplify(t[2]);
+    },
+    "^": function(t){
+        var x = cas.simplify(t[1]);
+        var y = cas.simplify(t[2]);
         if(y===1){
             return x;
         }else if(y===0){
             return 1;
         }else if(x==="i"){
             if(y===2) return -1;
-        }else if(x===1 && y===-1){
+        }else if(x===1){
             return 1;
         }else if(typeof x=="number"){
             if(typeof y=="number"){
@@ -235,8 +259,9 @@ simplify: function(t){
                 }));
             }
         }
-        return ["^",x,y];
-    }else if(t[0]==="*"){
+        return ["^",x,y];    
+    },
+    "*": function(t){
         var a = t.slice(1).map(cas.simplify);
         var y = cas.simplify_prod(a);
         if(cas.is_app(y) && y[0]==="*"){
@@ -254,20 +279,23 @@ simplify: function(t){
                 }
             }
         }
-        return y;
-    }else if(t[0]==="+"){
+        return y;    
+    },
+    "+": function(t){
         var a = t.slice(1).map(cas.simplify);
         return cas.simplify_sum(a);
-    }else if(t[0]==="neg"){
-        x = cas.simplify(t[1]);
+    },
+    "neg": function(t){
+        var x = cas.simplify(t[1]);
         if(typeof x=="number"){
             return -x;
         }else{
             return ["neg",x];
-        }
-    }else if(t[0]==="/"){
-        x = cas.simplify(t[1]);
-        y = cas.simplify(t[2]);
+        }    
+    },
+    "/": function(t){
+        var x = cas.simplify(t[1]);
+        var y = cas.simplify(t[2]);
         if(x===0 && y!==0){
             return 0;
         }else if(y===1){
@@ -276,31 +304,36 @@ simplify: function(t){
             return 1;
         }else{
             return ["/",x,y];
-        }
-    }else if(t[0]==="ln"){
-        x = cas.simplify(t[1]);
+        }    
+    },
+    "ln": function(t){
+        var x = cas.simplify(t[1]);
         if(x==="e"){
             return 1;
         }else if(x===1){
             return 0;
         }else{
             return ["ln",x];
-        }
-    }else if(t[0]==="fac"){
-        x = cas.simplify(t[1]);
+        }    
+    },
+    "fac": function(t){
+        var x = cas.simplify(t[1]);
         if(typeof x=="number" && x>=0 && x<10){
             return cas.fac(x);
         }else{
             return ["fac",x];
-        }
-    }else if(t[0]==="cos"){
-        x = cas.simplify(t[1]);
+        }    
+    },
+    "cos": function(t){
+        var x = cas.simplify(t[1]);
         if(cas.is_number(x)){
             if(x==0){
                 return 1;
             }else if(x<0){
                 return ["cos",-x];
             }
+        }else if(x==="pi"){
+            return -1;
         }else if(cas.is_app(x) && x[0]==="*" &&
             cas.is_number(x[1]) && x[1]<0
         ){
@@ -310,15 +343,18 @@ simplify: function(t){
                 return ["cos",["*",-x[1]].concat(x.slice(2))];
             }
         }
-        return ["cos",x];
-    }else if(t[0]==="sin"){
-        x = cas.simplify(t[1]);
+        return ["cos",x];    
+    },
+    "sin": function(t){
+        var x = cas.simplify(t[1]);
         if(cas.is_number(x)){
             if(x==0){
                 return 0;
             }else if(x<0){
                 return ["*",-1,["sin",-x]];
             }
+        }else if(x==="pi"){
+            return 0;
         }else if(cas.is_app(x) && x[0]==="*" &&
             cas.is_number(x[1]) && x[1]<0
         ){
@@ -328,9 +364,41 @@ simplify: function(t){
                 return ["*",-1,["sin",["*",-x[1]].concat(x.slice(2))]];
             }
         }
-        return ["sin",x];
+        return ["sin",x];    
+    },
+    "atan": function(t){
+        var x = cas.simplify(t[1]);
+        if(x===0){
+            return 0;
+        }else{
+            return ["atan",x];
+        }
+    },
+    "asin": function(t){
+        var x = cas.simplify(t[1]);
+        if(x===0){
+            return 0;
+        }else{
+            return ["asin",x];
+        }
+    },
+    "acos": function(t){
+        var x = cas.simplify(t[1]);
+        if(x===0){
+            return ["*","pi",["^",2,-1]];
+        }else{
+            return ["asin",x];
+        }
     }
-    return [t[0]].concat(t.slice(1).map(cas.simplify));
+},
+
+simplify: function(t){
+    if(!cas.is_app(t)) return t;
+    if(typeof t[0]==="string" && cas.simplify_tab.hasOwnProperty(t[0])){
+        return cas.simplify_tab[t[0]](t);
+    }else{
+        return [t[0]].concat(t.slice(1).map(cas.simplify));
+    }
 },
 
 is_sum: function(t){
@@ -694,7 +762,9 @@ evaluate: function(t){
         }else if(t[0]==="var"){
             return cas.variables_as_list(t[1]);
         }else if(t[0]==="taut"){
-            return cas.test_tautology(t[1]);
+            return cas.taut(t[1]);
+        }else if(t[0]==="sat"){
+            return cas.sat(t[1]);
         }else if(t[0]==="subs"){
             var expr,v,value;
             if(cas.is_app(t[1]) && t[1][0]==="="){
@@ -830,10 +900,15 @@ output_form_rec: function(t){
             return u;
         }else if(t[0]==="*"){
             return cas.frac_form(a);
+        }else if(t[0]==="^"){
+            if(typeof a[0]=="number" && a[0]<0){
+                return ["^",["neg",Math.abs(a[0])],a[1]];
+            }
         }
         return [t[0]].concat(a);
+    }else{
+        return t;
     }
-    return t;
 },
 
 output_form_residual: function(t){
@@ -924,9 +999,9 @@ test_all_valuations: function(a,i,t,d){
         var y = cas.evaluate_strict(t,d);
         return [y,y];
     }else{
-        d[a[i]]=0;
+        d[a[i]] = 0;
         var A = cas.test_all_valuations(a,i+1,t,d);
-        d[a[i]]=1;
+        d[a[i]] = 1;
         var B = cas.test_all_valuations(a,i+1,t,d);
         return [A[0]&&B[0],A[1]+B[1]];
     }
@@ -940,6 +1015,14 @@ test_tautology: function(t){
     }
     return cas.test_all_valuations(a,0,t,d);
 },
+
+taut: function(t){
+    return cas.test_tautology(t)[0];
+},
+
+sat: function(t){
+    return cas.test_tautology(t)[1]!=0?1:0;
+}
 
 }; return cas;
 })();

@@ -16,21 +16,22 @@ function isspace(s){
     return s==' ' || s=='\t' || s=='\n';
 }
 
-function token(type,value,line,col){
-    return {"type": type, "value": value, "line": line, "col": col};
-}
+var Symbol = 0;
+var SymbolIdentifier = 1;
+var SymbolNumber = 2;
+var SymbolTerminator = 3;
 
 function vtoken_tos(a){
     var b = [];
     for(var i=0; i<a.length; i++){
-        var t=a[i];
-        b.push("["+t.type+","+t.value+"]");
+        var t = a[i];
+        b.push("["+t[0]+","+t[1]+"]");
     }
     return b.join(" ");
 }
 
 var keywords = {
-    "in": "op", "and": "op", "or": "op", "not": "op"
+    "in":1, "and":1, "or":1, "not":1
 };
 
 var superscript = {
@@ -47,58 +48,60 @@ var superscript = {
 };
 
 function scan(s){
-    var n=s.length;
     var c,i,j,line,col,hcol;
-    var a=[];
-    i=0; line=0; col=0;
+    var n = s.length;
+    var a = [];
+    i = 0;
+    line = 0;
+    col = 0;
     while(i<n){
-        c=s[i];
+        c = s[i];
         if(isspace(c)){
             i++; col++;
         }else if(isdigit(c)){
-            j=i; hcol=col;
+            j = i; hcol = col;
             while(i<n && (isdigit(s[i]) || s[i]=='.')){
                 if(s[i]=='.' && i+1<n && s[i+1]=='.') break;
                 i++; col++;
             }
-            a.push(token("number",s.slice(j,i),line,hcol));
+            a.push([SymbolNumber,s.slice(j,i),line,hcol]);
         }else if(isalpha(c)){
-            j=i; hcol=col;
+            j = i; hcol = col;
             while(i<n && (isalpha(s[i]) || isdigit(s[i]))){
                 i++; col++;
             }
             var id = s.slice(j,i);
             if(keywords.hasOwnProperty(id)){
-                a.push(token(keywords[id],id,line,col));
+                a.push([Symbol,id,line,col]);
             }else{
-                if(a.length>0 && a[a.length-1].type=="number"){
-                    a.push(token("op","*",line,col));
+                if(a.length>0 && a[a.length-1][0]==SymbolNumber){
+                    a.push([Symbol,"*",line,col]);
                 }
-                a.push(token("id",id,line,hcol));
+                a.push([SymbolIdentifier,id,line,hcol]);
             }
         }else if(c=="(" || c=="[" || c=="{"){
-            if(a.length>0 && a[a.length-1].type=="number"){
-                a.push(token("op","*",line,col));
+            if(a.length>0 && a[a.length-1][0]==SymbolNumber){
+                a.push([Symbol,"*",line,col]);
             }
-            a.push(token("bracket",c,line,col));
+            a.push([Symbol,c,line,col]);
             i++; col++;
         }else if(c==")" || c=="]" || c=="}"){
-            a.push(token("bracket",c,line,col));
+            a.push([Symbol,c,line,col]);
             i++; col++;
         }else if(c=="," || c==";"){
-            a.push(token("sep",c,line,col));
+            a.push([Symbol,c,line,col]);
             i++; col++;
         }else if(c=="!" && i+1<n && s[i+1]=="="){
-            a.push(token("op","!=",line,col));
+            a.push([Symbol,"!=",line,col]);
             i+=2; col+=2;
         }else if(c=="=" && i+1<n && s[i+1]==">"){
-            a.push(token("op","=>",line,col));
+            a.push([Symbol,"=>",line,col]);
             i+=2; col+=2;
         }else if(c=="." && i+1<n && s[i+1]=="."){
-            a.push(token("op","..",line,col));
+            a.push([Symbol,"..",line,col]);
             i+=2; col+=2;
         }else if(c=="<" && i+2<n && s[i+1]=="=" && s[i+2]==">"){
-            a.push(token("op","<=>",line,col));
+            a.push([Symbol,"<=>",line,col]);
             i+=3; col+=3;
         }else if(superscript.hasOwnProperty(s[i])){
             var number = "";
@@ -106,14 +109,14 @@ function scan(s){
                 number += superscript[s[i]];
                 i++; col++;
             }
-            a.push(token("op","^",line,col));
-            a.push(token("number",number,line,col));
+            a.push([Symbol,"^",line,col]);
+            a.push([SymbolNumber,number,line,col]);
         }else{
-            a.push(token("op",c,line,col));
+            a.push([Symbol,c,line,col]);
             i++; col++;
         }
     }
-    a.push(token(".","",line,col));
+    a.push([SymbolTerminator,"",line,col]);
     return a;
 }
 
@@ -126,8 +129,8 @@ function point_to(s,col){
 }
 
 function syntax_error(i,text){
-    var line = i.a[i.index].line;
-    var col = i.a[i.index].col;
+    var line = i.a[i.index][2];
+    var col = i.a[i.index][3];
     var a = ["<code>",
         point_to(i.s,col+1), "\n<br>",
         "Line ", String(line+1), ", col ", String(col+1), "\n<br>",
@@ -142,12 +145,12 @@ function get_token(i){
 
 function atom(i){
     var t = get_token(i);
-    if(t.type=="number"){
+    if(t[0]==SymbolNumber){
         i.index++;
-        return parseFloat(t.value);
-    }else if(t.type=="id"){
+        return parseFloat(t[1]);
+    }else if(t[0]==SymbolIdentifier){
         i.index++;
-        return t.value;
+        return t[1];
     }else{
         syntax_error(i,"expected an identifier or a number.");
     }
@@ -157,17 +160,17 @@ function list(i){
     i.index++;
     var a=["[]"];
     var t = get_token(i);
-    if(t.type=="bracket" && t.value=="]"){
+    if(t[0]==Symbol && t[1]=="]"){
         i.index++;
         return a;
     }
     while(1){
         a.push(expression(i));
         t = get_token(i);
-        if(t.type=="bracket" && t.value=="]"){
+        if(t[0]==Symbol && t[1]=="]"){
             i.index++;
             return a;
-        }else if(t.type=="sep" && t.value==","){
+        }else if(t[0]==Symbol && t[1]==","){
             i.index++;
             continue;
         }else{
@@ -180,10 +183,10 @@ function formal_arguments(i,a){
     while(1){
         a.push(atomic_expression(i));
         var t = get_token(i);
-        if(t.type=="op" && t.value=="|"){
+        if(t[0]==Symbol && t[1]=="|"){
             i.index++;
             break;
-        }else if(t.type=="sep" && t.value==","){
+        }else if(t[0]==Symbol && t[1]==","){
             i.index++;
             continue;
         }
@@ -200,18 +203,18 @@ function function_literal(i){
 
 function atomic_expression(i){
     var t = get_token(i);
-    if(t.type=="bracket" && t.value=="("){
+    if(t[0]==Symbol && t[1]=="("){
         i.index++;
         var x = expression(i);
         t = get_token(i);
-        if(t.type!="bracket" || t.value!=")"){
+        if(t[0]!=Symbol || t[1]!=")"){
             syntax_error(i,"expected ')'.");
         }
         i.index++;
         return x;
-    }else if(t.type=="bracket" && t.value=="["){
+    }else if(t[0]==Symbol && t[1]=="["){
         return list(i);
-    }else if(t.type=="op" && t.value=="|"){
+    }else if(t[0]==Symbol && t[1]=="|"){
         return function_literal(i);
     }else{
         return atom(i);
@@ -222,24 +225,24 @@ function application(i){
     var x = atomic_expression(i);
     while(1){
         var t = get_token(i);
-        if(t.type=="bracket" && t.value=="("){
+        if(t[0]==Symbol && t[1]=="("){
             var a = [x];
             i.index++;
             while(1){
                 a.push(expression(i));
                 t = get_token(i);
-                if(t.type=="bracket" && t.value==")"){
+                if(t[0]==Symbol && t[1]==")"){
                     i.index++;
                     x = a;
                     break;
-                }else if(t.type=="sep" && t.value==","){
+                }else if(t[0]==Symbol && t[1]==","){
                     i.index++;
                     continue;
                 }else{
                     syntax_error(i,"expected ',' or ')'.");
                 }
             }
-        }else if(t.type=="op" && t.value=="!"){
+        }else if(t[0]==Symbol && t[1]=="!"){
             i.index++;
             x = ["fac",x];        
         }else{
@@ -252,7 +255,7 @@ function application(i){
 function power(i){
     var x = application(i);
     var t = get_token(i);
-    if(t.type=="op" && t.value=="^"){
+    if(t[0]==Symbol && t[1]=="^"){
         i.index++;
         var y = factor(i);
         return ["^",x,y];
@@ -263,11 +266,11 @@ function power(i){
 
 function factor(i){
     var t = get_token(i);
-    if(t.type=="op"){
-        if(t.value=="+"){
+    if(t[0]==Symbol){
+        if(t[1]=="+"){
             i.index++;
             return factor(i);
-        }else if(t.value=="-"){
+        }else if(t[1]=="-"){
             i.index++;
             return ["neg",factor(i)];
         }else{
@@ -281,14 +284,14 @@ function factor(i){
 function term(i){
     var x = factor(i);
     var t = get_token(i);
-    while(t.type=="id" || t.type=="number"){
+    while(t[0]==SymbolIdentifier || t[0]==SymbolNumber){
         x = ["*",x,factor(i)];
         t = get_token(i);
     }
-    while(t.type=="op" && (t.value=="*" || t.value=="/" || t.value=="%")){
+    while(t[0]==Symbol && (t[1]=="*" || t[1]=="/" || t[1]=="%")){
         i.index++;
         var y = factor(i);
-        x = [t.value,x,y];
+        x = [t[1],x,y];
         t = get_token(i);
     }
     return x;
@@ -297,10 +300,10 @@ function term(i){
 function pm_term(i){
     var x = term(i);
     var t = get_token(i);
-    while(t.type=="op" && (t.value=="+" || t.value=="-")){
+    while(t[0]==Symbol && (t[1]=="+" || t[1]=="-")){
         i.index++;
         var y = term(i);
-        x = [t.value,x,y];
+        x = [t[1],x,y];
         t = get_token(i);
     }
     return x;
@@ -309,11 +312,11 @@ function pm_term(i){
 function range_term(i){
     var x = pm_term(i);
     var t = get_token(i);
-    if(t.type=="op" && t.value==".."){
+    if(t[0]==Symbol && t[1]==".."){
         i.index++;
         var y = pm_term(i);
         t = get_token(i);
-        if(t.type=="op" && t.value==":"){
+        if(t[0]==Symbol && t[1]==":"){
             i.index++;
             var d = pm_term(i);
             return ["range",x,y,d];
@@ -327,10 +330,10 @@ function range_term(i){
 function eq_relation(i){
     var x = range_term(i);
     var t = get_token(i);
-    if(t.type=="op" && (t.value=="in" || t.value=="=" || t.value=="!=")){
+    if(t[0]==Symbol && (t[1]=="in" || t[1]=="=" || t[1]=="!=")){
         i.index++;
         var y = range_term(i);
-        return [t.value,x,y];
+        return [t[1],x,y];
     }else{
         return x;
     }
@@ -339,12 +342,13 @@ function eq_relation(i){
 function relation(i){
     var x = eq_relation(i);
     var t = get_token(i);
-    if(t.type=="op" && (t.value=="<" || t.value==">" ||
-       t.value=="<=" || t.value==">=" || t.value=="~")
-    ){
+    if(t[0]==Symbol && (
+       t[1]=="<" || t[1]==">" ||
+       t[1]=="<=" || t[1]==">=" || t[1]=="~"
+    )){
         i.index++;
         var y = eq_relation(i);
-        return [t.value,x,y];
+        return [t[1],x,y];
     }else{
         return x;
     }
@@ -352,7 +356,7 @@ function relation(i){
 
 function negation(i){
     var t = get_token(i);
-    if(t.type=="op" && t.value=="not"){
+    if(t[0]==Symbol && t[1]=="not"){
         i.index++;
         var x = negation(i);
         return ["not",x];
@@ -364,10 +368,10 @@ function negation(i){
 function and_expression(i){
     var x = negation(i);
     var t = get_token(i);
-    while(t.type=="op" && (t.value=="and")){
+    while(t[0]==Symbol && t[1]=="and"){
         i.index++;
         var y = negation(i);
-        x = [t.value,x,y];
+        x = [t[1],x,y];
         t = get_token(i);
     }
     return x;
@@ -376,10 +380,10 @@ function and_expression(i){
 function or_expression(i){
     var x = and_expression(i);
     var t = get_token(i);
-    while(t.type=="op" && (t.value=="or")){
+    while(t[0]==Symbol && t[1]=="or"){
         i.index++;
         var y = and_expression(i);
-        x=[t.value,x,y];
+        x=[t[1],x,y];
         t = get_token(i);
     }
     return x;
@@ -388,10 +392,10 @@ function or_expression(i){
 function implication(i){
     var x = or_expression(i);
     var t = get_token(i);
-    while(t.type=="op" && (t.value=="=>")){
+    while(t[0]==Symbol && t[1]=="=>"){
         i.index++;
         var y = or_expression(i);
-        x = [t.value,x,y];
+        x = [t[1],x,y];
         t = get_token(i);
     }
     return x;
@@ -400,10 +404,10 @@ function implication(i){
 function equivalence(i){
     var x = implication(i);
     var t = get_token(i);
-    while(t.type=="op" && (t.value=="<=>")){
+    while(t[0]==Symbol && t[1]=="<=>"){
         i.index++;
         var y = implication(i);
-        x=[t.value,x,y];
+        x = [t[1],x,y];
         t = get_token(i);
     }
     return x;
@@ -414,11 +418,17 @@ function expression(i){
 }
 
 function ast(a,s){
-    var i={};
-    i.index=0;
-    i.a=a;
-    i.s=s;
-    return expression(i);
+    if(s===undefined){
+        s = a;
+        a = scan(s);
+    }
+    if(a[0][0]==SymbolTerminator){
+        return null;
+    }else{
+        // log(compiler.vtoken_tos(a));
+        var i = {index: 0, a: a, s: s};
+        return expression(i);
+    }
 }
 
 function ast_tos(t){
@@ -452,7 +462,7 @@ return{
     isalpha: isalpha, isdigit: isdigit,
     htm_expression: htm_expression,
     scan: scan, ast_tos: ast_tos,
-    ast: ast
+    ast: ast,
 }
 
 })();
