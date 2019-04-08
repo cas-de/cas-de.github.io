@@ -331,7 +331,8 @@ var macro_tab_mathml = {
 "kgV": "<mi>kgV</mi>",
 "ord": "<mi>ord</mi>",
 "const": "<mi>const</mi>",
-"proj": "<mi>proj</mi>"
+"proj": "<mi>proj</mi>",
+"dd": "<mo mathvariant='normal' lspace='0px' rspace='0px'>d</mo>"
 };
 
 var macro_symbol_table = {
@@ -379,6 +380,18 @@ function flush_node(a,node){
     }
 }
 
+function consume_until(buffer,s,i,n,end){
+    var m = end.length;
+    while(i<n){
+        if(s[i]==end[0] && s.slice(i,i+m)==end){
+            return i+m;
+        }
+        buffer.push(s[i]);
+        i++;
+    }
+    return i;
+}
+
 function scan(s){
     var i = 0;
     var n = s.length;
@@ -418,8 +431,27 @@ function scan(s){
             i+=2;
         }else if(s[i]=='[' || s[i]==']'){
             flush_node(a,node);
-            a.push([Symbol,s[i]]);
-            i+=1;
+            if(i+1<n && s[i+1]=='l'){
+                if(s.slice(i,i+3)=="[l]"){
+                    i+=3;
+                    var buffer = [];
+                    i = consume_until(buffer,s,i,n,"[/l]");
+                    a.push([Symbol,"$"]);
+                    a.push([Text,buffer.join("")]);
+                }else if(s.slice(i,i+7)=="[latex]"){
+                    i+=7;
+                    var buffer = [];
+                    i = consume_until(buffer,s,i,n,"[/latex]");
+                    a.push([Symbol,"$"]);
+                    a.push([Text,buffer.join("")]);
+                }else{
+                    a.push([Symbol,s[i]]);
+                    i+=1;
+                }
+            }else{
+                a.push([Symbol,s[i]]);
+                i+=1;
+            }
         }else{
             node.push(s[i]);
             i++;
@@ -755,7 +787,9 @@ function ast(i,stop){
             }else if(t[1]=="["){
                 bbcode(a,i);
             }else{
-                throw "unknown symbol '"+t[1]+"'";
+                a.push(t[1]);
+                i.index++;
+                // throw "unknown symbol '"+t[1]+"'";
             }
         }
     }
@@ -1166,7 +1200,9 @@ function export_html_node(buffer,t){
             export_html_node(buffer,t[1]);
             buffer.push("</blockquote>");
         }else{
-            throw "unknown function: "+t[1];
+            buffer.push(["[",op,"]"].join(""));
+            export_html_node(buffer,t[1]);
+            buffer.push(["[/",op,"]"].join(""));
         }
     }else{
         buffer.push(encode_html(t));
@@ -1233,7 +1269,8 @@ var tex_substitution_table = {
 "kgV": "\\operatorname{kgV}",
 "const": "\\operatorname{const}",
 "ord": "\\operatorname{ord}",
-"proj": "\\operatorname{proj}"
+"proj": "\\operatorname{proj}",
+"dd": "\\mathrm d"
 };
 
 function tex_export_tex(buffer,s){
@@ -1299,7 +1336,9 @@ function export_mb_node(buffer,t){
             export_mb_node(buffer,t[1]);
             buffer.push("[/quote]");
         }else{
-            throw "unknown function: "+t[1];
+            buffer.push(["[",op,"]"].join(""));
+            buffer.push(t[1]);
+            buffer.push(["[",op,"]"].join(""));
         }
     }else{
         buffer.push(encode_html(t));
