@@ -783,6 +783,9 @@ evaluate: function(t){
             return cas.evaluate(cas.evaluate(t[1]));
         }else if(t[0]==="hold"){
             return t[1];
+        }else if(t[0]==="plain"){
+            var u = cas.output_form(cas.simplify_sf(2,cas.evaluate(t[1])));
+            return ["str",plain_print.text(u)];
         }else{
             var a = [];
             for(var i=0; i<t.length; i++){

@@ -231,6 +231,8 @@ ast: function(t,op,first){
                 return this.lambda(t);
             }else if(s=="sum"){
                 return this.sum(t,op);
+            }else if(s=="str"){
+                return ["<code>", t[1], "</code>"].join("");
             }
         }
         return this.app(t);
@@ -477,3 +479,175 @@ htm: function(t){
 
 };
 
+var plain_print = {
+order: {
+    "app": 80,
+    "^": 70,
+    "neg": 60,
+    "*": 50, "/": 50, "%": 50,
+    "+": 40, "-": 42,
+    "..": 30,
+    "=": 20, "in": 20,
+    "<": 10, ">": 10, "<=": 10, ">=": 10,
+    "not": 9,
+    "and": 8,
+    "or": 6,
+    "=>": 4,
+    "<=>": 2,
+    "": 0,
+},
+associative: {
+    "+": 1, "*": 1, "and": 1, "or": 1
+},
+
+power: function(t,op){
+    var s = [this.ast(t[1],"^"), "^", this.ast(t[2],"^")].join("");
+    if(this.order[op]>=this.order["^"]){
+        return ["(", s, ")"].join("");
+    }else{
+        return s;
+    }
+},
+
+mul: function(t,op){
+    var a = [];
+    for(var i=1; i<t.length; i++){
+        a.push(this.ast(t[i],"*"));
+    }
+    var b = [a[0]];
+    for(var i=2; i<t.length; i++){
+        if(htm_print.mul_invisible(t[i])){
+            if(typeof t[i-1]=="number"){
+                b.push(a[i-1]);
+            }else{
+                b.push("*",a[i-1]);
+            }
+        }else{
+            b.push("*",a[i-1]);
+        }
+    }
+    var s = b.join("");
+    if(this.order[op]>this.order["*"]){
+        return ["(", s, ")"].join("");
+    }else{
+        return s;
+    }
+},
+operator: function(t,op,cop,p,first){
+    var a = [];
+    for(var i=1; i<t.length; i++){
+        a.push(this.ast(t[i],op,i==1));
+    }
+    if(this.order[cop]<=this.order[op]){
+        if(this.order[cop]!=this.order[op]){
+            return a.join(p);
+        }else if(this.associative[op]){
+            return a.join(p);
+        }else if(first && cop==="-" && op==="-"){
+            return a.join(p);
+        }
+    }else{
+        if(first && cop==="-" && op==="+"){
+            return a.join(p);
+        }
+    }
+    return ["(", a.join(p), ")"].join("");
+},
+unary: function(t,op,context,p){
+    var s = p+this.ast(t[1],op);
+    if(this.order[context]>this.order[op]){
+        return ["(", s, ")"].join("");
+    }else{
+        return s;
+    }    
+},
+fraction: function(t,op){
+    var s = [
+        this.ast(t[1],"/"), "/",
+        this.ast(t[2],"/"),
+    ].join("");
+    if(this.order[op]>this.order["/"]){
+        return ["(", s, ")"].join("");
+    }else{
+        return s;
+    }
+},
+app: function(t){
+    var a = [];
+    for(var i=1; i<t.length; i++){
+        a.push(this.ast(t[i],""));
+    }
+    var f;
+    if(cas.is_app(t[0])){
+        f = ["(", this.ast(t[0],""), ")"].join("");
+    }else{
+        f = this.ast(t[0],"app");
+    }
+    return [f, "(", a.join(","), ")"].join("");
+},
+ast: function(t,op,first){
+    var T;
+    if(Array.isArray(t)){
+        var s = t[0];
+        if(typeof s=="string"){
+            if(s=="^"){
+                return this.power(t,op);
+            }else if(s=="*"){
+                return this.mul(t,op);
+            }else if(s=="/"){
+                return this.fraction(t,op);
+            }else if(s=="%"){
+                return this.operator(t,"%",op,"%");
+            }else if(s=="+"){
+                return this.operator(t,"+",op,"+",first);
+            }else if(s=="-"){
+                return this.operator(t,"-",op,"-",first);
+            }else if(s=="neg"){
+                return this.unary(t,"neg",op,"-");
+            }else if(s=="[]"){
+                return this.list(t);
+            }else if(s=="="){
+                return this.operator(t,"=",op,"=");
+            }else if(s=="!="){
+                return this.operator(t,"=",op,"!=");
+            }else if(s=="in"){
+                return this.operator(t,"in",op," in ");
+            }else if(s=="<"){
+                return this.operator(t,"<",op,"<");
+            }else if(s==">"){
+                return this.operator(t,">",op,">");
+            }else if(s=="<="){
+                return this.operator(t,"<=",op,"<=");
+            }else if(s==">="){
+                return this.operator(t,">=",op,">=");
+            }else if(s=="and"){
+                return this.operator(t,"and",op," and ");
+            }else if(s=="or"){
+                return this.operator(t,"or",op," or ");
+            }else if(s=="=>"){
+                return this.operator(t,"=>",op,"=>");
+            }else if(s=="<=>"){
+                return this.operator(t,"<=>",op,"<=>");   
+            }else if(s=="not"){
+                return this.unary(t,"not",op,"not ");
+            }else if(s=="range"){
+                return this.operator(t,"..",op,"..");
+            }
+        }
+        return this.app(t);
+    }
+    T = typeof t;
+    if(T=="string"){
+        return t;
+    }else if(T=="number"){
+        if(t<0){
+            return "-"+String(-t);
+        }else{
+            return String(t);
+        }
+    }
+},
+text: function(t){
+    return this.ast(t,"");
+}
+};

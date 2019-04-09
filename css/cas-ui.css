@@ -61,6 +61,9 @@ input[type=button]:focus{
 .mono{
   font-family: "FreeMono", monospace;
 }
+code{
+  font-family: "DejaVu Sans Mono", monospace;
+}
 
 span.frac{
   display: inline-table;
