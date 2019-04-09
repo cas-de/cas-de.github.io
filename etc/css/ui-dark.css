@@ -103,7 +103,7 @@ button{
 }
 
 button:active{
-  background-image: linear-gradient(#d0d0d0,#f0f0f0);
+  background-image: linear-gradient(#000000,#004040);
 }
 
 button::-moz-focus-inner {
