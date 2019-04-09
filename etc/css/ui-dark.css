@@ -1,0 +1,118 @@
+
+body{
+  margin-left: 2%;
+  margin-bottom: 1em;
+  font-family: "DejaVu Sans", "Verdana", sans-serif;
+  background-color: #141a1a;
+  color: #e0e0da;
+  line-height: 1.4em;
+}
+@media(max-width: 56em){
+  body{margin-left: 10%; margin-right: 4%;}
+}
+@media(max-width: 42em){
+  body{margin-left: 6%; margin-right: 4%;}
+}
+@media(max-width: 26em){
+  body{margin-left: 2%; margin-right: 1%; line-height: 1.2em;}
+  ol, ul{padding-left: 2em;}
+}
+h1,h2,h3,h4{color: #463c20;}
+h2{
+  font-weight: normal;
+  border-bottom: 2px solid #b4b4b0;
+}
+a{
+  color: #c0b080;
+  text-decoration: none;
+  background-image: linear-gradient(#002020,#000000);
+  border: 1px solid #a07a00;
+  border-radius: 5px;
+  padding-bottom: 3px;
+  padding-top: 3px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+a:hover{color: #ba8020; text-decoration: underline;}
+pre, code{
+  font-family: "DejaVu Sans Mono", "Menlo", "Consolas", monospace;
+  color: #403020;
+}
+table.bt{border-collapse: collapse;}
+table.bt td, table.bt th{
+  border: 1px solid #babab2;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+  text-align: left;
+  vertical-align: top;
+}
+table.bt td{
+  background-color: #fafaf0;
+}
+table.bt th{
+  background-color: #eaeaca;
+}
+.indent {
+  margin-left: 1.6em;
+}
+textarea {
+  font-size: 120%;
+  background-color: #101010;
+  border: 2px solid #404040;
+  color: #dadad0;
+  padding: 4px;
+}
+
+math{
+  font-size: 120%;
+}
+.mono{
+  font-family: "DejaVu Sans Mono", "Menlo", "Consolas", monospace;
+}
+
+div.container {
+  display: flex;
+}
+div.left {
+  border: 2px solid #ba8000;
+  flex-grow: 0;
+}
+div.right {
+  border: 2px solid #ba8000;
+  flex-grow: 2;
+  overflow: scroll;
+  max-height: 32em;
+  padding-left: 10px;
+}
+
+button{
+  background-image: linear-gradient(#002020,#000000);
+  color: #d0ba80;
+  border: 1px solid #a07a00;
+  border-radius: 5px;
+  padding-bottom: 4px;
+  padding-top: 4px;
+  margin-bottom: 4px;
+  margin-top: 1px;
+  padding-left: 13px;
+  padding-right: 13px;
+  margin-left: 1px;
+  margin-right: 1px;
+}
+
+button:active{
+  background-image: linear-gradient(#d0d0d0,#f0f0f0);
+}
+
+button::-moz-focus-inner {
+  border: 0;
+}
+
+button:focus{
+  outline: none;
+}
+
+blockquote{
+  border-left: 6px solid #4080a0;
+  padding-left: 8px;
+}

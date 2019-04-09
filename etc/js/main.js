@@ -1511,12 +1511,18 @@ function button_matrix31(){
     insert_text("\\begin{pmatrix}x \\\\ y\\\\ z\\end{pmatrix}");
 }
 
+function dark_mode(){
+    var style = document.getElementById("style");
+    style.href = "css/ui-dark.css";
+}
+
 function query(){
     var a = window.location.href.split("?");
     if(a.length>1){
         a = a[1].split(",");
         for(var i=0; i<a.length; i++){
             if(a[i]=="mathjax"){mathjax_mode = true;}
+            else if(a[i]=="dark" || a[i]=="dunkel"){dark_mode();}
         }
     }
 }
