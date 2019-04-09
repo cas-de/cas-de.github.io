@@ -429,29 +429,41 @@ function scan(s){
             flush_node(a,node);
             a.push([Symbol,"[/"]);
             i+=2;
-        }else if(s[i]=='[' || s[i]==']'){
+        }else if(s[i]=='['){
             flush_node(a,node);
-            if(i+1<n && s[i+1]=='l'){
+            if(s[i]=='[' && i+1<n && s[i+1]=='l'){
                 if(s.slice(i,i+3)=="[l]"){
                     i+=3;
                     var buffer = [];
                     i = consume_until(buffer,s,i,n,"[/l]");
                     a.push([Symbol,"$"]);
                     a.push([Text,buffer.join("")]);
+                    continue;
                 }else if(s.slice(i,i+7)=="[latex]"){
                     i+=7;
                     var buffer = [];
                     i = consume_until(buffer,s,i,n,"[/latex]");
                     a.push([Symbol,"$"]);
                     a.push([Text,buffer.join("")]);
-                }else{
-                    a.push([Symbol,s[i]]);
-                    i+=1;
+                    continue;
                 }
-            }else{
-                a.push([Symbol,s[i]]);
-                i+=1;
             }
+            a.push([Symbol,s[i]]);
+            i+=1;
+            while(i<n && s[i]!=']'){
+                if(s[i]=='='){
+                    flush_node(a,node);
+                    a.push([Symbol,"="]);
+                }else{
+                    node.push(s[i]);
+                }
+                i++;
+            }
+            flush_node(a,node);
+        }else if(s[i]==']'){
+            flush_node(a,node);
+            a.push([Symbol,s[i]]);
+            i+=1;        
         }else{
             node.push(s[i]);
             i++;
@@ -738,9 +750,19 @@ function bbcode(a,i){
         a.push("[");
         return;
     }
-    var id = t[1];
+    var id = t[1].toLowerCase();
+    var value = null;
     i.index++;
     t = i.a[i.index];
+    if(t[0]==Symbol && t[1]=="="){
+        i.index++;
+        t = i.a[i.index];
+        if(t[0]==Text){
+            value = t[1];
+            i.index++;
+            t = i.a[i.index];
+        }
+    }
     if(t[0]!=Symbol || t[1]!="]"){
         a.push("["+id);
         return;
@@ -749,7 +771,7 @@ function bbcode(a,i){
     var y = ast(i,"[/");
     var t = i.a[i.index];
     if(t[0]!=Symbol || t[1]!="[/"){
-        a.push([id,y]);
+        a.push(value==null?[id,y]:[id,y,value]);
         return;
     }
     i.index++;
@@ -757,7 +779,7 @@ function bbcode(a,i){
     if(t[0]==Text) i.index++;
     t = i.a[i.index];
     if(t[0]==Symbol && t[1]=="]") i.index++;
-    a.push([id,y]);
+    a.push(value==null?[id,y]:[id,y,value]);
 }
 
 function ast(i,stop){
@@ -1199,10 +1221,18 @@ function export_html_node(buffer,t){
             buffer.push("<blockquote>");
             export_html_node(buffer,t[1]);
             buffer.push("</blockquote>");
-        }else{
-            buffer.push(["[",op,"]"].join(""));
+        }else if(op=="url"){
+            buffer.push(["<a href='",t[2],"'>"].join(""));
             export_html_node(buffer,t[1]);
-            buffer.push(["[/",op,"]"].join(""));
+            buffer.push("</a>");
+        }else{
+            buffer.push("[",op);
+            if(t.length>2){
+                buffer.push("=",t[2]);
+            }
+            buffer.push("]");
+            export_html_node(buffer,t[1]);
+            buffer.push("[/",op,"]");
         }
     }else{
         buffer.push(encode_html(t));
@@ -1217,7 +1247,7 @@ function export_html(t){
 
 function into_html(s){
     var t = parse(s);
-    // console.log(JSON.stringify(t));
+    console.log(JSON.stringify(t));
     return export_html(t);
 }
 
@@ -1336,9 +1366,13 @@ function export_mb_node(buffer,t){
             export_mb_node(buffer,t[1]);
             buffer.push("[/quote]");
         }else{
-            buffer.push(["[",op,"]"].join(""));
+            buffer.push("[",op);
+            if(t.length>2){
+                buffer.push("=",t[2]);
+            }
+            buffer.push("]");
             buffer.push(t[1]);
-            buffer.push(["[",op,"]"].join(""));
+            buffer.push("[/",op,"]");
         }
     }else{
         buffer.push(encode_html(t));

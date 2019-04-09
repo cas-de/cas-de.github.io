@@ -23,6 +23,8 @@ h2{
 }
 a{
   color: #20506a;
+}
+a.box{
   text-decoration: none;
   background-image: linear-gradient(#ffffff,#ebebea);  
   border: 1px solid #bababa;
@@ -32,7 +34,7 @@ a{
   padding-left: 10px;
   padding-right: 10px;
 }
-a:hover{color: #102a40; text-decoration: underline;}
+a:hover{color: #802a40; text-decoration: underline;}
 pre, code{
   font-family: "DejaVu Sans Mono", "Menlo", "Consolas", monospace;
   color: #403020;
@@ -107,6 +109,6 @@ button:focus{
 }
 
 blockquote{
-  border-left: 6px solid #4080a0;
+  border-left: 6px solid #406a80;
   padding-left: 8px;
 }

@@ -24,6 +24,8 @@ h2{
 }
 a{
   color: #c0b080;
+}
+a.box{
   text-decoration: none;
   background-image: linear-gradient(#002020,#000000);
   border: 1px solid #a07a00;
@@ -113,6 +115,6 @@ button:focus{
 }
 
 blockquote{
-  border-left: 6px solid #4080a0;
+  border-left: 6px solid #ba8000;
   padding-left: 8px;
 }
