@@ -1467,7 +1467,7 @@ function button_export(){
 
 function button_example(){
     var a = [
-        "\n**Differentialqoutient**, auch //Ableitung//:\n\n",
+        "\n**Differentialqoutient**, auch __Ableitung__:\n\n",
         "$f'(x) = \\lim_{h\\to 0}\\frac{f(x+h)-f(x)}{h}$\n"
     ];
     insert_text(a.join(""));
