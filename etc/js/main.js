@@ -400,9 +400,15 @@ function scan(s){
     var a = [];
     while(i<n){
         if(s[i]=='`'){
-            flush_node(a,node);
-            a.push([Symbol,"`"]);
-            i++;
+            if(i+2<n && s[i+1]=='`' && s[i+2]=='`'){
+                flush_node(a,node);
+                a.push([Symbol,"```"]);
+                i+=3;
+            }else{
+                flush_node(a,node);
+                a.push([Symbol,"`"]);
+                i++;
+            }
         }else if(s[i]=='\n'){
             flush_node(a,node);
             a.push([Symbol,"n"]);
@@ -432,7 +438,7 @@ function scan(s){
             i+=2;
         }else if(s[i]=='['){
             flush_node(a,node);
-            if(s[i]=='[' && i+1<n && s[i+1]=='l'){
+            if(i+1<n && s[i+1]=='l'){
                 if(s.slice(i,i+3)=="[l]"){
                     i+=3;
                     var buffer = [];
@@ -448,6 +454,10 @@ function scan(s){
                     a.push([Text,buffer.join("")]);
                     continue;
                 }
+            }else if(i+2<n && s[i+1]=='*' && s[i+2]==']'){
+                i+=3;
+                a.push([Symbol,"*"]);
+                continue;
             }
             a.push([Symbol,s[i]]);
             i+=1;
@@ -801,13 +811,18 @@ function ast(i,stop){
                 a.push(["tex",i.a[i.index][1]]);
                 i.index++;
             }else if(t[1]=="`"){
-                wiki_syntax(a,i,"`","code");
+                wiki_syntax(a,i,"`","tt");
             }else if(t[1]=="**"){
                 wiki_syntax(a,i,"**","b");
             }else if(t[1]=="__"){
                 wiki_syntax(a,i,"__","i");
+            }else if(t[1]=="```"){
+                wiki_syntax(a,i,"```","code");
             }else if(t[1]=="["){
                 bbcode(a,i);
+            }else if(t[1]=="*"){
+                a.push(["li"]);
+                i.index++;
             }else{
                 a.push(t[1]);
                 i.index++;
@@ -1212,10 +1227,14 @@ function export_html_node(buffer,t){
             }
         }else if(op=="n"){
             buffer.push("<br>");
-        }else if(op=="code"){
+        }else if(op=="tt"){
             buffer.push("<code>");
             export_html_node(buffer,t[1]);
             buffer.push("</code>");
+        }else if(op=="code"){
+            buffer.push("<pre>");
+            export_html_node(buffer,t[1]);
+            buffer.push("</pre>");
         }else if(op=="b"){
             buffer.push("<b>");
             export_html_node(buffer,t[1]);
@@ -1224,6 +1243,30 @@ function export_html_node(buffer,t){
             buffer.push("<i>");
             export_html_node(buffer,t[1]);
             buffer.push("</i>");
+        }else if(op=="u"){
+            buffer.push("<u>");
+            export_html_node(buffer,t[1]);
+            buffer.push("</u>");
+        }else if(op=="list"){
+            if(t.length==3 && t[2]==="1"){
+                buffer.push("<ol>");
+                export_html_node(buffer,t[1]);
+                buffer.push("</ol>");
+            }else if(t.length==3 && t[2]=="a"){
+                buffer.push("<ol style='list-style-type: lower-alpha'>");
+                export_html_node(buffer,t[1]);
+                buffer.push("</ol>");
+            }else{
+                buffer.push("<ul>");
+                export_html_node(buffer,t[1]);
+                buffer.push("</ul>");
+            }
+        }else if(op=="li"){
+            buffer.push("<li>");
+        }else if(op=="center"){
+            buffer.push("<div style='text-align: center'>");
+            export_html_node(buffer,t[1]);
+            buffer.push("</div>");
         }else if(op=="tex"){
             if(mathjax_mode){
                 buffer.push("<span id='",formula_list.length,"'></span>");
@@ -1364,10 +1407,14 @@ function export_mb_node(buffer,t){
             }
         }else if(op=="n"){
             buffer.push("<br>");
-        }else if(op=="code"){
+        }else if(op=="tt"){
             buffer.push("[FONT=COURIER]");
             export_mb_node(buffer,t[1]);
             buffer.push("[/FONT]");
+        }else if(op=="code"){
+            buffer.push("[code]");
+            export_mb_node(buffer,t[1]);
+            buffer.push("[/code]");
         }else if(op=="b"){
             buffer.push("[b]");
             export_mb_node(buffer,t[1]);
@@ -1384,13 +1431,17 @@ function export_mb_node(buffer,t){
             buffer.push("[quote]");
             export_mb_node(buffer,t[1]);
             buffer.push("[/quote]");
+        }else if(op=="li"){
+            buffer.push("[*]");
         }else{
             buffer.push("[",op);
             if(t.length>2){
                 buffer.push("=",t[2]);
             }
             buffer.push("]");
-            buffer.push(t[1]);
+            if(t.length>1){
+                export_mb_node(buffer,t[1]);
+            }
             buffer.push("[/",op,"]");
         }
     }else{
