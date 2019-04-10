@@ -88,6 +88,8 @@ div.right {
 }
 
 button{
+  font-size: 100%;
+  font-family: "DejaVu Sans", "Verdana", sans-serif;
   background-image: linear-gradient(#002020,#000000);
   color: #d0ba80;
   border: 1px solid #a07a00;

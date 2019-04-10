@@ -18,6 +18,9 @@ var standard_context = {
     font_extra: false
 };
 
+var formula_list = [];
+var formula_map = {};
+
 var argc_table = {
 "frac": 2,
 "mathrm": 1,
@@ -421,9 +424,9 @@ function scan(s){
             flush_node(a,node);
             a.push([Symbol,"**"]);
             i+=2;
-        }else if(i+1<n && s[i]=='/' && s[i+1]=='/'){
+        }else if(i+1<n && s[i]=='_' && s[i+1]=='_'){
             flush_node(a,node);
-            a.push([Symbol,"//"]);
+            a.push([Symbol,"__"]);
             i+=2;
         }else if(i+1<n && s[i]=='[' && s[i+1]=='/'){
             flush_node(a,node);
@@ -804,8 +807,8 @@ function ast(i,stop){
                 wiki_syntax(a,i,"`","code");
             }else if(t[1]=="**"){
                 wiki_syntax(a,i,"**","b");
-            }else if(t[1]=="//"){
-                wiki_syntax(a,i,"//","i");
+            }else if(t[1]=="__"){
+                wiki_syntax(a,i,"__","i");
             }else if(t[1]=="["){
                 bbcode(a,i);
             }else{
@@ -1208,9 +1211,8 @@ function export_html_node(buffer,t){
             buffer.push("</i>");
         }else if(op=="tex"){
             if(mathjax_mode){
-                buffer.push("\\(\\displaystyle ");
-                tex_export_tex(buffer,t[1]);
-                buffer.push("\\)");
+                buffer.push("<span id='",formula_list.length,"'></span>");
+                formula_list.push(t[1]);
             }else{
                 buffer.push("<math displaystyle='true'>");
                 // console.log(JSON.stringify(tex_parse(t[1])));
@@ -1247,7 +1249,7 @@ function export_html(t){
 
 function into_html(s){
     var t = parse(s);
-    console.log(JSON.stringify(t));
+    // console.log(JSON.stringify(t));
     return export_html(t);
 }
 
@@ -1392,6 +1394,28 @@ function into_mb(s){
     return export_mb(t);
 }
 
+function mathjax_render(){
+    var m = {};
+    for(var i=0; i<formula_list.length; i++){
+        var math = document.getElementById(String(i));
+        var text = ["#",i,formula_list[i]].join("");
+        if(formula_map.hasOwnProperty(text)){
+            math.appendChild(formula_map[text]);
+            m[text] = formula_map[text];
+        }else{
+            var buffer = [];        
+            buffer.push("\\(\\displaystyle ");
+            tex_export_tex(buffer,formula_list[i]);
+            buffer.push("\\)");
+            math.innerHTML = buffer.join("");
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub,math]);
+            m[text] = math;
+        }
+    }
+    formula_list = [];
+    formula_map = m;
+}
+
 function update(force){
     if(update_needed || force==true){
         update_needed = false;
@@ -1408,7 +1432,7 @@ function update(force){
                 // console.log(out);
                 output.innerHTML = out;
                 if(mathjax_mode){
-                    MathJax.Hub.Queue(["Typeset",MathJax.Hub,output]);
+                    mathjax_render();
                 }
             }
         }
@@ -1561,12 +1585,21 @@ function query(){
     }
 }
 
+function firefox(){
+    var s = navigator.userAgent.toString().toLowerCase();
+    return s.indexOf("firefox") != -1;
+}
+
 window.onload = function(){
+    if(!firefox()){mathjax_mode = true;}
     query();
     if(mathjax_mode){
         var script = document.createElement("script");
         script.type = "text/javascript";
         script.src  = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML";
+        script.onload = function(){
+            MathJax.Hub.Config({messageStyle: "none"});
+        };
         document.getElementsByTagName("head")[0].appendChild(script);
         setInterval(update,1000);
     }else{
