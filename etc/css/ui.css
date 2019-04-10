@@ -16,11 +16,6 @@ body{
   body{margin-left: 2%; margin-right: 1%; line-height: 1.2em;}
   ol, ul{padding-left: 2em;}
 }
-h1,h2,h3,h4{color: #463c20;}
-h2{
-  font-weight: normal;
-  border-bottom: 2px solid #b4b4b0;
-}
 a{
   color: #20506a;
 }
@@ -53,11 +48,12 @@ table.bt td{
 table.bt th{
   background-color: #eaeaca;
 }
-.indent {
+.indent{
   margin-left: 1.6em;
 }
-textarea {
-  font-size: 120%;
+textarea{
+  font-family: "DejaVu Sans Mono", "Menlo", "Consolas", monospace;
+  font-size: 90%;
 }
 
 math{

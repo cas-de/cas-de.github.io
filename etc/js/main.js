@@ -1,6 +1,4 @@
 
-// Todo:
-// * x_12 as {x_1}2
 
 var update_needed = true;
 var export_input = false;
@@ -488,9 +486,8 @@ function tex_scan(s){
             a.push([Text,s[i]]);
             i++;
         }else if(isdigit(s[i])){
-            var j = i;
-            while(i<n && (isdigit(s[i]) || s[i]=='.')) i++;
-            a.push([Digits,s.slice(j,i)]);
+            a.push([Digits,s[i]]);
+            i++;
         }else if(s[i]=='\\'){
             i++;
             if(i<n && s[i]=='\\'){
@@ -814,7 +811,6 @@ function ast(i,stop){
             }else{
                 a.push(t[1]);
                 i.index++;
-                // throw "unknown symbol '"+t[1]+"'";
             }
         }
     }
@@ -1103,16 +1099,33 @@ function tex_export_mathml(buffer,t,context){
         }else if(op=="\\"){
             tex_macro_mathml(buffer,t[1],t[2],t[3],context);
         }else if(op=="_"){
-            if(is_under_over(t[1])){
-                buffer.push("<munder>");
-                tex_export_mathml(buffer,t[1],context);
-                tex_export_mathml(buffer,t[2],context);
-                buffer.push("</munder>");
+            var x = t[1];
+            if(Array.isArray(x) && x[0]=="^"){
+                if(is_under_over(x[1])){
+                    buffer.push("<munderover>");
+                    tex_export_mathml(buffer,x[1],context);
+                    tex_export_mathml(buffer,t[2],context);
+                    tex_export_mathml(buffer,x[2],context);
+                    buffer.push("</munderover>");
+                }else{
+                    buffer.push("<msubsup>");
+                    tex_export_mathml(buffer,x[1],context);
+                    tex_export_mathml(buffer,t[2],context);
+                    tex_export_mathml(buffer,x[2],context);
+                    buffer.push("</msubsup>");
+                }
             }else{
-                buffer.push("<msub>");
-                tex_export_mathml(buffer,t[1],context);
-                tex_export_mathml(buffer,t[2],context);
-                buffer.push("</msub>");
+                if(is_under_over(t[1])){
+                    buffer.push("<munder>");
+                    tex_export_mathml(buffer,t[1],context);
+                    tex_export_mathml(buffer,t[2],context);
+                    buffer.push("</munder>");
+                }else{
+                    buffer.push("<msub>");
+                    tex_export_mathml(buffer,t[1],context);
+                    tex_export_mathml(buffer,t[2],context);
+                    buffer.push("</msub>");
+                }
             }
         }else if(op=="^"){
             var x = t[1];
@@ -1175,9 +1188,11 @@ function tex_export_mathml(buffer,t,context){
                 buffer.push("<mspace linebreak='newline'/>");
             }
         }else if(op.length>0 && op[0]=="'"){
-            buffer.push("<mo lspace='0em' rspace='0em'>");
+            buffer.push("<mo lspace='0px' rspace='0px'>");
             buffer.push(Array(op.length+1).join("′"));
             buffer.push("</mo>");
+        }else if(op=="."){
+            buffer.push("<mo lspace='1px' rspace='1px'>.</mo>");
         }else{
             buffer.push("<mo>");
             buffer.push(op);
@@ -1224,7 +1239,9 @@ function export_html_node(buffer,t){
             export_html_node(buffer,t[1]);
             buffer.push("</blockquote>");
         }else if(op=="url"){
-            buffer.push(["<a href='",t[2],"'>"].join(""));
+            buffer.push("<a href='");
+            export_html_node(buffer,t.length>2?t[2]:t[1])
+            buffer.push("'>");
             export_html_node(buffer,t[1]);
             buffer.push("</a>");
         }else{
