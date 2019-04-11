@@ -1519,6 +1519,8 @@ function insert_text(text,offset){
     var s = input.value;
     input.value = s.slice(0,i)+text+s.slice(i);
     input.selectionStart = i+text.length-offset;
+    input.selectionEnd = input.selectionStart;
+    input.focus();
     update(true);
 }
 
@@ -1547,6 +1549,7 @@ function button_sqrt(){
 
 function button_parens(){
     insert_text("\\left(\\right)",7);
+    text_area_active();
 }
 
 function button_brackets(){
