@@ -24,8 +24,8 @@ a.box{
   background-image: linear-gradient(#ffffff,#ebebea);  
   border: 1px solid #bababa;
   border-radius: 5px;
-  padding-bottom: 3px;
-  padding-top: 3px;
+  padding-bottom: 2px;
+  padding-top: 2px;
   padding-left: 10px;
   padding-right: 10px;
 }
@@ -84,8 +84,8 @@ button{
   background-image: linear-gradient(#ffffff,#ebebea);
   border: 1px solid #bababa;
   border-radius: 5px;
-  padding-bottom: 4px;
-  padding-top: 4px;
+  padding-bottom: 2px;
+  padding-top: 2px;
   margin-bottom: 4px;
   margin-top: 1px;
   padding-left: 13px;

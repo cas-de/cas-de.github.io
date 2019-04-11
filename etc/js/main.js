@@ -1567,27 +1567,33 @@ function button_frac(){
     insert_text("\\frac{a}{b}");
 }
 
-function button_pm(){
-    insert_text("\\pm ");
-}
+function button_pm(){insert_text("\\pm ");}
+function button_mp(){insert_text("\\mp ");}
+function button_neg(){insert_text("\\neg ");}
+function button_and(){insert_text("\\land ");}
+function button_or(){insert_text("\\lor ");}
+function button_implies(){insert_text("\\implies ");}
+function button_iff(){insert_text("\\iff ");}
+function button_forall(){insert_text("\\forall ");}
+function button_exists(){insert_text("\\exists ");}
 
-function button_mp(){
-    insert_text("\\mp ");
-}
+function button_pi(){insert_text("\\pi ");}
+function button_delta(){insert_text("\\Delta ")};
+function button_equiv(){insert_text("\\equiv ");}
+function button_approx(){insert_text("\\approx ");}
+function button_ne(){insert_text("\\ne ");}
+function button_le(){insert_text("\\le ");}
+function button_ge(){insert_text("\\ge ");}
+function button_in(){insert_text("\\in ");}
+function button_notin(){insert_text("\\notin ");}
+function button_sub(){insert_text("\\subset ");}
+function button_sube(){insert_text("\\subseteq ");}
+function button_cup(){insert_text("\\cup ");}
+function button_cap(){insert_text("\\cap ");}
+function button_times(){insert_text("\\times ");}
 
-function button_implies(){
-    insert_text("\\implies ");
-}
-function button_iff(){
-    insert_text("\\iff ");
-}
-
-function button_forall(){
-    insert_text("\\forall ");
-}
-
-function button_exists(){
-    insert_text("\\exists");
+function button_set(){
+    insert_text("\\{ \\mid \\}",8);
 }
 
 function button_diff(){
