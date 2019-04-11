@@ -1549,7 +1549,6 @@ function button_sqrt(){
 
 function button_parens(){
     insert_text("\\left(\\right)",7);
-    text_area_active();
 }
 
 function button_brackets(){
