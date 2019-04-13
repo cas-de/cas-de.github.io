@@ -97,7 +97,7 @@ var cmd_tab = {
 
 var keyword_table = {
     "for": "for", "für": "for", "in": "in",
-    "und": "&", "oder": "|"
+    "und": "&", "oder": "|", "and": "&", "or": "|"
 };
 
 var lang_points = "Punkte";

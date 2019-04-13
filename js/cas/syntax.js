@@ -31,7 +31,8 @@ function vtoken_tos(a){
 }
 
 var keywords = {
-    "in":1, "and":1, "or":1, "not":1
+    "in": "in", "and": "&", "or": "|", "not": "not",
+    "und": "&", "oder": "|"
 };
 
 var superscript = {
@@ -72,7 +73,7 @@ function scan(s){
             }
             var id = s.slice(j,i);
             if(keywords.hasOwnProperty(id)){
-                a.push([Symbol,id,line,col]);
+                a.push([Symbol,keywords[id],line,col]);
             }else{
                 if(a.length>0 && a[a.length-1][0]==SymbolNumber){
                     a.push([Symbol,"*",line,col]);
@@ -368,10 +369,10 @@ function negation(i){
 function and_expression(i){
     var x = negation(i);
     var t = get_token(i);
-    while(t[0]==Symbol && t[1]=="and"){
+    while(t[0]==Symbol && t[1]=="&"){
         i.index++;
         var y = negation(i);
-        x = [t[1],x,y];
+        x = ["and",x,y];
         t = get_token(i);
     }
     return x;
@@ -380,10 +381,10 @@ function and_expression(i){
 function or_expression(i){
     var x = and_expression(i);
     var t = get_token(i);
-    while(t[0]==Symbol && t[1]=="or"){
+    while(t[0]==Symbol && t[1]=="|"){
         i.index++;
         var y = and_expression(i);
-        x=[t[1],x,y];
+        x=["or",x,y];
         t = get_token(i);
     }
     return x;
