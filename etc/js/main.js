@@ -295,6 +295,8 @@ var macro_tab_mathml = {
 "C": "<mi mathvariant='bold'>C</mi>",
 "H": "<mi mathvariant='bold'>H</mi>",
 "P": "<mi mathvariant='bold'>P</mi>",
+"K": "<mi mathvariant='bold'>K</mi>",
+"F": "<mi mathvariant='bold'>F</mi>",
 "la": "<mo>&larr;</mo>",
 "ra": "<mo>&rarr;</mo>",
 "lra": "<mo>&harr;</mo>",
@@ -333,6 +335,10 @@ var macro_tab_mathml = {
 "ord": "<mi>ord</mi>",
 "const": "<mi>const</mi>",
 "proj": "<mi>proj</mi>",
+"adj": "<mi>adj</mi>",
+"tr": "<mi>tr</mi>",
+"GL": "<mi>GL</mi>",
+"var": "<mi>var</mi>",
 "dd": "<mo mathvariant='normal' lspace='0px' rspace='0px'>d</mo>"
 };
 
@@ -1321,6 +1327,8 @@ var tex_substitution_table = {
 "C": "\\mathbb C",
 "H": "\\mathbb H",
 "P": "\\mathbb P",
+"K": "\\mathbb K",
+"F": "\\mathbb F",
 "la": "\\leftarrow",
 "ra": "\\rightarrow",
 "lra": "\\leftrightarrow",
@@ -1362,6 +1370,10 @@ var tex_substitution_table = {
 "const": "\\operatorname{const}",
 "ord": "\\operatorname{ord}",
 "proj": "\\operatorname{proj}",
+"adj": "\\operatorname{adj}",
+"tr": "\\operatorname{tr}",
+"GL": "\\operatorname{GL}",
+"var": "\\operatorname{var}",
 "dd": "\\mathrm d"
 };
 
