@@ -731,6 +731,14 @@ taylor: function(t,v,a,n){
     }
 },
 
+grad: function(t,v){
+    var y = ["[]"];
+    for(var i=1; i<v.length; i++){
+        y.push(cas.diff(t,v[i]));
+    }
+    return y;
+},
+
 variables_table: {
 },
 
@@ -752,6 +760,8 @@ evaluate: function(t){
                     cas.evaluate(t[2])
                 ));
             }
+        }else if(t[0]==="grad"){
+            return cas.grad(cas.evaluate(t[1]),t[2]);
         }else if(t[0]==="taylor"){
             return cas.taylor(t[1],t[2],t[3],t[4]);
         }else if(t[0]==="simp"){

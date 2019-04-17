@@ -2665,10 +2665,11 @@ function points(gx,color,f,a){
     labels(gx);
 }
 
-function points_list(gx,color,a){
+function points_list(gx,color,a,r){
+    if(r==undefined) r=4;
     for(var i=0; i<a.length; i++){
         var t = a[i];
-        gx.circle(color,t[0],t[1],4,true);
+        gx.circle(color,t[0],t[1],r,true);
     }
     flush(gx);
     labels(gx);
