@@ -3,12 +3,7 @@ ftab["mesh"] = 0.2;
 ftab["maxcount"] = 4000;
 ftab["parts"] = 2;
 
-var once = false;
-var done = false;
-
-ftab["once"] = function(){
-    once = true;
-};
+var last_input = "";
 
 function enqueue(a,node,value){
     for(var i=0; i<a.length; i++){
@@ -163,7 +158,7 @@ function tauten(a,constraint){
             }
         }
         if(!modification){
-            console.log("iterations needed: "+count);
+            // console.log("iterations needed: "+count);
             break;
         }
         count++;
@@ -187,9 +182,11 @@ function plot_node(gx,t,color){
         var p = compile(t[2],[])();
         var q = compile(t[3],[])();
         plot_node_basic(gx,t[1],[0,60,0]);
-        if(once && done){
+        var input = document.getElementById("inputf").value;
+        if(input == last_input){
             points_list(gx,color_table[0],ftab["p"],2);
         }else{
+            last_input = input;
             var a = find_path(constraint,p,q);
             a = fine_path(a,ftab["parts"]);
             tauten(a,constraint);
@@ -199,7 +196,6 @@ function plot_node(gx,t,color){
             ftab["L"] = len;
             var adds = document.getElementById("adds");
             adds.innerHTML = "<p>Pfadlänge: "+len.toFixed(4);
-            done = true;
         }
     }else{
         plot_node_basic(gx,t,color);
