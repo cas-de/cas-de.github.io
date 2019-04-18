@@ -76,7 +76,7 @@ var ftab = {
     Gamma: Gamma, erf: erf, erfc: erfc,
     En: En, Ei: Ei, li: li, Li: Li,
     diff: diff, int: integral, D: diff_operator, int16: int16,
-    iter: pow, sum: sum, prod: prod, af: af,
+    iter: iterate, sum: sum, prod: prod, af: af,
     rand: rand, rng: rand, tg: tg, sc: sc, res: res,
     range: range, inv: invab, agm: agm,
     E: eiE, K: eiK, F: eiF, Pi: eiPi,
@@ -413,7 +413,7 @@ function int16(a,b,f,n){
     return gauss16(f,a,b,n);
 }
 
-function pow(f,n,x){
+function iterate(f,n,x){
     for(var i=0; i<n; i++){
         x = f(x);
     }
@@ -2232,9 +2232,9 @@ async function fplot(gx,f,d,cond,color){
     busy = true;
     var spoint = gx.spoint;
     var wx = 0.5*gx.w/(gx.mx*ax);
-    var wy = 0.5*(gx.h+4)/(gx.mx*ax);
+    var wy = 0.5*(gx.h+4)/(gx.mx*ay);
     var x0 = (0.5*gx.w-gx.px0)/(gx.mx*ax);
-    var y0 = (gx.py0-0.5*gx.h)/(gx.mx*ax);
+    var y0 = (gx.py0-0.5*gx.h)/(gx.mx*ay);
     var ya = y0-wy;
     var yb = y0+wy;
     var k=0;
