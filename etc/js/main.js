@@ -4,6 +4,7 @@ var update_needed = true;
 var export_input = false;
 var mathjax_mode = false;
 var last_input = undefined;
+var export_fn = into_latex;
 
 var Text = 0;
 var Symbol = 1;
@@ -18,6 +19,10 @@ var standard_context = {
 
 var formula_list = [];
 var formula_map = {};
+
+var valid_bbcode = {
+    "b":1, "i":1, "u":1, "tt":1, "code":1, "url":1, "quote":1
+};
 
 var argc_table = {
 "frac": 2,
@@ -399,6 +404,41 @@ function consume_until(buffer,s,i,n,end){
     return i;
 }
 
+function is_valid_bbcode(s,i,n){
+    var id = [];
+    var m = Math.min(n,i+10);
+    for(var j=i+1; j<m; j++){
+        if(isalpha(s[j])){
+            id.push(s[j]);
+        }else{
+            return valid_bbcode.hasOwnProperty(id.join(""));
+        }
+    }
+    return false;
+}
+
+function scan_bbcode(a,s,i,n){
+    if(!is_valid_bbcode(s,i,n)){
+        a.push([Text,"["]);
+        return i+1;
+    }else{
+        a.push([Symbol,"["]);
+        i+=1;
+    }
+    var node = [];
+    while(i<n && s[i]!=']'){
+        if(s[i]=='='){
+            flush_node(a,node);
+            a.push([Symbol,"="]);
+        }else{
+            node.push(s[i]);
+        }
+        i++;
+    }
+    flush_node(a,node);
+    return i;
+}
+
 function scan(s){
     var i = 0;
     var n = s.length;
@@ -465,18 +505,7 @@ function scan(s){
                 a.push([Symbol,"*"]);
                 continue;
             }
-            a.push([Symbol,s[i]]);
-            i+=1;
-            while(i<n && s[i]!=']'){
-                if(s[i]=='='){
-                    flush_node(a,node);
-                    a.push([Symbol,"="]);
-                }else{
-                    node.push(s[i]);
-                }
-                i++;
-            }
-            flush_node(a,node);
+            i = scan_bbcode(a,s,i,n);
         }else if(s[i]==']'){
             flush_node(a,node);
             a.push([Symbol,s[i]]);
@@ -1474,6 +1503,145 @@ function into_mb(s){
     return export_mb(t);
 }
 
+function export_latex_node(buffer,t){
+    if(Array.isArray(t)){
+        var op = t[0];
+        if(op==="block"){
+            for(var i=1; i<t.length; i++){
+                export_latex_node(buffer,t[i]);
+            }
+        }else if(op=="n"){
+            buffer.push("<br>");
+        }else if(op=="tt"){
+            buffer.push("\\texttt{");
+            export_latex_node(buffer,t[1]);
+            buffer.push("}");
+        }else if(op=="code"){
+            buffer.push("\\begin{verbatim}\n");
+            export_latex_node(buffer,t[1]);
+            buffer.push("\\end{verbatim}\n");
+        }else if(op=="b"){
+            buffer.push("\\textbf{");
+            export_latex_node(buffer,t[1]);
+            buffer.push("}");
+        }else if(op=="i"){
+            buffer.push("\\emph{");
+            export_latex_node(buffer,t[1]);
+            buffer.push("}");
+        }else if(op=="tex"){
+            buffer.push("$");
+            tex_export_tex(buffer,t[1]);
+            buffer.push("$");
+        }else if(op=="quote"){
+            buffer.push("\\begin{quote}");
+            export_latex_node(buffer,t[1]);
+            buffer.push("\\end{quote}");
+        }else if(op=="li"){
+            buffer.push("\\item ");
+        }else if(op=="list"){
+            buffer.push("\\begin{itemize}");
+            export_latex_node(buffer,t[1]);
+            buffer.push("\\end{itemize}");
+        }else{
+            buffer.push("\\begin{",op,"}");
+            if(t.length>2){
+                buffer.push("[",t[2],"]");
+            }
+            if(t.length>1){
+                export_latex_node(buffer,t[1]);
+            }
+            buffer.push("\\end{",op,"}");
+        }
+    }else{
+        buffer.push(encode_html(t));
+    }
+}
+
+function export_latex(t){
+    var buffer = [];
+    buffer.push("<div class='mono'>");
+    export_latex_node(buffer,t);
+    buffer.push("</div>");
+    return buffer.join("");
+}
+
+function into_latex(s){
+    var t = parse(s);
+    return export_latex(t);
+}
+
+function export_mw_node(buffer,t){
+    if(Array.isArray(t)){
+        var op = t[0];
+        if(op==="block"){
+            for(var i=1; i<t.length; i++){
+                export_mw_node(buffer,t[i]);
+            }
+        }else if(op=="n"){
+            buffer.push("<br>");
+        }else if(op=="tt"){
+            buffer.push("&lt;code&gt;");
+            export_mw_node(buffer,t[1]);
+            buffer.push("&lt;/code&gt;");
+        }else if(op=="code"){
+            buffer.push("&lt;pre&gt;");
+            export_mw_node(buffer,t[1]);
+            buffer.push("&lt;/pre&gt;");
+        }else if(op=="b"){
+            buffer.push("'''");
+            export_mw_node(buffer,t[1]);
+            buffer.push("'''");
+        }else if(op=="i"){
+            buffer.push("''");
+            export_mw_node(buffer,t[1]);
+            buffer.push("''");
+        }else if(op=="tex"){
+            buffer.push("&lt;math&gt;");
+            tex_export_tex(buffer,t[1]);
+            buffer.push("&lt;/math&gt;");
+        }else if(op=="quote"){
+            buffer.push("&lt;blockquote&gt;");
+            export_mw_node(buffer,t[1]);
+            buffer.push("&lt;/blockquote&gt;");
+        }else if(op=="li"){
+            buffer.push("* ");
+        }else if(op=="list"){
+            export_mw_node(buffer,t[1]);
+        }else if(op=="url"){
+            if(t.length>2){
+                buffer.push("[");
+                export_mw_node(buffer,t[2]);
+                buffer.push(" ");
+                export_mw_node(buffer,t[1]);
+                buffer.push("]");
+            }else{
+                export_mw_node(buffer,t[1]);
+            }
+        }else{
+            buffer.push("&lt;",op,"&gt;");
+            if(t.length>1){
+                export_mw_node(buffer,t[1]);
+            }
+            buffer.push("&lt;/",op,"&gt;");
+        }
+    }else{
+        buffer.push(encode_html(t));
+    }
+}
+
+function export_mw(t){
+    var buffer = [];
+    buffer.push("<div class='mono'>");
+    export_mw_node(buffer,t);
+    buffer.push("</div>");
+    return buffer.join("");
+}
+
+function into_mw(s){
+    var t = parse(s);
+    return export_mw(t);
+}
+
 function mathjax_render(){
     var m = {};
     for(var i=0; i<formula_list.length; i++){
@@ -1503,7 +1671,7 @@ function update(force){
         var output = document.getElementById("output");
         var input_value = input.value;
         if(export_input){
-            var out = into_mb(input_value);
+            var out = export_fn(input_value);
             // console.log(out);
             output.innerHTML = out;
         }else{
@@ -1662,6 +1830,12 @@ function dark_mode(){
     style.href = "css/ui-dark.css";
 }
 
+var export_table = {
+    "matheboard": into_mb,
+    "latex": into_latex,
+    "mediawiki": into_mw
+}
+
 function query(){
     var a = window.location.href.split("?");
     if(a.length>1){
@@ -1669,6 +1843,9 @@ function query(){
         for(var i=0; i<a.length; i++){
             if(a[i]=="mathjax"){mathjax_mode = true;}
             else if(a[i]=="dark" || a[i]=="dunkel"){dark_mode();}
+            else if(export_table.hasOwnProperty(a[i])){
+                export_fn = export_table[a[i]];
+            }
         }
     }
 }

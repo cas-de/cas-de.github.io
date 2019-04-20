@@ -58,6 +58,7 @@ var ftab = {
     hypot: Math.hypot, floor: Math.floor, ceil: Math.ceil,
     div: div, mod: mod, diveuc: diveuc, modeuc: modeuc,
     divtrunc: divtrunc, modtrunc: modtrunc,
+    rect: rectangle, tri: triangle,
     rd: Math.round, trunc: Math.trunc, frac: frac,
     sqrt: Math.sqrt, cbrt: cbrt, rt: root, root: root,
     exp: Math.exp, expm1: Math.expm1,
@@ -491,6 +492,14 @@ function modtrunc(x,m){
 
 function angle(x,y){
     return Math.atan2(y,x);
+}
+
+function rectangle(x){
+    return Math.abs(x)<0.5?1:0;
+}
+
+function triangle(x){
+    return Math.abs(x)<1?1-Math.abs(x):0;
 }
 
 function tanh(x){
