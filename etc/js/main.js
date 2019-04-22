@@ -1715,12 +1715,8 @@ function button_export(){
     update(true);
 }
 
-function button_example(){
-    var a = [
-        "\n**Differentialqoutient**, auch __Ableitung__:\n\n",
-        "$f'(x) = \\lim_{h\\to 0}\\frac{f(x+h)-f(x)}{h}$\n"
-    ];
-    insert_text(a.join(""));
+function button_formula(){
+    insert_text("$$",1);
 }
 
 function button_sqrt(){

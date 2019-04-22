@@ -921,8 +921,14 @@ function nextprime(n){
     return n;
 }
 
+var factor_tab = {};
+
 function factor(n){
     n = Math.round(n);
+    var sn = String(n);
+    if(factor_tab.hasOwnProperty(sn)){
+        return factor_tab[sn];
+    }
     var a,k,m;
     a = [];
     k = 2;
@@ -932,6 +938,7 @@ function factor(n){
         if(m!=0) a.push([k,m]);
         k = nextprime(k+1);
     }
+    factor_tab[sn] = a;
     return a;
 }
 
@@ -975,6 +982,15 @@ function divisors(n){
         if(n%d==0) a.push(d);
     }
     return a;
+}
+
+function moebius(n){
+    if(Math.round(n)<=0) return 0;
+    var a = factor(n);
+    for(var i=0; i<a.length; i++){
+        if(a[i][1]>1) return 0;
+    }
+    return a.length%2==0?1:-1;
 }
 
 function all(p,a){
@@ -1246,7 +1262,7 @@ lcm: lcm_variadic, kgV: lcm_variadic,
 isprime: isprime, prim: isprime, pcf: pcf, factor: factor,
 phi: euler_phi, lambda: carmichael_lambda, sigma: sigma,
 pseq: prime_sequence, divisors: divisors, Teiler: divisors,
-all: all, any: any, count: count,
+mu: moebius, all: all, any: any, count: count,
 sample: sample, samples: samples, cdf: cdf,
 cdfu: cdfu, pdfu: pdfu, cdfN: cdfN, pdfN: pdfN,
 cdfLogN: cdfLogN, pdfLogN: pdfLogN, cdfExp: cdfExp, pdfExp: pdfExp,
