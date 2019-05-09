@@ -140,7 +140,7 @@ var lang = {
             "z.B.:<br><br>"+
             "y''=-y; p:=[0,0,1]");
     },
-    p_to_short: "Fehler: p is zu kurz."
+    p_to_short: "Fehler: p ist zu kurz."
 };
 
 function load_async(URL,callback){
@@ -2635,7 +2635,11 @@ function ode_as_fn_rec(v,t){
 
 function ode_as_fn(t,v,order){
     var u = ode_as_fn_rec(v,t[2]);
-    return compile(u,["x","y"]);
+    if(!ftab.hasOwnProperty("t") && contains_variable(t[2],"t")){
+        return compile(u,["t","y"]);
+    }else{
+        return compile(u,["x","y"]);
+    }
 }
 
 function from_ode(gx,t){
@@ -2686,10 +2690,21 @@ function points_list(gx,color,a,r){
 
 function contains_variable(t,v){
     if(Array.isArray(t)){
-        for(var i=0; i<t.length; i++){
-            if(contains_variable(t[i],v)) return true;
+        if(t[0]==="fn"){
+            if(Array.isArray(t[1])){
+                for(var i=0; i<t[1].length; i++){
+                    if(t[1][i]===v) return false;
+                }
+            }else if(t[1]===v){
+                return false;
+            }
+            return contains_variable(t[2],v);
+        }else{
+            for(var i=0; i<t.length; i++){
+                if(contains_variable(t[i],v)) return true;
+            }
+            return false;
         }
-        return false;
     }else{
         return t===v;
     }
@@ -2772,7 +2787,11 @@ function plot_node_basic(gx,t,color){
             f = compile(t,["x","y"]);
             plot_level_async(gx,f,color);
         }else{
-            f = compile(t,["x"]);
+            if(!ftab.hasOwnProperty("t") && contains_variable(t,"t")){
+                f = compile(t,["t"]);
+            }else{
+                f = compile(t,["x"]);
+            }
             plot_async(gx,f,color);
         }
     }
