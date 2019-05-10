@@ -472,9 +472,9 @@ function plot_sf(gx,f,d,xstep,ystep){
     var dx = d/ax;
     var dy = d/ay;
     var u0 = grx[0]/ax;
-    var u1 = grx[1]/ax;
+    var u1 = grx[1]/ax-0.01*dx;
     var v0 = gry[0]/ay;
-    var v1 = gry[1]/ay;
+    var v1 = gry[1]/ay-0.01*dy;
     var mz = az/ax;
     
     var x0 = position[0];
@@ -507,6 +507,10 @@ function plot_sf(gx,f,d,xstep,ystep){
 
 function vector_product(vx,vy,vz,wx,wy,wz){
     return [vy*wz-vz*wy, vz*wx-vx*wz, vx*wy-vy*wx];
+}
+
+function exterior_product(ax,ay,bx,by){
+    return ax*by-bx*ay;
 }
 
 function plot_psf(gx,f,d,ustep,vstep){
@@ -551,6 +555,14 @@ function plot_psf(gx,f,d,ustep,vstep){
                 p10[0]-p00[0],p10[1]-p00[1],p10[2]-p00[2],
                 p01[0]-p00[0],p01[1]-p00[1],p01[2]-p00[2]
             );
+            var sign = Math.sign(exterior_product(
+                p1[0]-p0[0], p1[1]-p0[1],
+                p3[0]-p0[0], p3[1]-p0[1]
+            ));
+            e[0] = sign*e[0];
+            e[1] = sign*e[1];
+            e[2] = sign*e[2];
+
             a.push([TILE,-gxt-gyt,p0,p1,p2,p3,p00[2],
                 mesh_cond(ku/ustep),mesh_cond(kv/vstep),e]);
             kv++;
