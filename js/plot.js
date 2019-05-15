@@ -1432,7 +1432,7 @@ var TypeVector = 1;
 var TypeMatrix = 2;
 var type_op_table = {
     "[]":0, "+":0, "-":0, "*":0, "/":0, "^":0, "~":0,
-    "abs":0, "index":0, "fn":0, "diff":0, "let":0
+    "abs":0, "index":0, "fn":0, "diff":0
 };
 
 var id_type_table = {
@@ -1446,9 +1446,33 @@ var id_type_table = {
     "jacobi": [TypeMatrix]
 };
 
-function infer_type(t){
+function assign(x,y){
+    var a = Object.keys(y);
+    for(var i=0; i<a.length; i++){
+        x[a[i]] = y[a[i]];
+    }
+}
+
+function infer_from_let(t,local_context){
+    var local_variables = {};
+    if(local_context!==undefined){
+        assign(local_variables,local_context);
+    }
+    var n = t.length-1;
+    for(var i=1; i<n; i++){
+        local_variables[t[i][1]] = infer_type(t[i][2],local_variables);
+    }
+    return infer_type(t[n],local_variables);
+}
+
+function infer_type(t,local_variables){
     if(Array.isArray(t)){
-        var T = t.map(infer_type);
+        if(t[0]==="let"){
+            return infer_from_let(t,local_variables);
+        }
+        var T = t.map(function(x){
+            return infer_type(x,local_variables);
+        });
         if(type_op_table.hasOwnProperty(t[0])){
             if(t[0]==="[]"){
                 if(T.length>1 && T[1]===TypeVector){
@@ -1527,14 +1551,14 @@ function infer_type(t){
                     t[0] = "nabla";
                     return TypeVector;
                 }
-            }else if(t[0]==="let"){
-                return T[t.length-1];
             }
         }else if(Array.isArray(T[0])){
             return T[0][0];
         }
     }else if(typeof t=="string"){
-        if(id_type_table.hasOwnProperty(t)){
+        if(local_variables!==undefined && local_variables.hasOwnProperty(t)){
+            return local_variables[t];
+        }else if(id_type_table.hasOwnProperty(t)){
             return id_type_table[t];
         }
     }
