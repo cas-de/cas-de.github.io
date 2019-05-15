@@ -1432,7 +1432,7 @@ var TypeVector = 1;
 var TypeMatrix = 2;
 var type_op_table = {
     "[]":0, "+":0, "-":0, "*":0, "/":0, "^":0, "~":0,
-    "abs":0, "index":0, "fn":0, "diff":0
+    "abs":0, "index":0, "fn":0, "diff":0, "let":0
 };
 
 var id_type_table = {
@@ -1527,6 +1527,8 @@ function infer_type(t){
                     t[0] = "nabla";
                     return TypeVector;
                 }
+            }else if(t[0]==="let"){
+                return T[t.length-1];
             }
         }else if(Array.isArray(T[0])){
             return T[0][0];
