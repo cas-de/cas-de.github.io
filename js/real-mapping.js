@@ -73,9 +73,19 @@ async function plot_net_async(gx,f){
 }
 
 function plot_node(gx,t,color){
-    var T = infer_type(t);
-    var f = compile(t,["u","v"]);
-    plot_net_async(gx,f);
+    if(Array.isArray(t) && t[0]==="Kurve"){
+        infer_type(t[1]);
+        var f = compile(t[1],["t"]);
+        vplot_async(gx,f,color);
+    }else{
+        var T = infer_type(t);
+        if(T===TypeVector){
+            var f = compile(t,["u","v"]);
+            plot_net_async(gx,f);
+        }else{
+            plot_node_basic(gx,t,color);
+        }
+    }
 }
 
 
