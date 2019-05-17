@@ -39,11 +39,11 @@ var color_table = [
 ];
 
 var color_table_dark = [
-    [220,180,20],
-    [140,0,100],
-    [0,120,120],
-    [60,140,0],
-    [140,40,40]
+    [220,180,20,255],
+    [140,0,100,255],
+    [0,120,120,255],
+    [60,140,0,255],
+    [140,40,40,255]
 ];
 
 var diff = diffh(0.001);
@@ -93,7 +93,11 @@ var ftab = {
 };
 
 var cmd_tab = {
-    "=": 0, slider: 0, Regler: 0, ani: 0
+    "=":0, slider:0, Regler:0, ani:0, vec:0
+};
+
+var plot_cmd_tab = {
+    vec:0
 };
 
 var keyword_table = {
@@ -2784,6 +2788,10 @@ function plot_node_basic(gx,t,color){
             f = compile(t[1],[])();
             points(gx,color,f,a);
         }
+    }else if(Array.isArray(t) &&
+        typeof t[0]==="string" && plot_cmd_tab.hasOwnProperty(t[0])
+    ){
+        eval_cmd(t);
     }else if(Array.isArray(t) && t[0]==="="){
         if(Array.isArray(t[1]) && t[1][0]==="D"){
             var v = t[1][1];
@@ -2855,6 +2863,16 @@ function eval_node(t){
     value();
 }
 
+function eval_cmd(t){
+    if(extension_loaded.cmd){
+        cmd_tab[t[0]](t);
+    }else{
+        async_continuation = "await";
+        load_extension(cmd_tab,"cmd","js/ext-cmd.js");
+        throw new Repeat();
+    }
+}
+
 function eval_statements(t){
     if(Array.isArray(t) && (t[0]==="block" || t[0]===";")){
         for(var i=1; i<t.length; i++){
@@ -2866,13 +2884,7 @@ function eval_statements(t){
         }else if(Array.isArray(t) && typeof t[0]=="string" &&
             cmd_tab.hasOwnProperty(t[0])
         ){
-            if(extension_loaded.cmd){
-                cmd_tab[t[0]](t);
-            }else{
-                async_continuation = "await";
-                load_extension(cmd_tab,"cmd","js/ext-cmd.js");
-                throw new Repeat();
-            }
+            eval_cmd(t);
         }else{
             eval_node(t);
         }

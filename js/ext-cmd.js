@@ -303,9 +303,59 @@ function ani(t){
     animation();
 }
 
+function line(gx,color,x1,y1,x2,y2){
+    var x,y;
+    var d = 1/Math.hypot(x2-x1,y2-y1);
+    for(var t=0; t<1; t+=d){
+        x = x1+t*(x2-x1);
+        y = y1+t*(y2-y1);
+        gx.fpsets(color[3],color,x,y);
+    }
+}
+
+function arrow(gx,color,x,y,vx,vy){
+    var x1 = gx.px0+ax*gx.mx*x;
+    var y1 = gx.py0-ay*gx.my*y;
+    var m = 20/Math.hypot(vx,vy);
+    var x2 = x1+ax*gx.mx*vx;
+    var y2 = y1-ay*gx.my*vy;
+    line(gx,color,x1,y1,x2,y2);
+    var a = 0.5*m;
+    var Lb = [0.2,0.14,0.07]
+    for(var i=0; i<Lb.length; i++){
+        var b = Lb[i]*m;
+        line(gx,color,x2,y2,x2-a*vx-b*vy,y2+a*vy-b*vx);
+        line(gx,color,x2,y2,x2-a*vx+b*vy,y2+a*vy+b*vx);
+    }
+}
+
+function vec(t){
+    infer_type(t[1]);
+    var p = compile(t[1],[])();
+    if(p==0) p = [0,0];
+    var a = t.slice(2).map(function(x){
+        infer_type(x);
+        return compile(x,[])();
+    });
+    post_app_stack.push(function(){
+        var gx = graphics;
+        var Ax = ax*gx.mx;
+        var Ay = ay*gx.my;
+        var px0 = gx.px0;
+        var py0 = gx.py0;
+        var n = color_table.length;
+        for(var i=0; i<a.length; i++){
+            var color = color_table[i%n];
+            arrow(gx,color,p[0],p[1],a[i][0],a[i][1]);
+        }
+        flush(gx);
+        labels(gx);
+    });
+}
+
 extension_table.cmd = {
     "=": equation, slider: slider, Regler: slider,
-    ani: ani
+    ani: ani, vec: vec
 };
 
 

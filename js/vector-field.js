@@ -12,7 +12,7 @@ function scale_vec(a){
     }
 }
 
-ftab["vec"] = scale_vec;
+ftab["dyn"] = scale_vec;
 
 function line(gx,color,x1,y1,x2,y2){
     var x,y;
