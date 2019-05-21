@@ -93,11 +93,11 @@ var ftab = {
 };
 
 var cmd_tab = {
-    "=":0, slider:0, Regler:0, ani:0, vec:0
+    "=":0, slider:0, Regler:0, ani:0, vec:0, line:0, chain:0
 };
 
 var plot_cmd_tab = {
-    vec:0
+    vec:0, line:0, chain:0
 };
 
 var keyword_table = {

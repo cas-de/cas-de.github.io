@@ -353,9 +353,52 @@ function vec(t){
     });
 }
 
+function polygonal_chain(t,points){
+    var a;
+    if(t.length==2){
+        infer_type(t[1]);
+        a = compile(t[1],[])();
+    }else{
+        a = t.slice(1).map(function(x){
+            infer_type(x);
+            return compile(x,[])();
+        });
+    }
+    post_app_stack.push(function(){
+        var gx = graphics;
+        var Ax = ax*gx.mx;
+        var Ay = ay*gx.my;
+        var px0 = gx.px0;
+        var py0 = gx.py0;
+        var color = color_table[0];
+        for(var i=1; i<a.length; i++){
+            var p = a[i-1];
+            var q = a[i];
+            line(gx,color,px0+Ax*p[0],py0-Ay*p[1],px0+Ax*q[0],py0-Ay*q[1]);
+        }
+        if(points){
+            for(var i=0; i<a.length; i++){
+                var t = a[i];
+                gx.circle(color,t[0],t[1],4,true);
+            }        
+        }
+
+        flush(gx);
+        labels(gx);
+    });
+}
+
+function cmd_line(t){
+    polygonal_chain(t,false);
+}
+
+function cmd_chain(t){
+    polygonal_chain(t,true);
+}
+
 extension_table.cmd = {
     "=": equation, slider: slider, Regler: slider,
-    ani: ani, vec: vec
+    ani: ani, vec: vec, line: cmd_line, chain: cmd_chain
 };
 
 
