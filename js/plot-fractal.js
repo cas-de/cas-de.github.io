@@ -44,7 +44,7 @@ function new_index_color(color_array){
         t[1] = Math.floor(255*fg(x));
         t[2] = Math.floor(255*fb(x));
         return t;
-    }
+    };
 }
 
 function sink(color,x,a){

@@ -12,15 +12,29 @@ ftab["mesh"] = set_mesh;
 ftab["tile"] = set_tile;
 ftab["alpha"] = 0.94;
 ftab["P"] = set_position;
+ftab["colorfn"] = choose_color;
 
 var TILE = 0;
 var LINE = 1;
 var LINE_SHADOW = 2;
 
 var position = [0,0,0];
+var new_colorfn = new_light_source;
+var color_slope = 1;
 
 sys_xyz.line_color = "#00000060";
 sys_xyz.fill_color = "#000000a0";
+
+function choose_color(n,slope){
+    if(n==0){
+        new_colorfn = new_light_source;
+    }else if(n==1){
+        new_colorfn = new_heat_map;
+        if(slope!=undefined){
+            color_slope = slope;
+        }
+    }
+}
 
 function set_position(x,y,z){
     if(y==undefined) y=0;
@@ -201,10 +215,16 @@ function new_color_gradient(color_array){
     };
 }
 
-function colorfn2(t,a){
-    var c = hsl_to_rgb(4/3*Math.PI*(1-clamp(t,0,1)),1,0.6);
-    var y = rgba_to_hex(Math.round(255*c[0]),Math.round(255*c[1]),Math.round(255*c[2]),a);
-    return y;
+function new_heat_map(gx){
+    var m = color_slope;
+    var colormap = new_color_gradient([
+        [0.1,0.1,0.3],[0,0.4,0.4],[1,0.9,0]
+    ]);
+    return function(tilet,alpha){
+        var x = 0.5+m*0.1*(ax*tilet[6]-position[2]*az);
+        var t = clamp(x,0,0.9999);
+        return colormap(t,alpha);
+    };
 }
 
 function draw_line(context,proj,x0,y0,z0,x1,y1,z1){
@@ -347,13 +367,16 @@ function rot(phi,v){
     return [c*v[0]-s*v[1],s*v[0]+c*v[1],v[2]];
 }
 
-function new_light_source(phi,w){
+function new_light_source(gx){
+    var phi = gx.phi;
+    var w = [1,0,0.8];
     var f = new_color_gradient([
         [0.4,0.7,0.64],[0.4,0.7,0.62],[0.5,0.7,0.6],
         [0.8,0.7,0.4],[1,0.76,0],[1,0.96,0.5]
     ]);
     w = normalize(rot(0.5*Math.PI-phi,w));
-    return function(v,a){
+    return function(t,a){
+        var v = t[9];
         var vv = v[0]*v[0]+v[1]*v[1]+v[2]*v[2];
         var s = (v[0]*w[0]+v[1]*w[1]+v[2]*w[2])/Math.sqrt(vv);
         return f(0.5*s+0.5,a);
@@ -384,7 +407,7 @@ function flush_tile_buffer(gx,alpha,lw){
         return y[1]-x[1];
     });
 
-    var colorfn = new_light_source(gx.phi,[1,0,0.8]);
+    var colorfn = new_colorfn(gx);
 
     context.lineWidth = 1;
     context.fillStyle = "#d0d0d0b0";
@@ -397,8 +420,7 @@ function flush_tile_buffer(gx,alpha,lw){
             continue;
         }
         p0 = t[2]; p1 = t[3]; p2 = t[4]; p3 = t[5];
-        // color = colorfn2(0.5+0.2*t[6],alpha);
-        color = colorfn(t[9],alpha);
+        color = colorfn(t,alpha);
         context.fillStyle = color;
         context.beginPath();
         context.moveTo(p0[0],p0[1]);
