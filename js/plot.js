@@ -19,6 +19,7 @@ var extension_table = {};
 var recursion_table = {};
 var post_app_stack = [];
 var freq = 1;
+var iso_mode = 0;
 var sys_mode = 2;
 var sys_xyz = {};
 
@@ -89,7 +90,7 @@ var ftab = {
     _addtt_: add_tensor_tensor, _subtt_: sub_tensor_tensor,
     _mulst_: mul_scalar_tensor, _mulmv_: mul_matrix_vector,
     _mulmm_: mul_matrix_matrix, _mulvv_: scalar_product,
-    _vabs_: abs_vec, _negt_: neg_tensor, sys: sys
+    _vabs_: abs_vec, _negt_: neg_tensor, sys: sys, iso: iso
 };
 
 var cmd_tab = {
@@ -2526,9 +2527,13 @@ function plot_level_async(gx,f,color){
         var r = freq*f(x,y);
         return r-1-Math.floor(r-0.5);
     };
-    plot_level(gx,f,1,false);
+    if(iso_mode==0 || iso_mode==2){
+        plot_level(gx,f,1,false);
+    }
     labels(gx);
-    // plot_zero_set_async(gx,g,color);
+    if(iso_mode>0){
+        plot_zero_set_async(gx,g,color);
+    }
 }
 
 function bisection_bool(state,f,a,b){
@@ -3088,6 +3093,10 @@ function yscale_dec(){
 
 function sys(n){
     sys_mode = n;
+}
+
+function iso(n){
+    iso_mode = n;
 }
 
 function switch_hud(){
