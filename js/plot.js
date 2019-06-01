@@ -2327,10 +2327,6 @@ async function fplot(gx,f,d,cond,color){
         labels(gx);
         busy = false;
         return;
-    }else if(cond){
-        flush(gx);
-        labels(gx);
-        await sleep(20);
     }
     var k = 0;
     for(var depth=0; depth<buffer.length; depth++){
@@ -2338,9 +2334,14 @@ async function fplot(gx,f,d,cond,color){
         var bfn = buffer[depth];
         for(var i=0; i<bfn.length; i++){
             bfn[i]();
-            k++;
+            if(depth!=0) k++;
             if(cond && k==100){k = 0; await sleep(10);}
             if(cancel(pid,index,pid_stack)){return;}
+        }
+        if(depth==0 && cond){
+            flush(gx);
+            labels(gx);
+            await sleep(20);
         }
     }
     flush(gx);
