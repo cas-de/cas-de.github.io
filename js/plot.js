@@ -1783,6 +1783,8 @@ function compile_string(s,argv){
     return compile(t,argv);
 }
 
+var spoint_counter;
+
 function new_point(gx){
     var w = gx.w;
     var h = gx.h;
@@ -1864,6 +1866,7 @@ function new_point(gx){
         var rx = gx.px0+mx*x;
         var ry = gx.py0-my*y;
         fpsets(255,color,rx,ry);
+        spoint_counter++;
     };
     var point = function(color,x,y){
         var px = floor(gx.w2+mx*x);
@@ -2265,6 +2268,38 @@ function cancel(pid,index,pid_stack){
       !Object.is(pid,pid_stack[index]));
 }
 
+function new_fplot_rec(buffer,gx,color,spoint,y0,wy,count){
+    var ya = y0-wy;
+    var yb = y0+wy;
+    var YA = y0-2*wy;
+    var YB = y0+2*wy;
+    return function fplot_rec(depth,f,a,b,d){
+        var delta_max = 0;
+        var y0 = f(a);
+        for(var x=a; x<b; x+=d){
+            var y = f(x);
+            if(YA<y && y<YB){
+                if(ya<y && y<yb){
+                    spoint(color,ax*x,ay*y);
+                }
+                var delta = Math.abs(y-y0);
+                if(delta>delta_max) delta_max = delta;
+            }
+            y0 = y;
+        }
+        if(delta_max>0.02/ay && depth<8){
+            buffer[depth].push(function(){
+                count.value++;
+                var n = 10;
+                var h = (b-a)/n;
+                for(var i=0; i<n; i++){
+                    fplot_rec(depth+1,f,a+h*i,a+h*(i+1),d/n);
+                }
+            });
+        }
+    };
+}
+
 async function fplot(gx,f,d,cond,color){
     var pid = {};
     var index = pid_stack.length;
@@ -2275,22 +2310,38 @@ async function fplot(gx,f,d,cond,color){
     var wy = 0.5*(gx.h+4)/(gx.mx*ay);
     var x0 = (0.5*gx.w-gx.px0)/(gx.mx*ax);
     var y0 = (gx.py0-0.5*gx.h)/(gx.mx*ay);
-    var ya = y0-wy;
-    var yb = y0+wy;
     var k=0;
     d = d/ax;
-    for(var x=x0-wx; x<x0+wx; x+=d){
-        var y = f(x);
-        if(ya<y && y<yb){
-            spoint(color,ax*x,ay*y);
-        }
-        if(cond && k==4000){
-            k=0;
-            await sleep(10);
-        }else{
+    var a = x0-wx;
+    var b = x0+wx;
+    var n = 100;
+    var h = (b-a)/n;
+    var count = {value: 0};
+    var buffer = [[],[],[],[],[],[],[],[]];
+    var fplot_rec = new_fplot_rec(buffer,gx,color,spoint,y0,wy,count);
+    for(var i=0; i<n; i++){
+        fplot_rec(0,f,a+h*i-0.12*h,a+h*(i+1)+0.12*h,d);
+    }
+    if(gx.animation==true){
+        flush(gx);
+        labels(gx);
+        busy = false;
+        return;
+    }else if(cond){
+        flush(gx);
+        labels(gx);
+        await sleep(20);
+    }
+    var k = 0;
+    for(var depth=0; depth<buffer.length; depth++){
+        if(count.value>600) break;
+        var bfn = buffer[depth];
+        for(var i=0; i<bfn.length; i++){
+            bfn[i]();
             k++;
+            if(cond && k==100){k = 0; await sleep(10);}
+            if(cancel(pid,index,pid_stack)){return;}
         }
-        if(cancel(pid,index,pid_stack)) return;
     }
     flush(gx);
     labels(gx);
@@ -2403,14 +2454,13 @@ async function vplot(gx,f,d,cond,color){
 
 async function plot_async(gx,f,color){
     if(gx.sync_mode==true){
-        fplot(gx,f,0.0002,false,color);
-    }else{
         fplot(gx,f,0.01,false,color);
-        if(gx.animation==true) return;
-        while(busy){await sleep(40);}
-        await sleep(40);
-        fplot(gx,f,0.001,true,color);
-        fplot(gx,f,0.0001,true,color);
+    }else{
+        if(gx.animation==true){
+            fplot(gx,f,0.01,false,color);
+        }else{
+            fplot(gx,f,0.01,true,color);
+        }
     }
 }
 
