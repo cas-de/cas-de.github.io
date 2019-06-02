@@ -1,5 +1,10 @@
 
-/*
+// Functionality, superseded or currently not used.
+
+// =====================================
+// Graphing a real function, replaced by
+// a recursive algorithm.
+
 async function fplot(gx,f,d,cond,color){
     var pid = {};
     var index = pid_stack.length;
@@ -46,9 +51,12 @@ async function plot_async(gx,f,color){
         fplot(gx,f,0.0001,true,color);
     }
 }
-*/
 
-/*
+
+// ===============================
+// Graphing a fractal, replaced by
+// a recursive algorithm.
+
 async function plot_fractal(gx,f,n,cond){
     var pid = {};
     var index = pid_stack.length;
@@ -112,4 +120,4 @@ async function plot_fractal_async(gx,f){
         plot_fractal(gx,f,1,true);
     }
 }
-*/
+

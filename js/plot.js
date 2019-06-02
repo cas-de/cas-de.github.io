@@ -2278,16 +2278,16 @@ function new_fplot_rec(buffer,gx,color,spoint,y0,wy,count){
         var y0 = f(a);
         for(var x=a; x<b; x+=d){
             var y = f(x);
-            if(YA<y && y<YB){
-                if(ya<y && y<yb){
-                    spoint(color,ax*x,ay*y);
-                }
+            if(ya<y && y<yb){
+                spoint(color,ax*x,ay*y);
+            }
+            if((ya<y || ya<y0) && (y<yb || y0<yb)){
                 var delta = Math.abs(y-y0);
                 if(delta>delta_max) delta_max = delta;
             }
             y0 = y;
         }
-        if(delta_max>0.02/ay && depth<8){
+        if(delta_max>0.02/ay && depth<6){
             buffer[depth].push(function(){
                 count.value++;
                 var n = 10;
@@ -2317,7 +2317,7 @@ async function fplot(gx,f,d,cond,color){
     var n = 100;
     var h = (b-a)/n;
     var count = {value: 0};
-    var buffer = [[],[],[],[],[],[],[],[]];
+    var buffer = [[],[],[],[],[],[]];
     var fplot_rec = new_fplot_rec(buffer,gx,color,spoint,y0,wy,count);
     for(var i=0; i<n; i++){
         fplot_rec(0,f,a+h*i-0.12*h,a+h*(i+1)+0.12*h,d);
