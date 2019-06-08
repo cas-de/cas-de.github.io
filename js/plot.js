@@ -84,7 +84,7 @@ var ftab = {
     E: eiE, K: eiK, F: eiF, Pi: eiPi,
     RF: RF, RC: RC, RJ: RJ, RD: RD,
     P: set_position, scale: set_scale,
-    zeroes: zeroes, roots: zeroes,
+    zeros: zeros, zeroes: zeros, roots: zeros, Nullstellen: zeros,
     map: map, filter: filter, freq: set_freq, not: not,
     img: plot_img, calc: calc_cmd, len: list_length, cat: list_cat,
     _addtt_: add_tensor_tensor, _subtt_: sub_tensor_tensor,
@@ -563,41 +563,94 @@ function invab(f,x,a,b){
     return m;
 }
 
-function zeroes_push(a,x){
-    var n = a.length;
-    if(n==0 || Math.abs(a[n-1]-x)>1E-10){
-        a.push(x);
+function bisection(f,x,a,b){
+    var s = Math.sign(f(b)-f(a));
+    if(s==0 || isNaN(s)) s = 1;
+    for(var k=0; k<100; k++){
+        var m = 0.5*(a+b);
+        var d = f(m)-x;
+        if(s*d<0) a = m; else b = m;
     }
+    return m;
 }
 
-function zeroes_bisection(f,a,b,n){
-    var zeroes = [];
+function optimize(f,a,b){
+    var n = 100;
+    for(var k=0; k<14; k++){
+        var h = (b-a)/n;
+        var xmin = a;
+        var ymin = Math.abs(f(a));
+        for(var i=1; i<=n; i++){
+            var x = a+h*i;
+            var y = Math.abs(f(x));
+            if(y<ymin){xmin = x; ymin = y;}
+        }
+        a = xmin-h;
+        b = xmin+h;
+    }
+    return xmin;
+}
+
+function zeros_bisection(f,a,b,n){
+    var zeros = [];
     var h = (b-a)/n;
-    var x0,x1,y0,y1,z;
     for(var k=0; k<n; k++){
-        x0 = a+h*k;
-        x1 = a+h*(k+1);
-        y0 = f(x0);
-        y1 = f(x1);
+        var x0 = a+h*k;
+        var x1 = a+h*(k+1);
+        var y0 = f(x0);
+        var y1 = f(x1);
         if(Number.isNaN(y1-y0)) continue;
         if(Math.sign(y0)!=Math.sign(y1)){
-            if(y0==0){
-                zeroes_push(zeroes,x0);
-            }else{
-                z = invab(f,0,x0,x1);
-                if(Number.isFinite(z)){
-                    zeroes_push(zeroes,z);
-                }
-            }
+            var x = bisection(f,0,x0,x1);
+            if(Number.isFinite(x)){zeros.push(x);}
         }
     }
-    return zeroes;
+    return zeros;
 }
 
-function zeroes(f,a,b){
-    if(a==undefined) a=-100;
-    if(b==undefined) b=100;
-    return zeroes_bisection(f,a,b,10000);
+function zeros_uniq(f,a,epsilon){
+    a.sort(function(x,y){return x-y;});
+    var b = [];
+    var k = 0;
+    var n = a.length;
+    while(k<n){
+        var xmin = a[k];
+        var i = k+1;
+        while(i<n && Math.abs(a[i]-a[k])<epsilon){
+            if(Math.abs(f(a[i]))<Math.abs(f(xmin))){xmin = a[i];}
+            i++;
+        }
+        if(Math.abs(f(xmin))<1E-12){
+            if(Math.abs(xmin)<1E-24){
+                b.push(0);
+            }else if(Math.abs(xmin)>0.1){
+                b.push(Math.round(1E14*xmin)/1E14);
+            }else{
+                b.push(xmin);
+            }
+        }
+        k = i;
+    }
+    return b;
+}
+
+function zeros(f,a,b){
+    if(a==undefined) a = -100;
+    if(b==undefined) b = 100;
+    var h = 0.0001;
+    var f1 = function(x){
+        return (f(x+3*h)-9*f(x+2*h)+45*f(x+h)
+            -45*f(x-h)+9*f(x-2*h)-f(x-3*h))/(60*h);
+    };
+    var L = zeros_bisection(f,a,b,100000);
+    var L1 = zeros_bisection(f1,a,b,100000);
+    for(var i=0; i<L1.length; i++){
+        if(Math.abs(f(L1[i]))<1E-6){
+            var x = optimize(f,L1[i]-1E-4,L1[i]+1E-4);
+            if(Math.abs(f(x))<1E-12){L.push(x);}
+        }
+    }
+    return zeros_uniq(f,L,1E-6);
 }
 
 // Arithmetic-geometric mean
@@ -2059,7 +2112,7 @@ function ftos(x,m,a){
     return minus?"\u2212"+s:s;
 }
 
-function strip_zeroes(s){
+function strip_zeros(s){
     var n = s.length;
     var point = false;
     for(var i=0; i<n; i++){
@@ -2077,7 +2130,7 @@ function strip_zeroes(s){
 }
 
 function ftos_strip(x,m){
-    return strip_zeroes(ftos(x,m,1));
+    return strip_zeros(ftos(x,m,1));
 }
 
 function labels(gx){
@@ -2107,7 +2160,7 @@ function labels(gx){
         if(x!=0){
             px = px0+Math.floor(mx*x);
             if(px<xmargin || px>w-xmargin) continue;
-            s = strip_zeroes(ftos(x/ax,ax,1));
+            s = strip_zeros(ftos(x/ax,ax,1));
             if(s.length>9) bulky2 = true;
             if(bulky2){
                 if(mod(x,3)==1) py_adjust=22;
@@ -2131,7 +2184,7 @@ function labels(gx){
             py = py0+Math.floor(mx*y);
             if(py<ymargin || py>h-ymargin) continue;
             s = ftos(-y/ay,ay/4,1);
-            if(ay<2){s=strip_zeroes(s);}
+            if(ay<2){s=strip_zeros(s);}
             context.fillText(s,clamp(px0-10,28+10*(s.length-2),w-16),py+6);
         }
     }
