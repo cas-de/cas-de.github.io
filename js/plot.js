@@ -623,8 +623,13 @@ function zeros_uniq(f,a,epsilon){
         if(Math.abs(f(xmin))<1E-12){
             if(Math.abs(xmin)<1E-24){
                 b.push(0);
-            }else if(Math.abs(xmin)>0.1){
-                b.push(Math.round(1E14*xmin)/1E14);
+            }else if(Math.abs(xmin)>0.001){
+                var xr = Math.round(1E12*xmin)/1E12;
+                if(Math.abs(f(xr))<=Math.abs(f(xmin))){
+                    b.push(xr);
+                }else{
+                    b.push(xmin);
+                }
             }else{
                 b.push(xmin);
             }
@@ -1836,8 +1841,6 @@ function compile_string(s,argv){
     return compile(t,argv);
 }
 
-var spoint_counter;
-
 function new_point(gx){
     var w = gx.w;
     var h = gx.h;
@@ -1919,7 +1922,6 @@ function new_point(gx){
         var rx = gx.px0+mx*x;
         var ry = gx.py0-my*y;
         fpsets(255,color,rx,ry);
-        spoint_counter++;
     };
     var point = function(color,x,y){
         var px = floor(gx.w2+mx*x);
