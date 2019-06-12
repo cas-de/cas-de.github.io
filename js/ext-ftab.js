@@ -897,11 +897,16 @@ function euler_phi(n){
     return Math.round(n*y);
 }
 
+function log(x){
+    console.log(JSON.stringify(x));
+    return x;
+}
+
 function carmichael_lambda(n){
     if(n<1) return NaN;
     if(n==1) return 1;
     var a,i,y;
-    a = factor(n);
+    a = factor(n).slice();
     for(i=0; i<a.length; i++){
         y = a[i];
         if(y[0]==2){
