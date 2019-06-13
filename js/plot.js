@@ -22,6 +22,7 @@ var freq = 1;
 var iso_mode = 0;
 var sys_mode = 2;
 var sys_xyz = {};
+var max_count = 600;
 
 var color_bg = [255,255,255,255];
 var color_axes = [160,160,160];
@@ -2389,7 +2390,7 @@ async function fplot(gx,f,d,cond,color){
     }
     var k = 0;
     for(var depth=0; depth<buffer.length; depth++){
-        if(count.value>600) break;
+        if(count.value>max_count) break;
         var bfn = buffer[depth];
         for(var i=0; i<bfn.length; i++){
             bfn[i]();

@@ -319,13 +319,15 @@ function arrow(gx,color,x,y,vx,vy){
     var m = 20/Math.hypot(vx,vy);
     var x2 = x1+ax*gx.mx*vx;
     var y2 = y1-ay*gx.my*vy;
-    line(gx,color,x1,y1,x2,y2);
-    var a = 0.5*m;
-    var Lb = [0.2,0.14,0.07]
-    for(var i=0; i<Lb.length; i++){
-        var b = Lb[i]*m;
-        line(gx,color,x2,y2,x2-a*vx-b*vy,y2+a*vy-b*vx);
-        line(gx,color,x2,y2,x2-a*vx+b*vy,y2+a*vy+b*vx);
+    if(Math.abs(x2-x1)<200000 && Math.abs(y2-y1)<200000){
+        line(gx,color,x1,y1,x2,y2);
+        var a = 0.5*m;
+        var Lb = [0.2,0.14,0.07]
+        for(var i=0; i<Lb.length; i++){
+            var b = Lb[i]*m;
+            line(gx,color,x2,y2,x2-a*vx-b*vy,y2+a*vy-b*vx);
+            line(gx,color,x2,y2,x2-a*vx+b*vy,y2+a*vy+b*vx);
+        }
     }
 }
 

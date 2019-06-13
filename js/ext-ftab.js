@@ -1244,6 +1244,11 @@ function cdfLog(x,p){
     return s;
 }
 
+function quality_level(n){
+    if(n==undefined) n = 0;
+    max_count = 600*Math.pow(10,n);
+}
+
 extension_table.ftab = {
 PT: ChebyshevT, PU: ChebyshevU, PH: Hermite, 
 PP: Legendre, PL: Laguerre, bc: bc, s1: s1, s2: s2,
@@ -1270,7 +1275,8 @@ cdfF: cdfF, pdfF: pdfF, cdfW: cdfW, pdfW: pdfW,
 cdfGamma: cdfGamma, pdfGamma: pdfGamma,
 cdfBeta: cdfBeta, pdfBeta: pdfBeta, pmfB: pmfB, cdfB: cdfB,
 cmfG: pmfG, cdfG: cdfG, pmfH: pmfH, cdfH: cdfH,
-pmfP: pmfP, cdfP: cdfP, pmfLog: pmfLog, cdfLog: cdfLog
+pmfP: pmfP, cdfP: cdfP, pmfLog: pmfLog, cdfLog: cdfLog,
+level: quality_level
 };
 
 
