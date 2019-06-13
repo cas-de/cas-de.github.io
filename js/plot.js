@@ -931,8 +931,12 @@ function str(x,ftos,newline){
             return x.toString().toLowerCase();
         }
     }else if(x.hasOwnProperty("re")){
-        var sep = x.im<0? "": "+";
-        return [str(x.re),sep,str(x.im),"i"].join("");
+        if(x.im==0){
+            return str(x.re);
+        }else{
+            var sep = x.im<0? "": "+";
+            return [str(x.re),sep,str(x.im),"i"].join("");
+        }
     }else{
         return JSON.stringify(x);
     }
@@ -3072,6 +3076,7 @@ function calculate_eval(t,conf){
         global_definition(t);
     }else{
         if(conf==="complex"){
+            infer_type(t);
             return ccompile(t,[])();
         }else{
             infer_type(t);

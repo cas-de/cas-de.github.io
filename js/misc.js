@@ -10,7 +10,6 @@ async function fplot(gx,f,d,cond,color){
     var index = pid_stack.length;
     pid_stack.push(pid);
     busy = true;
-    spoint_counter = 0;
     var spoint = gx.spoint;
     var wx = 0.5*gx.w/(gx.mx*ax);
     var wy = 0.5*(gx.h+4)/(gx.mx*ay);
@@ -35,7 +34,6 @@ async function fplot(gx,f,d,cond,color){
     }
     flush(gx);
     labels(gx);
-    console.log(spoint_counter);
     busy = false;
 }
 

@@ -523,12 +523,281 @@ function ctable(f,a){
     return buffer.join("");
 }
 
+function cadd_tensor_tensor(a,b){
+    var c = [];
+    for(var i=0; i<a.length; i++){
+        if(Array.isArray(a[i])){
+            c.push(cadd_tensor_tensor(a[i],b[i]));
+        }else{
+            c.push(cadd(a[i],b[i]));
+        }
+    }
+    return c;
+}
+
+function csub_tensor_tensor(a,b){
+    var c = [];
+    for(var i=0; i<a.length; i++){
+        if(Array.isArray(a[i])){
+            c.push(csub_tensor_tensor(a[i],b[i]));
+        }else{
+            c.push(csub(a[i],b[i]));
+        }
+    }
+    return c;
+}
+
+function cmul_scalar_tensor(r,a){
+    var b = [];
+    for(var i=0; i<a.length; i++){
+        if(Array.isArray(a[i])){
+            b.push(cmul_scalar_tensor(r,a[i]));
+        }else{
+            b.push(cmul(r,a[i]));
+        }
+    }
+    return b;
+}
+
+function cneg_tensor(a){
+    return cmul_scalar_tensor({re: -1, im: 0},a);
+}
+
+function cmul_matrix_vector(A,v){
+    var m = A.length;
+    var nv = v.length;
+    var w = [];
+    for(var i=0; i<m; i++){
+        var y = {re: 0, im: 0};
+        var n = Math.min(nv,A[i].length);
+        for(var j=0; j<n; j++){y = cadd(y,cmul(A[i][j],v[j]));}
+        w.push(y);
+    }
+    return w;
+}
+
+function cmul_matrix_matrix(A,B){
+    var m = A.length;
+    var n = B[0].length;
+    var p = A[0].length;
+    var C = [];
+    for(var i=0; i<m; i++){
+        var v = [];
+        for(var j=0; j<n; j++){
+            var y = {re: 0, im: 0};
+            for(var k=0; k<p; k++){y=cadd(y,cmul(A[i][k],B[k][j]));}
+            v.push(y);
+        }
+        C.push(v);
+    }
+    return C;
+}
+
+function cabs_vec(v){
+    var y = 0;
+    for(var i=0; i<v.length; i++){
+        var r = cabs(v[i]);
+        y+=r*r;
+    }
+    return {re: Math.sqrt(y), im: 0};
+}
+
+function cscalar_product(v,w){
+    var n = Math.min(v.length,w.length);
+    var y = {re: 0, im: 0};
+    for(var i=0; i<n; i++){
+        y = cadd(y,cmul(conj(v[i]),w[i]));
+    }
+    return y;
+}
+
+function cidm(n){
+    var a = [];
+    for(var i=0; i<n; i++){
+        var t = [];
+        for(var j=0; j<n; j++){t.push({re: i==j?1:0, im: 0});}
+        a.push(t);
+    }
+    return a;
+}
+
+function copy_array(a){
+    var b = [];
+    for(var i=0; i<a.length; i++){
+        if(Array.isArray(a[i])){
+            b.push(copy_array(a[i]));
+        }else{
+            b.push(a[i]);
+        }
+    }
+    return b;
+}
+
+function cmul_inplace(r,v){
+    for(var i=0; i<v.length; i++){
+        v[i] = cmul(r,v[i]);
+    }
+}
+
+function cmul_add_inplace(a,v,b,w){
+    for(var i=0; i<v.length; i++){
+        v[i] = cadd(cmul(a,v[i]),cmul(b,w[i]));
+    }
+}
+
+function swap(a,i,j){
+    var t = a[i];
+    a[i] = a[j];
+    a[j] = t;
+}
+
+function cpivoting(A,B,n,j){
+    var m = cabs(A[j][j]);
+    var k = j;
+    for(var i=j+1; i<n; i++){
+        if(m<cabs(A[i][j])){
+            m = cabs(A[i][j]);
+            k = i;
+        }
+    }
+    swap(A,k,j);
+    swap(B,k,j);
+}
+
+function cgauss_jordan(A,B,n){
+    var i,j;
+    for(j=0; j<n; j++){
+        cpivoting(A,B,n,j);
+        cmul_inplace(crdiv(1,A[j][j]),B[j]);
+        cmul_inplace(crdiv(1,A[j][j]),A[j]);
+        for(i=j+1; i<n; i++){
+            if(A[i][j]!=0){
+                cmul_add_inplace(crdiv(1,A[i][j]),B[i],{re:-1,im:0},B[j]);
+                cmul_add_inplace(crdiv(1,A[i][j]),A[i],{re:-1,im:0},A[j]);
+            }
+        }
+    }
+    for(i=0; i<n-1; i++){
+        for(j=i+1; j<n; j++){
+            cmul_add_inplace({re:1,im:0},B[i],cneg(A[i][j]),B[j]);
+            cmul_add_inplace({re:1,im:0},A[i],cneg(A[i][j]),A[j]);
+        }
+    }
+    return B;
+}
+
+function cmatrix_inv(A){
+    var n = A[0].length;
+    var E = cidm(n);
+    A = copy_array(A);
+    return cgauss_jordan(A,E,n);
+}
+
+function cmatrix_pow(A,n){
+    n = n.re;
+    if(n<0){
+        A = cmatrix_inv(A);
+        n = -n;
+    }else if(n==0){
+        return cidm(A.length);
+    }
+    n--;
+    var M = A;
+    while(n>0){
+        if(n%2==1){
+            M = cmul_matrix_matrix(M,A);
+        }
+        A = cmul_matrix_matrix(A,A);
+        n = Math.floor(n/2);
+    }
+    return M;
+}
+
+function cpivoting_det(A,n,j){
+    var m = cabs(A[j][j]);
+    var k = j;
+    for(var i=j+1; i<n; i++){
+        if(m<cabs(A[i][j])){
+            m = cabs(A[i][j]);
+            k = i;
+        }
+    }
+    if(k==j){
+        return false;
+    }else{
+        swap(A,k,j);
+        return true;
+    }
+}
+
+function cgauss_det(A,n){
+    A = copy_array(A);
+    var y = {re: 1, im: 0};
+    for(var j=0; j<n; j++){
+        if(cpivoting_det(A,n,j)){y = cneg(y);}
+        for(var i=j+1; i<n; i++){
+            if(A[i][j].re!=0 || A[i][j].im!=0){
+                y = cdiv(y,A[j][j]);
+                cmul_add_inplace(A[j][j],A[i],cneg(A[i][j]),A[j]);
+            }
+        }
+        y = cmul(y,A[j][j]);
+    }
+    return y;
+}
+
+function cdet(A){
+    var n = A.length;
+    if(n==2){
+        return csub(cmul(A[0][0],A[1][1]),cmul(A[0][1],A[1][0]));
+    }else if(n==3){
+        var M00 = csub(cmul(A[1][1],A[2][2]),cmul(A[1][2],A[2][1]));
+        var M10 = csub(cmul(A[0][1],A[2][2]),cmul(A[0][2],A[2][1]));
+        var M20 = csub(cmul(A[0][1],A[1][2]),cmul(A[0][2],A[1][1]));
+        return cadd(
+            csub(cmul(A[0][0],M00),cmul(A[1][0],M10)),
+            cmul(A[2][0],M20)
+        );
+    }else{
+        return cgauss_det(A,n);
+    }
+}
+
+function ctrace(A){
+    var n = A.length;
+    var y = {re: 0, im: 0};
+    for(var i=0; i<n; i++){
+        y = cadd(y,A[i][i]);
+    }
+    return y;
+}
+
+function transpose(A){
+    var m = A.length;
+    var n = A[0].length;
+    var B = [];
+    for(var j=0; j<n; j++){
+        var v = [];
+        for(var i=0; i<m; i++){
+            v.push(A[i][j]);
+        }
+        B.push(v);
+    }
+    return B;
+}
+
 extension_table.ftab = {
     Si: "cSi", Ci: "cCi", Ci90: "cCi90", Cin: "cCin",
     E1: "cE1", Ei: "cEi", Ein: "cEin", li: "cli", Li: "cLi",
     zeta: "czeta_variadic", pseq: "cprime_sequence",
     psi: "cpsi", ff: "cffac", rf: "crfac", bc: "cbc",
     erf: "cerf", erfc: "cerfc", B: "cbernoulliB", Bm: "cbernoulliBm",
-    table: "ctable", Wertetabelle: "ctable"
+    table: "ctable", Wertetabelle: "ctable",
+    _addtt_: "cadd_tensor_tensor", _subtt_: "csub_tensor_tensor",
+    _mulst_: "cmul_scalar_tensor", _mulmv_: "cmul_matrix_vector",
+    _mulmm_: "cmul_matrix_matrix", _mulvv_: "cscalar_product",
+    _vabs_: "cabs_vec", _negt_: "cneg_tensor",
+    _matrix_pow_: "cmatrix_pow", det: "cdet",
+    tr: "ctrace", tp: "transpose"
 };
 

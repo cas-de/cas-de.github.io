@@ -609,9 +609,9 @@ function ccompile_expression(a,t,context){
             ccompile_block(a,t,context);
         }else if(op=="index"){
             ccompile_expression(a,t[1],context);
-            a.push("[");
+            a.push("[(");
             ccompile_expression(a,t[2],context);
-            a.push("]");
+            a.push(").re]");
         }else if(op=="if"){
             a.push("((");
             ccompile_expression(a,t[1],context);
@@ -804,6 +804,7 @@ function move_refresh(gx){
 function plot_node(gx,t,color){
     var index = document.getElementById("method").value;
     img_color = color_method_tab[index];  
+    infer_type(t);
     var f = ccompile(t,["z"]);
     cplot_async(gx,f);
 }
@@ -814,6 +815,8 @@ function global_definition(t){
         var value = ccompile(t[2],app.slice(1));
         cftab[app[0]] = value;
     }else{
+        var T = infer_type(t[2]);
+        if(T!==TypeNumber) id_type_table[t[1]] = T;
         var value = ccompile(t[2],[]);
         cftab[t[1]] = value();
     }
