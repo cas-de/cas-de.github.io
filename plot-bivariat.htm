@@ -21,7 +21,7 @@
 <input type="button" value="+" onclick="xyzscale_inc()"> 
 <input type="button" value="&minus;" onclick="xyzscale_dec()">
 <br>
-<input type="text" id="inputf"
+<input type="text" id="inputf" spellcheck="false"
 onkeyup="keys(event);" value="4sinc(hypot(x,y)/2)">
 
 <br>
@@ -35,7 +35,8 @@ onkeyup="keys(event);" value="4sinc(hypot(x,y)/2)">
 <a href="doc.htm">Hilfe</a>
 <br><br>
 <input type="button" value="Berechne" onclick="calc()">
-<input type="text" id="input-calc" onkeyup="keys_calc(event);">
+<input type="text" id="input-calc" spellcheck="false"
+onkeyup="keys_calc(event);">
 <div id="calc-out" class="mono"></div>
 </div>
 </table>

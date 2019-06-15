@@ -22,7 +22,7 @@
 <input type="button" value="+" onclick="xyscale_inc()"> 
 <input type="button" value="&minus;" onclick="xyscale_dec()">
 <br>
-<input type="text" id="inputf"
+<input type="text" id="inputf" spellcheck="false"
 onkeyup="keys(event);" value="t*e^(i*pi*t); t0:=0, t1:=4">
 
 <br>
@@ -38,7 +38,8 @@ onkeyup="keys(event);" value="t*e^(i*pi*t); t0:=0, t1:=4">
 &nbsp;<a href="doc-komplex.htm">Hilfe</a>
 <br><br>
 <input type="button" value="Berechne" onclick="calc()">
-<input type="text" id="input-calc" onkeyup="keys_calc(event);">
+<input type="text" id="input-calc" spellcheck="false"
+onkeyup="keys_calc(event);">
 <div id="calc-out" class="mono"></div>
 </div>
 </table>
