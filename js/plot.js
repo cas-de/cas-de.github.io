@@ -3089,7 +3089,7 @@ function calculate_eval(t,conf){
 function calculate(conf){
     var input = get_value("input-calc");
     var out = document.getElementById("calc-out");
-    if(input.length==0){
+    if(input.trim().length==0){
         out.innerHTML = "";
         return;
     }

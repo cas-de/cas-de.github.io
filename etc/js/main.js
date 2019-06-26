@@ -26,6 +26,7 @@ var valid_bbcode = {
 
 var argc_table = {
 "frac": 2,
+"tfrac": 2,
 "mathrm": 1,
 "mathbf": 1,
 "mathbb": 1,
@@ -59,7 +60,10 @@ var argc_table = {
 "end": 1,
 "tilde": 1,
 "hat": 1,
-"text": 1
+"text": 1,
+"pmod": 1,
+"mod": 1,
+"pod": 1
 };
 
 var opt_table = {
@@ -128,6 +132,7 @@ var macro_tab_mathml = {
 "bigcup": "<mo>⋃</mo>",
 "bigwedge": "<mo>⋀ </mo>",
 "bigvee": "<mo>⋁</mo>",
+"bmod": "<mo lspace='6px' rspace='6px'>mod</mo>",
 
 "langle": "<mo stretchy='false'>&lang;</mo>",
 "rangle": "<mo stretchy='false'>&rang;</mo>",
@@ -1086,6 +1091,23 @@ function tex_macro_mathml(buffer,id,a,opt,context){
         buffer.push("<mo stretchy='true'>&OverBrace;</mo></mover>");
     }else if(id=="_limits_" || id=="_nolimits_"){
         tex_export_mathml(buffer,a[0],context);
+    }else if(id=="tfrac"){
+        buffer.push("<mfrac style='font-size: 11pt'>");
+        tex_export_mathml(buffer,a[0],context);
+        tex_export_mathml(buffer,a[1],context);
+        buffer.push("</mfrac>");
+    }else if(id=="pmod"){
+        buffer.push("<mrow><mspace width='15px'/><mo>(mod</mo><mspace width='3px'/>");
+        tex_export_mathml(buffer,a[0],context);
+        buffer.push("<mo>)</mo></mrow>");
+    }else if(id=="pod"){
+        buffer.push("<mrow><mspace width='14px'/><mo>(</mo>");
+        tex_export_mathml(buffer,a[0],context);
+        buffer.push("<mo>)</mo></mrow>");
+    }else if(id=="mod"){
+        buffer.push("<mrow><mspace width='15px'/><mo>mod</mo><mspace width='3px'/>");
+        tex_export_mathml(buffer,a[0],context);
+        buffer.push("</mrow>");
     }else{
         buffer.push("<mo>\\"+id+"</mo>");
     }
