@@ -253,21 +253,37 @@ function slider(t){
     slider.setAttribute("max","100");
     slider.setAttribute("value","0");
     if(graphics.w>540){
-        slider.setAttribute("style","width: 14em;");
+        slider.setAttribute("style","width: 280px;");
     }
+
+    var out = document.createElement("span");
+    out.innerHTML = range[0];
+
     slider.addEventListener("input",function(){
         var t = this.value/100;
         ftab[id] = range[0]*(1-t)+range[1]*t;
         graphics.animation = true;
+        out.innerHTML = ftos_strip(ftab[id],100/Math.abs(range[1]-range[0]));
         update(graphics);
     });
     slider.addEventListener("change",function(){
         graphics.animation = false;
         update(graphics);
     });
+    var style = [
+        "border-left: 6px solid #a0a0a0;",
+        "padding-left: 10px;",
+        "margin-top: 8px; margin-bottom: 8px;",
+        "font-size: 60%"
+    ].join("");
+    
     var content = document.createElement("div");
-    content.innerHTML = id+": ";
+    content.style = style;
+    content.appendChild(document.createTextNode(id+": "));
+    content.appendChild(out);
+    content.appendChild(document.createElement("br"));
     content.appendChild(slider);
+
     var adds = document.getElementById("adds");
     adds.appendChild(content);
 }
@@ -402,5 +418,4 @@ extension_table.cmd = {
     "=": equation, slider: slider, Regler: slider,
     ani: ani, vec: vec, line: cmd_line, chain: cmd_chain
 };
-
 
