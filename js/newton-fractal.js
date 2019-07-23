@@ -82,6 +82,8 @@ async function plot_fractal_async(gx,f){
         newton_fractal(gx,f,1,false);
     }else if(refresh){
         newton_fractal(gx,f,20,false);
+    }else if(gx.animation){
+        newton_fractal(gx,f,10,false);
     }else{
         newton_fractal(gx,f,4,false);
         while(busy){await sleep(40);}
