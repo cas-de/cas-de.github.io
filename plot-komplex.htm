@@ -7,6 +7,14 @@
   <link rel="stylesheet" href="css/ui-dark.css">
   <script src = "js/plot.js"></script>
   <script src = "js/plot-complex.js"></script>
+  <script>
+color_dark_axes = [80,80,80];
+dark = true;
+
+function move_refresh(gx){
+    update(gx);
+}
+  </script>
 </head>
 <body>
 
@@ -25,8 +33,8 @@
 onkeyup="keys(event);" value="z">
 
 <br>
-<div id="out" class="mono">
-</div>
+<div id="adds"></div>
+<div id="out" class="mono"></div>
 <div class="hud" id="hud">
 <input type="button" value="x+" onclick="xscale_inc()">
 <input type="button" value="x&minus;" onclick="xscale_dec()">

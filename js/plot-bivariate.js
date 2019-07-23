@@ -97,8 +97,6 @@ var gtile = 1;
 var new_proj = new_proj_parallel;
 var proj_distance = 100;
 
-var move_mode = false;
-
 function float_re(x){
     return typeof x=="object"?x.re:x;
 }
@@ -108,7 +106,7 @@ var theta_min = theta_max-Math.PI;
 
 function mouse_move_handler(e){
     if(e.buttons==1){
-        move_mode = true;
+        refresh = true;
         var gx = graphics;
         pid_stack = [];
         var dx = e.clientX-clientXp;
@@ -124,17 +122,10 @@ function mouse_move_handler(e){
     }
 }
 
-function mouse_up_handler(e){
-    if(move_mode){
-        move_mode = false;
-        update(graphics);
-    }
-}
-
 function touch_move(e){
     if(e.touches.length!=0){
         e = e.touches[0];
-        move_mode = true;
+        refresh = true;
         var gx = graphics;
         pid_stack = [];
         var dx = e.clientX-clientXp;
@@ -152,13 +143,6 @@ function touch_start(e){
         e = e.touches[0];
         clientXp = e.clientX;
         clientYp = e.clientY;
-    }
-}
-
-function touch_end(){
-    if(move_mode){
-        move_mode = false;
-        update(graphics);
     }
 }
 
@@ -734,7 +718,7 @@ function plot_node_bivariate(gx,t,index){
     }else if(Array.isArray(t) && t[0]==="="){
         var f = compile(t[1],["x","y"]);
         var z0 = compile(t[2],[])();
-        if(move_mode){
+        if(refresh){
             plot_level_set(gx,f,z0,1,0.4,12,0.4,false);
         }else{
             plot_level_set(gx,f,z0,10,0.1,12,0.2,false);
@@ -747,9 +731,7 @@ function plot_node_bivariate(gx,t,index){
                 plot_curve(gx,f);
             }else{
                 var f = compile(t,["u","v"]);
-                if(move_mode){
-                    plot_psf(gx,f,1,1,1);
-                }else if(gx.animation==true){
+                if(refresh || gx.animation){
                     plot_psf(gx,f,1,1,1);
                 }else{
                     plot_psf(gx,f,m*0.5,gstep[0]*2/m,gstep[1]*2/m);
@@ -757,9 +739,9 @@ function plot_node_bivariate(gx,t,index){
             }
         }else{
             var f = compile(t,["x","y"]);
-            if(move_mode){
+            if(refresh){
                 plot_sf(gx,f,1,1,1);
-            }else if(gx.animation==true){
+            }else if(gx.animation){
                 plot_sf(gx,f,1,1,1);
             }else{
                 plot_sf(gx,f,m*0.25,gstep[0]*4/m,gstep[1]*4/m);
@@ -779,7 +761,7 @@ function plot_node_relief(gx,t,index){
     };
     pftab = cftab;
     var m = gtile;
-    if(move_mode){
+    if(refresh || gx.animation){
         plot_sf(gx,f,1,1,1);
     }else{
         plot_sf(gx,f,m*0.25,gstep[0]*4/m,gstep[1]*4/m);

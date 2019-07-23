@@ -245,7 +245,7 @@ function slider(t){
     
     var range = [a,b];
     slider_table[id] = range;
-    ftab[id] = a;
+    ftab_set(id,a);
 
     var slider = document.createElement("input");
     slider.setAttribute("type","range");
@@ -261,9 +261,10 @@ function slider(t){
 
     slider.addEventListener("input",function(){
         var t = this.value/100;
-        ftab[id] = range[0]*(1-t)+range[1]*t;
+        var x = range[0]*(1-t)+range[1]*t;
+        ftab_set(id,x);
         graphics.animation = true;
-        out.innerHTML = ftos_strip(ftab[id],100/Math.abs(range[1]-range[0]));
+        out.innerHTML = ftos_strip(x,100/Math.abs(range[1]-range[0]));
         update(graphics);
     });
     slider.addEventListener("change",function(){

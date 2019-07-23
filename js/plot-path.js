@@ -1,5 +1,4 @@
 
-dark = false;
 cftab["t0"] = complex(0,0);
 cftab["t1"] = complex(2*Math.PI,0);
 

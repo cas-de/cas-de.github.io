@@ -12,7 +12,6 @@
 function plot_node(gx,t,index){plot_node_relief(gx,t,index);}
 cftab["d"] = function(z){return {re:set_distance(z.re),im:0};};
 cftab["alpha"] = {re:0.94,im:0};
-dark = false;
   </script>
 </head>
 <body>
@@ -32,8 +31,8 @@ dark = false;
 onkeyup="keys(event);" value="|z|">
 
 <br>
-<div id="out" class="mono">
-</div>
+<div id="adds"></div>
+<div id="out" class="mono"></div>
 <div class="hud" id="hud">
 <input type="button" value="w+" onclick="zscale_inc()"> 
 <input type="button" value="w&minus;" onclick="zscale_dec()">

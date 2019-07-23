@@ -1,6 +1,13 @@
 
 "use strict";
 
+color_dark_axes = [80,80,80];
+dark = true;
+
+function move_refresh(gx){
+    update(gx);
+}
+
 var tau = 2*Math.PI;
 cftab["N"] = {re:40,im:0};
 cftab["r"] = {re:10,im:0};
@@ -73,8 +80,7 @@ async function newton_fractal(gx,f,n,cond){
 async function plot_fractal_async(gx,f){
     if(gx.sync_mode==true){
         newton_fractal(gx,f,1,false);
-    }else if(plot_refresh){
-        plot_refresh = false;
+    }else if(refresh){
         newton_fractal(gx,f,20,false);
     }else{
         newton_fractal(gx,f,4,false);

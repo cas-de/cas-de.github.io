@@ -2224,23 +2224,23 @@ function flush(gx){
     gx.context.putImageData(gx.img,0,0);
 }
 
-var clientXp=0;
-var clientYp=0;
-var moved = false;
+var clientXp = 0;
+var clientYp = 0;
+var refresh = false;
 
-function refresh(gx){
+function refresh_system(gx){
     clear_system(gx);
     flush(gx);
     labels(gx);
 }
 
 function move_refresh(gx){
-    refresh(gx);
+    refresh_system(gx);
 }
 
 function mouse_move_handler(e){
     if(e.buttons==1){
-        moved = true;
+        refresh = true;
         var gx = graphics;
         pid_stack = [];
         var dx = e.clientX-clientXp;
@@ -2258,16 +2258,16 @@ function mouse_move_handler(e){
 }
 
 function mouse_up_handler(e){
-    if(moved){
+    if(refresh){
+        refresh = false;
         update(graphics);
-        moved = false;
     }
 }
 
 function touch_move(e){
     if(e.touches.length!=0){
         e = e.touches[0];
-        moved = true;
+        refresh = true;
         var gx = graphics;
         pid_stack = [];
         var dx = e.clientX-clientXp;
@@ -2290,9 +2290,9 @@ function touch_start(e){
 }
 
 function touch_end(){
-    if(moved){
+    if(refresh){
+        refresh = false;
         update(graphics);
-        moved = false;
     }
 }
 
@@ -2315,7 +2315,7 @@ function new_system(last_gx){
         canvas.addEventListener("touchend", touch_end, false);
         canvas.addEventListener("touchmove", touch_move, false);
     }
-    refresh(gx);
+    refresh_system(gx);
 
     return gx;
 }
@@ -2382,7 +2382,7 @@ async function fplot(gx,f,d,cond,color){
     for(var i=0; i<n; i++){
         fplot_rec(0,f,a+h*i-0.12*h,a+h*(i+1)+0.12*h,d);
     }
-    if(gx.animation==true){
+    if(gx.animation){
         flush(gx);
         labels(gx);
         busy = false;
@@ -2517,7 +2517,7 @@ async function plot_async(gx,f,color){
     if(gx.sync_mode==true){
         fplot(gx,f,0.01,false,color);
     }else{
-        if(gx.animation==true){
+        if(gx.animation){
             fplot(gx,f,0.01,false,color);
         }else{
             fplot(gx,f,0.01,true,color);
@@ -2529,7 +2529,7 @@ async function plot_zero_set_async(gx,f,color){
     if(gx.sync_mode==true){
         plot_zero_set(gx,f,1,14,false,color);
     }else{
-        if(gx.animation==true){
+        if(gx.animation){
             plot_zero_set(gx,f,40,10,false,color);
             return;
         }
@@ -2545,7 +2545,7 @@ async function vplot_async(gx,f,color){
         vplot(gx,f,0.001,false,color);
     }else{
         vplot(gx,f,0.01,false,color);
-        if(gx.animation==true) return;
+        if(gx.animation) return;
         while(busy){await sleep(40);}
         await sleep(40);
         vplot(gx,f,0.001,true,color);
@@ -3034,9 +3034,9 @@ function plot(gx){
                 eval_statements(t[i]);
             }
             t = t[1];
-            if(t===null){refresh(gx); return;}
+            if(t===null){refresh_system(gx); return;}
         }
-        refresh(gx);
+        refresh_system(gx);
         if(Array.isArray(t) && t[0]==="block"){
             for(var i=1; i<t.length; i++){
                 if(Array.isArray(t[i]) && t[i][0]===":="){
@@ -3054,7 +3054,7 @@ function plot(gx){
             }
         }
     }else{
-        refresh(gx);
+        refresh_system(gx);
     }
 }
 
@@ -3347,6 +3347,10 @@ function calc_img(){
     var input = document.getElementById("input-calc");
     input.value = "img(540,360)";
     calc();
+}
+
+function ftab_set(id,value){
+    ftab[id] = value;
 }
 
 function process_post_applications(){

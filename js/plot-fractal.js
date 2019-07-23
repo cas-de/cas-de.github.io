@@ -1,6 +1,13 @@
 
 "use strict";
 
+color_dark_axes = [80,80,80];
+dark = true;
+
+function move_refresh(gx){
+    update(gx);
+}
+
 var tau = 2*Math.PI;
 cftab["z0"] = function(c){return {re:0,im:0};};
 cftab["N"] = {re:200,im:0};
@@ -206,9 +213,10 @@ async function plot_fractal_tree(gx,f,n,cond){
 async function plot_fractal_async(gx,f){
     if(gx.sync_mode==true){
         plot_fractal_tree(gx,f,1,false);
-    }else if(plot_refresh){
-        plot_refresh = false;
+    }else if(refresh){
         plot_fractal_tree(gx,f,20,false);
+    }else if(gx.animation){
+        plot_fractal_tree(gx,f,10,false);
     }else{
         plot_fractal_tree(gx,f,4,false);
         while(busy){await sleep(40);}

@@ -42,7 +42,7 @@ async function plot_async(gx,f,color){
         fplot(gx,f,0.0002,false,color);
     }else{
         fplot(gx,f,0.01,false,color);
-        if(gx.animation==true) return;
+        if(gx.animation) return;
         while(busy){await sleep(40);}
         await sleep(40);
         fplot(gx,f,0.001,true,color);
@@ -108,7 +108,7 @@ async function plot_fractal(gx,f,n,cond){
 async function plot_fractal_async(gx,f){
     if(gx.sync_mode==true){
         plot_fractal(gx,f,1,false);
-    }else if(plot_refresh){
+    }else if(refresh){
         plot_refresh = false;
         plot_fractal(gx,f,20,false);
     }else{

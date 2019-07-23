@@ -234,9 +234,9 @@ function plot_node(gx,t,index){
     infer_type(t);
     var f = compile(t,["x","y","z"]);
     var m = gtile;
-    if(move_mode){
+    if(refresh){
         plot_implicit_sf(gx,f,2,1,1,4/ax);
-    }else if(gx.animation==true){
+    }else if(gx.animation){
         plot_implicit_sf(gx,f,1,2,2,4/ax);
     }else{
         plot_implicit_sf(gx,f,m*0.5,gstep[0]*4/m,gstep[1]*4/m,1.2/ax);

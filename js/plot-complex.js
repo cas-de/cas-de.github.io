@@ -783,22 +783,16 @@ async function cplot(gx,f,n,cond){
 async function cplot_async(gx,f){
     if(gx.sync_mode==true){
         cplot(gx,f,1,false);
-    }else if(plot_refresh){
-        plot_refresh = false;
+    }else if(refresh){
         cplot(gx,f,20,false);
+    }else if(gx.animation){
+        cplot(gx,f,10,false);
     }else{
         cplot(gx,f,4,false);
         while(busy){await sleep(40);}
         await sleep(40);
         cplot(gx,f,1,true);
     }
-}
-
-var plot_refresh = false;
-
-function move_refresh(gx){
-    plot_refresh = true;
-    update(gx);
 }
 
 function plot_node(gx,t,color){
@@ -830,7 +824,8 @@ function cplot_img(w,h){
     return plot_img(w.re,h.re);
 }
 
-color_dark_axes = [80,80,80];
-dark = true;
+function ftab_set(id,value){
+    cftab[id] = {re: value, im: 0};
+}
 
 

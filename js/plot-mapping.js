@@ -1,4 +1,8 @@
 
+function move_refresh(gx){
+    update(gx);
+}
+
 async function plot_net(gx,f,d,cond){
     var pid = {};
     var index = pid_stack.length;
@@ -46,7 +50,7 @@ async function plot_net(gx,f,d,cond){
 async function plot_net_async(gx,f){
     if(gx.sync_mode==true){
         plot_net(gx,f,0.002,false);
-    }else if(plot_refresh){
+    }else if(refresh || gx.animation){
         plot_refresh = false;
         plot_net(gx,f,0.1,false);
     }else{
@@ -62,4 +66,3 @@ function plot_node(gx,t,color){
     plot_net_async(gx,f);
 }
 
-dark = false;
