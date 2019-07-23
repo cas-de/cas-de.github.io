@@ -230,6 +230,11 @@ function equation(t){
     eval_node(t);
 }
 
+function round_prec(x,n){
+    var m = Math.pow(10,n);
+    return Math.round(m*x)/m;
+}
+
 var slider_table = {};
 
 function slider(t){
@@ -262,9 +267,12 @@ function slider(t){
     slider.addEventListener("input",function(){
         var t = this.value/100;
         var x = range[0]*(1-t)+range[1]*t;
+        var size = 100/Math.abs(range[1]-range[0]);
+        var n = 1+Math.round(Math.max(0,lg(size)));
+        x = round_prec(x,n);
         ftab_set(id,x);
         graphics.animation = true;
-        out.innerHTML = ftos_strip(x,100/Math.abs(range[1]-range[0]));
+        out.innerHTML = x;
         update(graphics);
     });
     slider.addEventListener("change",function(){
