@@ -71,7 +71,8 @@ function exterior_product(ax,ay,bx,by){
     return ax*by-bx*ay;
 }
 
-function plot_implicit_sf(gx,f,d,xstep,ystep,epsilon){
+function plot_implicit_sf(gx,f,index,d,xstep,ystep,epsilon){
+    index = index % color_gradient_table.length;
     var x,y,z,w00,v;
     var kx,ky,kz;
     var context = gx.context;
@@ -219,7 +220,7 @@ function plot_implicit_sf(gx,f,d,xstep,ystep,epsilon){
         v[2] = sign*v[2];
 
         tile_buffer.push([TILE,s*p00[1]-c*p00[0],p0,p1,p2,p3,p00[2],
-            mesh_cond(kx/xstep),mesh_cond(ky/ystep),v]);
+            mesh_cond(kx/xstep),mesh_cond(ky/ystep),v,index]);
     }
 }
 
@@ -235,10 +236,10 @@ function plot_node(gx,t,index){
     var f = compile(t,["x","y","z"]);
     var m = gtile;
     if(refresh){
-        plot_implicit_sf(gx,f,2,1,1,4/ax);
+        plot_implicit_sf(gx,f,index,2,1,1,4/ax);
     }else if(gx.animation){
-        plot_implicit_sf(gx,f,1,2,2,4/ax);
+        plot_implicit_sf(gx,f,index,1,2,2,4/ax);
     }else{
-        plot_implicit_sf(gx,f,m*0.5,gstep[0]*4/m,gstep[1]*4/m,1.2/ax);
+        plot_implicit_sf(gx,f,index,m*0.5,gstep[0]*4/m,gstep[1]*4/m,1.2/ax);
     }
 }

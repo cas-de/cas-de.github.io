@@ -351,19 +351,24 @@ function rot(phi,v){
     return [c*v[0]-s*v[1],s*v[0]+c*v[1],v[2]];
 }
 
+var color_gradient_table = [
+    [[0.4,0.7,0.64],[0.4,0.7,0.62],[0.5,0.7,0.6],
+     [0.8,0.7,0.4],[1,0.76,0],[1,0.96,0.5]],
+    [[0.6,0.3,0.5],[0.5,0.8,0.9],[0.94,0.98,1]],
+    [[0.2,0.1,0.3],[0.8,0.6,0.5],[0.9,0.9,0.8]],
+    [[0.04,0.2,0.3],[0.5,0.7,0.6],[1,1,0.9]]
+];
+
 function new_light_source(gx){
     var phi = gx.phi;
     var w = [1,0,0.8];
-    var f = new_color_gradient([
-        [0.4,0.7,0.64],[0.4,0.7,0.62],[0.5,0.7,0.6],
-        [0.8,0.7,0.4],[1,0.76,0],[1,0.96,0.5]
-    ]);
+    var gradient = color_gradient_table.map(new_color_gradient);
     w = normalize(rot(0.5*Math.PI-phi,w));
     return function(t,a){
         var v = t[9];
         var vv = v[0]*v[0]+v[1]*v[1]+v[2]*v[2];
         var s = (v[0]*w[0]+v[1]*w[1]+v[2]*w[2])/Math.sqrt(vv);
-        return f(0.5*s+0.5,a);
+        return gradient[t[10]](0.5*s+0.5,a);
     };
 }
 
@@ -467,7 +472,8 @@ function mesh_cond(x){
     return Math.abs(x-Math.floor(x+0.5))<0.001;
 }
 
-function plot_sf(gx,f,d,xstep,ystep){
+function plot_sf(gx,f,index,d,xstep,ystep){
+    index = index % color_gradient_table.length;
     var x,y,z00,z01,z10,z11,u,v,e;
     var p0,p1,p2,p3;
     var context = gx.context;
@@ -504,7 +510,7 @@ function plot_sf(gx,f,d,xstep,ystep){
             p3 = proj(u+dx,v,z10-z0);
             e = [dy*(z00-z10),dx*(z00-z01),dx*dy];
             a.push([TILE,s*v-c*u,p0,p1,p2,p3,z00,
-                mesh_cond(kx/xstep),mesh_cond(ky/ystep),e]);
+                mesh_cond(kx/xstep),mesh_cond(ky/ystep),e,index]);
             ky++;
         }
         kx++;
@@ -519,7 +525,8 @@ function exterior_product(ax,ay,bx,by){
     return ax*by-bx*ay;
 }
 
-function plot_psf(gx,f,d,ustep,vstep){
+function plot_psf(gx,f,index,d,ustep,vstep){
+    index = index % color_gradient_table.length;
     var context = gx.context;
     var proj = gx.proj;
     var c = Math.cos(gx.phi);
@@ -570,7 +577,7 @@ function plot_psf(gx,f,d,ustep,vstep){
             e[2] = sign*e[2];
 
             a.push([TILE,-gxt-gyt,p0,p1,p2,p3,p00[2],
-                mesh_cond(ku/ustep),mesh_cond(kv/vstep),e]);
+                mesh_cond(ku/ustep),mesh_cond(kv/vstep),e,index]);
             kv++;
         }
         ku++;
@@ -732,19 +739,19 @@ function plot_node_bivariate(gx,t,index){
             }else{
                 var f = compile(t,["u","v"]);
                 if(refresh || gx.animation){
-                    plot_psf(gx,f,1,1,1);
+                    plot_psf(gx,f,index,1,1,1);
                 }else{
-                    plot_psf(gx,f,m*0.5,gstep[0]*2/m,gstep[1]*2/m);
+                    plot_psf(gx,f,index,m*0.5,gstep[0]*2/m,gstep[1]*2/m);
                 }
             }
         }else{
             var f = compile(t,["x","y"]);
             if(refresh){
-                plot_sf(gx,f,1,1,1);
+                plot_sf(gx,f,index,1,1,1);
             }else if(gx.animation){
-                plot_sf(gx,f,1,1,1);
+                plot_sf(gx,f,index,1,1,1);
             }else{
-                plot_sf(gx,f,m*0.25,gstep[0]*4/m,gstep[1]*4/m);
+                plot_sf(gx,f,index,m*0.25,gstep[0]*4/m,gstep[1]*4/m);
             }
         }
     }
@@ -762,9 +769,9 @@ function plot_node_relief(gx,t,index){
     pftab = cftab;
     var m = gtile;
     if(refresh || gx.animation){
-        plot_sf(gx,f,1,1,1);
+        plot_sf(gx,f,index,1,1,1);
     }else{
-        plot_sf(gx,f,m*0.25,gstep[0]*4/m,gstep[1]*4/m);
+        plot_sf(gx,f,index,m*0.25,gstep[0]*4/m,gstep[1]*4/m);
     }
 }
 
