@@ -734,12 +734,46 @@ function color_rect(w){
     return [255-Math.min(255,pim+pre),255-Math.min(255,pim+0.5*pre),255-pre];
 }
 
+var phase_color_table = [
+[-1.0, 0.0,0.0,0.0],
+[-0.95,0.1,0.2,0.5],
+[-0.5, 0.0,0.5,1.0],
+[-0.05,0.4,0.8,0.8],
+[ 0.0, 1.0,1.0,1.0],
+[ 0.05,1.0,0.9,0.3],
+[ 0.5, 0.9,0.5,0.0],
+[ 0.95,0.7,0.1,0.0],
+[ 1.0, 0.0,0.0,0.0]
+];
+
+function pli_color_nodes(t){
+    var n = t.length-1;
+    return function(x){
+        var i = 1;
+        while(i<n && x>t[i][0]) i++;
+        var p1 = t[i-1];
+        var p2 = t[i];
+        var r = (p2[1]-p1[1])/(p2[0]-p1[0])*(x-p2[0])+p2[1];
+        var g = (p2[2]-p1[2])/(p2[0]-p1[0])*(x-p2[0])+p2[2];
+        var b = (p2[3]-p1[3])/(p2[0]-p1[0])*(x-p2[0])+p2[3];
+        return [255*r,255*g,255*b];
+    };
+}
+
+function new_color_phase() {
+    var color = pli_color_nodes(phase_color_table);
+    return function(w){
+        return color(carg(w)/Math.PI);
+    }
+}
+
 var color_method_tab = {
     "0": color_hsl,
     "1": color_hsl_and_rect,
     "2": color_hsl_and_polar,
     "3": color_lb_repeat,
-    "4": color_rect
+    "4": new_color_phase(),
+    "5": color_rect
 };
 
 var img_color = color_hsl;
