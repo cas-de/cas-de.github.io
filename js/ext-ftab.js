@@ -677,6 +677,10 @@ function transpose(A){
     return B;
 }
 
+function mul_vector_matrix(v,A){
+    return mul_matrix_vector(transpose(A),v);
+}
+
 function unit_vector(v){
     var r = abs_vec(v);
     return mul_scalar_vector(1/r,v);
@@ -1258,7 +1262,7 @@ table: table, Wertetabelle: table, Delta: Delta,
 Si: Si, Ci: Ci, det: det, unit: unit_vector, I: idm,
 diag: diag_variadic, _matrix_pow_: matrix_pow, expm: expm,
 _vdiff_: vdiff, nabla: nablah(0.001), divop: divoph(0.001),
-jacobi: jacobih(0.001),
+jacobi: jacobih(0.001), _mulvm_: mul_vector_matrix,
 apply: apply, rot: rotation_matrix, tr: trace, tp: transpose,
 pli: pli_general, L: laplace_transform, delta: delta,
 gcd: gcd_variadic, ggT: gcd_variadic,

@@ -1573,6 +1573,9 @@ function infer_type(t,local_variables){
                     if(T[1]===TypeMatrix){
                         t[0] = "_mulmm_";
                         return TypeMatrix;
+                    }else if(T[1]===TypeVector){
+                        t[0] = "_mulvm_";
+                        return TypeVector;
                     }else{
                         t[0] = "_mulst_";
                         return TypeMatrix;
@@ -2870,12 +2873,16 @@ function substitute(t,v,value){
     }
 }
 
+function repr(x){
+    return Array.isArray(x)?["[]"].concat(x):x;
+}
+
 function node_loop(callback,gx,t,color){
     var v = t[2][1];
     var a = compile(t[2][2],[])();
     var node = t[1];
     for(var i=0; i<a.length; i++){
-        t = substitute(node,v,a[i]);
+        t = substitute(node,v,repr(a[i]));
         if(Array.isArray(t) && t[0]===";"){
             for(var j=2; j<t.length; j++){
                 eval_statements(t[j]);
