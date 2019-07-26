@@ -704,12 +704,16 @@ function color_hsl_and_rect(w){
     return hsl_to_rgb_u8(phi,0.8,Math.tanh(r/10*(1+pulse(w.re,100))*(1+pulse(w.im,100))));
 }
 
+function light(x){
+    return 0.3*Math.exp(-0.02/x)+0.7*Math.exp(-6/x);
+}
+
 function color_hsl_and_polar(w){
     var r = cabs(w);
     var phi = carg_positive(w);
-    var iso_r = 1+pulse(r,100);
-    var iso_phi = 1-1/Math.sqrt(r)*pulse(6*phi/Math.PI,100);
-    return hsl_to_rgb_u8(phi,0.8,Math.tanh(r/10*iso_r*iso_phi));
+    var iso_phi = Math.max(1,1+0.2*pulse(6*phi/Math.PI,50));
+    var iso_r = 1-0.5/Math.pow(1+r,0.6)*pulse(ld(r),100);
+    return hsl_to_rgb_u8(phi,0.9,0.06+0.94*light(r)*iso_r*iso_phi);
 }
 
 function smooth_mod(a){
@@ -769,10 +773,10 @@ function new_color_phase() {
 
 var color_method_tab = {
     "0": color_hsl,
-    "1": color_hsl_and_rect,
+    "1": color_lb_repeat,
     "2": color_hsl_and_polar,
-    "3": color_lb_repeat,
-    "4": new_color_phase(),
+    "3": new_color_phase(),
+    "4": color_hsl_and_rect,
     "5": color_rect
 };
 
