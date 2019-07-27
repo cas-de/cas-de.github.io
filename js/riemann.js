@@ -16,7 +16,12 @@ function color_phase(w){
 function new_color_map(gx){
     return function(t,alpha){
         var color = color_phase(t[9]);
-        return rgba_to_hex(Math.round(color[0]),Math.round(color[1]),Math.round(color[2]),255);
+        return rgba_to_hex(
+            Math.round(color[0]),
+            Math.round(color[1]),
+            Math.round(color[2]),
+            alpha
+        );
     };
 }
 
