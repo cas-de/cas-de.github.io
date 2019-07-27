@@ -7,6 +7,16 @@ cftab["u1"] = {re:2,im:0}
 cftab["v0"] = {re:-2*Math.PI,im:0};
 cftab["v1"] = {re:2*Math.PI,im:0};
 
+ftab["real"] = function(){
+    var method = document.getElementById("method");
+    method.value = "re";
+};
+
+ftab["imag"] = function(){
+    var method = document.getElementById("method");
+    method.value = "im";
+};
+
 function color_phase(w){
     var r = cabs(w);
     var phi = carg_positive(w);
