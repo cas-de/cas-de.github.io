@@ -34,6 +34,10 @@ onkeyup="keys(event);" value="exp(z); u0:=-4,u1:=2,v0:=-2pi,v1:=2pi">
 <input type="button" value="z&minus;" onclick="zscale_dec()">
 <input type="button" value="Teilen" onclick="link(false,true)">
 <input type="button" value="Bild" onclick="calc_img()">
+<select id="method">
+<option value="re">Realteil</option>
+<option value="im" selected>Imaginärteil</option>
+</select>
 <a href="doc.htm">Hilfe</a>
 <br><br>
 <input type="button" value="Berechne" onclick="calc()">

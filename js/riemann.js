@@ -70,16 +70,26 @@ function plot_psf_color(gx,f,index,d,ustep,vstep){
 }
 
 function plot_node(gx,t,index){
+    var method = document.getElementById("method").value;
+
     ftab.u0 = cftab.u0.re;
     ftab.u1 = cftab.u1.re;
     ftab.v0 = cftab.v0.re;
     ftab.v1 = cftab.v1.re;
     infer_type(t);
     var f = ccompile(t,["z"]);
-    var F = function(u,v){
-        var w = f({re:u,im:v});
-        return [w.re,w.im,v];
-    };
+    var F;
+    if(method=="re"){
+        F = function(u,v){
+            var w = f({re:u,im:v});
+            return [w.re,w.im,u];
+        };
+    }else{
+        F = function(u,v){
+            var w = f({re:u,im:v});
+            return [w.re,w.im,v];
+        };
+    }
     pftab = cftab;
     var m = gtile;
     if(refresh || gx.animation){
