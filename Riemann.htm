@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>plot</title>
+  <link id="ui" rel="stylesheet" href="css/ui.css">
+  <meta name="viewport" content="width=device-width,minimum-scale=1">
+  <script src = "js/plot.js"></script>
+  <script src = "js/plot-complex.js"></script>
+  <script src = "js/plot-bivariate.js"></script>
+  <script src = "js/riemann.js"></script>
+</head>
+<body>
+
+<canvas id="canvas1" width="720" height="480"
+  class="main-canvas"
+>Error: HTML canvas not supported.</canvas>
+
+<table id="menu">
+<tr><td>
+<input type="button" value="plot" onclick="main()">
+<input type="button" value="&equiv;" onclick="switch_hud()">
+<input type="button" value="+" onclick="xyzscale_inc()"> 
+<input type="button" value="&minus;" onclick="xyzscale_dec()">
+<br>
+<input type="text" id="inputf" spellcheck="false"
+onkeyup="keys(event);" value="exp(z); u0:=-4,u1:=2,v0:=-2pi,v1:=2pi">
+
+<br>
+<div id="adds"></div>
+<div id="out" class="mono"></div>
+<div class="hud" id="hud">
+<input type="button" value="z+" onclick="zscale_inc()"> 
+<input type="button" value="z&minus;" onclick="zscale_dec()">
+<input type="button" value="Teilen" onclick="link(false,true)">
+<input type="button" value="Bild" onclick="calc_img()">
+<a href="doc.htm">Hilfe</a>
+<br><br>
+<input type="button" value="Berechne" onclick="calc()">
+<input type="text" id="input-calc" spellcheck="false"
+onkeyup="keys_calc(event);">
+<div id="calc-out" class="mono"></div>
+</div>
+</table>
+
+</body>
+</html>
