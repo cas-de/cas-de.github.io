@@ -385,9 +385,29 @@ function czeta_variadic(s,a){
     }
 }
 
+function bc(x,k){
+    var y=1;
+    for(var i=1; i<=k; i++){
+        y = y*(x-i+1)/i;
+    }
+    return y;
+}
+
+var Btab = [1];
+
+function tabB(n){
+    while(n>=Btab.length){
+        var m = Btab.length;
+        var s = 0;
+        for(var k=0; k<m; k++){s+=bc(m+1,k)*Btab[k];}
+        Btab.push(1-s/(m+1));
+    }
+    return Btab[n];
+}
+
 function cbernoulliB(n){
-    if(n.re==0 && n.im==0){
-        return {re: 1, im: 0};
+    if(n.im==0 && n.re==Math.floor(n.re) && n.re>=0 && n.re<260){
+        return {re: tabB(n.re), im: 0};
     }else{
         return cneg(cmul(n,czeta(crsub(1,n))));
     }

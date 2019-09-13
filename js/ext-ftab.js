@@ -167,8 +167,24 @@ function zeta(s,a){
     }
 }
 
+var Btab = [1];
+
+function tabB(n){
+    while(n>=Btab.length){
+        var m = Btab.length;
+        var s = 0;
+        for(var k=0; k<m; k++){s+=bc(m+1,k)*Btab[k];}
+        Btab.push(1-s/(m+1));
+    }
+    return Btab[n];
+}
+
 function bernoulliB(n){
-    return n==0?1:-n*zeta(1-n);
+    if(n==Math.floor(n) && n>=0 && n<260){
+        return tabB(n);
+    }else{
+        return -n*zeta(1-n);
+    }
 }
 
 function bernoulliBm(n){
@@ -1256,7 +1272,7 @@ function quality_level(n){
 extension_table.ftab = {
 PT: ChebyshevT, PU: ChebyshevU, PH: Hermite, 
 PP: Legendre, PL: Laguerre, bc: bc, s1: s1, s2: s2,
-psi: psi, digamma: digamma,
+psi: psi, digamma: digamma, tabB: tabB,
 zeta: zeta, B: Bvariadic, Bm: bernoulliBm, ipp: ipp,
 table: table, Wertetabelle: table, Delta: Delta,
 Si: Si, Ci: Ci, det: det, unit: unit_vector, I: idm,
