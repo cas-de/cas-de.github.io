@@ -448,16 +448,32 @@ function gamma(x){
     }
 }
 
+var fac_tab = [1,1];
+
+function tab_fac(n){
+    while(n>=fac_tab.length){
+        if(n>180) return Infinity;
+        var k = fac_tab.length;
+        var y = fac_tab[k-1];
+        fac_tab.push(y*k);
+    }
+    return fac_tab[n];
+}
+
 function fac(x){
-    return gamma(x+1);
+    if(x==Math.floor(x) && x>=0){
+        return tab_fac(x);
+    }else{
+        return gamma(x+1);
+    }
 }
 
 function ffac(n,k){
-    return gamma(n+1)/gamma(n-k+1)
+    return fac(n)/fac(n-k)
 }
 
 function rfac(n,k){
-    return gamma(n+k)/gamma(n);
+    return fac(n+k-1)/fac(n-1);
 }
 
 function cbrt(x){

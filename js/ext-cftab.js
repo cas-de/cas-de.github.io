@@ -420,11 +420,19 @@ function cpsi(x,y){
 }
 
 function cffac(z,n){
-    return cdiv(cgamma(caddr(z,1)),cgamma(caddr(csub(z,n),1)));
+    if(z.im==0 && n.im==0){
+        return {re:ffac(z.re,n.re),im:0};
+    }else{
+        return cdiv(cgamma(caddr(z,1)),cgamma(caddr(csub(z,n),1)));
+    }
 }
 
 function crfac(z,n){
-    return cdiv(cgamma(cadd(z,n)),cgamma(z));
+    if(z.im==0 && n.im==0){
+        return {re:rfac(z.re,n.re),im:0};
+    }else{
+        return cdiv(cgamma(cadd(z,n)),cgamma(z));
+    }
 }
 
 function cerf(x){

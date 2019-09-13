@@ -283,6 +283,9 @@ function cgamma(z){
 }
 
 function cfac(z){
+    if(z.im==0 && z.re==Math.floor(z.re) && z.re>=0){
+        return {re: tab_fac(z.re),im:0};
+    }
     return cgamma(caddr(z,1));
 }
 
