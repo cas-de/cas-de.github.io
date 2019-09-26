@@ -103,7 +103,7 @@ var plot_cmd_tab = {
 };
 
 var keyword_table = {
-    "for": "for", "für": "for", "in": "in",
+    "for": "for", "für": "for", "in": "in", "bis": ":", "to": ":",
     "und": "&", "oder": "|", "and": "&", "or": "|"
 };
 
