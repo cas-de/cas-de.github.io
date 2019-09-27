@@ -1046,13 +1046,13 @@ function scan(s){
             if(s[i]=='\n'){line++; col=0;}
             else {col++;}
             i++;
-        }else if(i+1<n && s[i]=='<' && s[i+1]=='='){
+        }else if(s[i]=='<' && i+1<n && s[i+1]=='='){
             a.push([Symbol,"<=",line,col]);
             i+=2; col+=2;
-        }else if(i+1<n && s[i]=='>' && s[i+1]=='='){
+        }else if(s[i]=='>' && i+1<n && s[i+1]=='='){
             a.push([Symbol,">=",line,col]);
             i+=2; col+=2;
-        }else if(i+1<n && s[i]==':' && s[i+1]=='='){
+        }else if(s[i]==':' && i+1<n && s[i+1]=='='){
             a.push([Symbol,":=",line,col]);
             i+=2; col+=2;
         }else if(superscript.hasOwnProperty(s[i])){
@@ -1074,6 +1074,9 @@ function scan(s){
             while(i<n && s[i]!='"'){i++; col++;}
             a.push([SymbolString,s.slice(j,i),line,col0]);
             i++; col++;
+        }else if(s[i]=='*' && i+1<n && s[i+1]=='*'){
+            a.push([Symbol,"^",line,col]);
+            i+=2; col+=2;
         }else{
             if((s[i]=='(' || s[i]=='[') && a.length>0){
                 var last = a[a.length-1];
@@ -1375,6 +1378,10 @@ function expression_list(i,type){
         var t = i.a[i.index];
         if(t[0]==Symbol && t[1]==","){
             i.index++;
+            t = i.a[i.index];
+            if(t[0]==SymbolTerminator || t[0]==Symbol && t[1]==";"){
+                break;
+            }
         }else{
             break;
         }
@@ -1399,6 +1406,8 @@ function semicolon(i,type){
         t = i.a[i.index];
         if(t[0]==Symbol && t[1]==";"){
             i.index++;
+            t = i.a[i.index];
+            if(t[0]==SymbolTerminator) break;
         }else{
             break;
         }
