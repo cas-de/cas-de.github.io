@@ -7,13 +7,13 @@ async function vcplot(gx,f,d,cond,color){
     var index = pid_stack.length;
     pid_stack.push(pid);
     busy = true;
-    var spoint = gx.spoint;
+    var point = gx.point();
     var k=0;
     var t0 = cftab.t0.re;
     var t1 = cftab.t1.re;
     for(var t=t0; t<t1; t+=d){
         var z = f({re: t, im: 0});
-        spoint(color,ax*z.re,ay*z.im);
+        point(color,ax*z.re,ay*z.im);
         if(cond && k==4000){
             k=0;
             await sleep(10);

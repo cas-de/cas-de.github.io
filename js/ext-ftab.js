@@ -1269,6 +1269,10 @@ function quality_level(n){
     max_count = 600*Math.pow(10,n);
 }
 
+function dot(a){
+    dot_alpha = a;
+}
+
 extension_table.ftab = {
 PT: ChebyshevT, PU: ChebyshevU, PH: Hermite, 
 PP: Legendre, PL: Laguerre, bc: bc, s1: s1, s2: s2,
@@ -1296,7 +1300,7 @@ cdfGamma: cdfGamma, pdfGamma: pdfGamma,
 cdfBeta: cdfBeta, pdfBeta: pdfBeta, pmfB: pmfB, cdfB: cdfB,
 cmfG: pmfG, cdfG: cdfG, pmfH: pmfH, cdfH: cdfH,
 pmfP: pmfP, cdfP: cdfP, pmfLog: pmfLog, cdfLog: cdfLog,
-level: quality_level
+level: quality_level, dot: dot
 };
 
 

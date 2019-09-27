@@ -26,7 +26,7 @@ async function plot_net(gx,f,d,cond){
     var m = 1;
     var color1 = [0,0,160];
     var color2 = [140,0,140];
-    var point = gx.spoint;
+    var point = gx.point();
 
     for(y=v0; y<=v1; y+=ystep){
         for(x=u0; x<u1; x+=d){

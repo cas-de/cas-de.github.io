@@ -10,7 +10,7 @@ async function fplot(gx,f,d,cond,color){
     var index = pid_stack.length;
     pid_stack.push(pid);
     busy = true;
-    var spoint = gx.spoint;
+    var point = gx.point();
     var wx = 0.5*gx.w/(gx.mx*ax);
     var wy = 0.5*(gx.h+4)/(gx.mx*ay);
     var x0 = (0.5*gx.w-gx.px0)/(gx.mx*ax);
@@ -22,7 +22,7 @@ async function fplot(gx,f,d,cond,color){
     for(var x=x0-wx; x<x0+wx; x+=d){
         var y = f(x);
         if(ya<y && y<yb){
-            spoint(color,ax*x,ay*y);
+            point(color,ax*x,ay*y);
         }
         if(cond && k==4000){
             k=0;

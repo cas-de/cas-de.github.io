@@ -85,7 +85,7 @@ function vector_head(gx,color,x,y,vx,vy,L){
 }
 
 function new_stream_line(gx,occupied,M,N,px0,py0,Ax,Ay,ds){
-    var spoint = gx.spoint;
+    var point = gx.point();
     var color0 = [120,160,220,255];
     var color1 = [240,160,160,255];
     var color = [180,200,220,255];
@@ -118,7 +118,7 @@ function new_stream_line(gx,occupied,M,N,px0,py0,Ax,Ay,ds){
             color[1] = (1-alpha)*color0[1]+alpha*color1[1];
             color[2] = (1-alpha)*color0[2]+alpha*color1[2];
 
-            spoint(color,ax*x,ay*y);
+            point(color,ax*x,ay*y);
             if(Math.abs(x-lastx)>xspace || Math.abs(y-lasty)>yspace){
                 lastx = x;
                 lasty = y;

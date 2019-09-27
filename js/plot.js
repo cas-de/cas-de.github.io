@@ -23,6 +23,7 @@ var iso_mode = 0;
 var sys_mode = 2;
 var sys_xyz = {};
 var max_count = 600;
+var dot_alpha = 0;
 
 var color_bg = [255,255,255,255];
 var color_axes = [160,160,160];
@@ -54,7 +55,7 @@ var diff_operator = diffh_curry(0.001);
 var ftab = {
     pi: Math.PI, tau: 2*Math.PI, e: Math.E, nan: NaN, inf: Infinity,
     deg: Math.PI/180, grad: Math.PI/180, gon: Math.PI/200,
-    gc: GAMMA, gr: PHI, angle: angle, t0: 0, t1: 2*Math.PI,
+    gc: GAMMA, gr: PHI, angle: angle, t0: 0, t1: 2*Math.PI, tstep: 1,
     abs: Math.abs, sgn: Math.sign, sign: Math.sign,
     max: Math.max, min: Math.min, clamp: clamp,
     hypot: Math.hypot, floor: Math.floor, ceil: Math.ceil,
@@ -1344,7 +1345,7 @@ function for_expression(i){
     var t = i.a[i.index];
     if(t[0]==Symbol && t[1]=="for"){
         i.index++;
-        var y = disjunction(i);
+        var y = assignment(i);
         return ["for",x,y];
     }else{
         return x;
@@ -1947,10 +1948,17 @@ function new_point(gx){
         var ry = gx.py0-my*y;
         fpsets(255,color,rx,ry);
     };
-    var point = function(color,x,y){
-        var px = floor(gx.w2+mx*x);
-        var py = floor(gx.h2-my*y);
+    var bpoint = function(color,x,y){
+        var px = floor(gx.px0+mx*x);
+        var py = floor(gx.py0-my*y);
         pset4(color,px,py);
+    };
+    var needle = function(a){
+        return function(color,x,y){
+            var px = floor(gx.px0+mx*x);
+            var py = floor(gx.py0-my*y);
+            pseta_median(color,px,py,a);
+        };
     };
     var hline = function(gx,py0,y,a){
         var py = py0-Math.floor(my*y);
@@ -2014,11 +2022,14 @@ function new_point(gx){
             fpsets(255,color,rx+r*Math.cos(t),ry+r*Math.sin(t));
         }
     };
+    var point = function(){
+        return dot_alpha==0?spoint:dot_alpha>1?bpoint:needle(dot_alpha);
+    };
 
     gx.pset = pset;
     gx.pset4 = pset4;
-    gx.point = point;
     gx.spoint = spoint;
+    gx.point = point;
     gx.fpsets = fpsets;
     gx.hline = hline;
     gx.vline = vline;
@@ -2347,7 +2358,7 @@ function cancel(pid,index,pid_stack){
       !Object.is(pid,pid_stack[index]));
 }
 
-function new_fplot_rec(buffer,gx,color,spoint,y0,wy,count){
+function new_fplot_rec(buffer,gx,color,point,y0,wy,count){
     var ya = y0-wy;
     var yb = y0+wy;
     var YA = y0-2*wy;
@@ -2358,7 +2369,7 @@ function new_fplot_rec(buffer,gx,color,spoint,y0,wy,count){
         for(var x=a; x<b; x+=d){
             var y = f(x);
             if(ya<y && y<yb){
-                spoint(color,ax*x,ay*y);
+                point(color,ax*x,ay*y);
             }
             if((ya<y || ya<y0) && (y<yb || y0<yb)){
                 var delta = Math.abs(y-y0);
@@ -2384,7 +2395,7 @@ async function fplot(gx,f,d,cond,color){
     var index = pid_stack.length;
     pid_stack.push(pid);
     busy = true;
-    var spoint = gx.spoint;
+    var point = gx.point();
     var wx = 0.5*gx.w/(gx.mx*ax);
     var wy = 0.5*(gx.h+4)/(gx.mx*ay);
     var x0 = (0.5*gx.w-gx.px0)/(gx.mx*ax);
@@ -2397,7 +2408,7 @@ async function fplot(gx,f,d,cond,color){
     var h = (b-a)/n;
     var count = {value: 0};
     var buffer = [[],[],[],[],[],[]];
-    var fplot_rec = new_fplot_rec(buffer,gx,color,spoint,y0,wy,count);
+    var fplot_rec = new_fplot_rec(buffer,gx,color,point,y0,wy,count);
     for(var i=0; i<n; i++){
         fplot_rec(0,f,a+h*i-0.12*h,a+h*(i+1)+0.12*h,d);
     }
@@ -2438,6 +2449,7 @@ function bisection_fast(N,state,f,a,b){
 }
 
 async function plot_zero_set(gx,f,n,N,cond,color){
+    var point = gx.point();
     var pid = {};
     var index = pid_stack.length;
     pid_stack.push(pid);
@@ -2467,7 +2479,7 @@ async function plot_zero_set(gx,f,n,N,cond,color){
                     var g = function(x){return f(x,y);};
                     var x0 = bisection_fast(N,state,g,x-dx,x+dx);
                     if(Math.abs(f(x0,y))<0.1){
-                        gx.spoint(color,ax*x0,ay*y);
+                        point(color,ax*x0,ay*y);
                     }
                 }
                 state = z;
@@ -2490,7 +2502,7 @@ async function plot_zero_set(gx,f,n,N,cond,color){
                     var g = function(y){return f(x,y);};
                     var y0 = bisection_fast(N,!state,g,y-dy,y+dy);
                     if(Math.abs(f(x,y0))<0.1){
-                        gx.spoint(color,ax*x,ay*y0);
+                        point(color,ax*x,ay*y0);
                     }
                 }
                 state = z;
@@ -2512,13 +2524,14 @@ async function vplot(gx,f,d,cond,color){
     var index = pid_stack.length;
     pid_stack.push(pid);
     busy = true;
-    var spoint = gx.spoint;
+    var point = gx.point();
     var k=0;
     var t0 = ftab.t0;
     var t1 = ftab.t1;
+    d = d*ftab.tstep;
     for(var t=t0; t<t1; t+=d){
         var v = f(t);
-        spoint(color,ax*v[0],ay*v[1]);
+        point(color,ax*v[0],ay*v[1]);
         if(cond && k==4000){
             k=0;
             await sleep(10);
@@ -2679,6 +2692,7 @@ function plot_bool(gx,f,color,n){
     var W = gx.w;
     var H = gx.h;
     var px,py,x,y,z;
+    var point = gx.point();
     var pseta = gx.pseta_median;
     var alpha = dark?0.3:0.4;
     var pset = function(color,x,y){pseta(color,x,y,alpha);}
@@ -2700,7 +2714,7 @@ function plot_bool(gx,f,color,n){
                 if(state!=undefined){
                     var g = function(x){return f(x,y);};
                     var x0 = bisection_bool(state,g,x-d,x+d);
-                    gx.spoint(color,ax*x0,ay*y);
+                    point(color,ax*x0,ay*y);
                 }
                 state = z;
             }
@@ -2716,7 +2730,7 @@ function plot_bool(gx,f,color,n){
                 if(state!=undefined){
                     var g = function(y){return f(x,y);};
                     var y0 = bisection_bool(!state,g,y-d,y+d);
-                    gx.spoint(color,ax*x,ay*y0);
+                    point(color,ax*x,ay*y0);
                 }
                 state = z;
             }
