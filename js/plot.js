@@ -67,7 +67,7 @@ var ftab = {
     exp: Math.exp, expm1: Math.expm1,
     log: log, ln: Math.log, lg: lg, ld: ld, lb: ld,
     sin: Math.sin, cos: Math.cos, tan: Math.tan,
-    cot: cot, sec: sec, csc: csc,
+    cot: cot, sec: sec, csc: csc, acot: acot, arccot: acot,
     asin: Math.asin, acos: Math.acos, atan: Math.atan,
     arcsin: Math.asin, arccos: Math.acos, arctan: Math.atan,
     sinh: sinh, cosh: cosh, tanh: tanh, coth: coth,
