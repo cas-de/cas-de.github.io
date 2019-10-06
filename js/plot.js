@@ -86,7 +86,7 @@ var ftab = {
     E: eiE, K: eiK, F: eiF, Pi: eiPi,
     RF: RF, RC: RC, RJ: RJ, RD: RD,
     P: set_position, scale: set_scale,
-    zeros: zeros, zeroes: zeros, roots: zeros, Nullstellen: zeros,
+    zeros: zeros, zeroes: zeros, roots: zeros,
     map: map, filter: filter, freq: set_freq, not: not,
     img: plot_img, calc: calc_cmd, len: list_length, cat: list_cat,
     _addtt_: add_tensor_tensor, _subtt_: sub_tensor_tensor,
@@ -96,19 +96,22 @@ var ftab = {
 };
 
 var cmd_tab = {
-    "=":0, slider:0, Regler:0, ani:0, vec:0, line:0, chain:0
+    "=":0, slider:0, ani:0, vec:0, line:0, chain:0
 };
 
 var plot_cmd_tab = {
     vec:0, line:0, chain:0
 };
 
+// begin localisation
 var keyword_table = {
     "for": "for", "für": "for", "in": "in", "bis": ":", "to": ":",
     "und": "&", "oder": "|", "and": "&", "or": "|"
 };
 
 var lang_points = "Punkte";
+ftab["Nullstellen"] = zeros;
+cmd_tab["Regler"]=0;
 
 var lang = {
     a_function: "eine Funktion",
@@ -149,6 +152,7 @@ var lang = {
     },
     p_to_short: "Fehler: p ist zu kurz."
 };
+// end localisation
 
 function load_async(URL,callback){
    var head = document.getElementsByTagName("head")[0];

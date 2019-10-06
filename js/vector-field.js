@@ -166,7 +166,7 @@ function plot_stream(gx,f){
 }
 
 function plot_node(gx,t,color){
-    if(Array.isArray(t) && t[0]==="Kurve"){
+    if(Array.isArray(t) && (t[0]==="curve" || t[0]==="Kurve")){
         infer_type(t[1]);
         var f = compile(t[1],["t"]);
         vplot_async(gx,f,color);
