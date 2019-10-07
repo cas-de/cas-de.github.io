@@ -14,6 +14,7 @@ cftab["N"] = {re:200,im:0};
 cftab["n"] = {re:1,im:0};
 cftab["ctab"] = [[1,1,1], [1,0.8,0], [0,0.2,0.6]];
 cftab["r"] = {re:10,im:0};
+cftab["shift"] = {re:0,im:0};
 ftab["debug"] = debug_mode;
 var debug = false;
 
@@ -35,7 +36,7 @@ function float_re(x){
     return typeof x=="object"?x.re:x;
 }
 
-function new_index_color(color_array){
+function new_index_color(color_array,shift){
     var a = color_array.slice();
     var d = 1/a.length;
     a.push(a[0]);
@@ -46,7 +47,7 @@ function new_index_color(color_array){
     var fg = pli(0,d,ag);
     var fb = pli(0,d,ab);
     return function(t,i){
-        var x = (0.3*Math.log(i/10+1))%1;
+        var x = (0.3*Math.log(i/10+1)+shift)%1;
         t[0] = Math.floor(255*fr(x));
         t[1] = Math.floor(255*fg(x));
         t[2] = Math.floor(255*fb(x));
@@ -64,11 +65,12 @@ function sink(color,x,a){
 function new_calc_rect(gx,f,z0,mx,r2,pset,N,n){
     var px0 = gx.px0;
     var py0 = gx.py0;
-    var index_color = new_index_color(cftab["ctab"]);
+    var shift = Math.abs(cftab["shift"].re);
+    var index_color = new_index_color(cftab["ctab"],shift);
     var buffer = [0,0,0];
     var black = [0,0,0];
-    var sample_count = Math.round(cftab["n"].re);
-    var d = 2*n/(mx*ax);
+    var count = Math.round(cftab["n"].re);
+    var d = n/(mx*ax);
     var offset = 0.5*d;
     var M = N-20;
     var a_sink = 0.06*N;
@@ -76,33 +78,36 @@ function new_calc_rect(gx,f,z0,mx,r2,pset,N,n){
     var Ax = 1/(mx*ax);
     var Ay = -1/(mx*ay);
 
-    if(sample_count>1){
+    if(count>1){
+        var w = d/count;
         return function(px,py){
             var x = Ax*(px-px0);
             var y = Ay*(py-py0);
             var all = 1;
             var sum = 0;
-            for(var k=0; k<sample_count; k++){
-                var c = {re: x-offset+d*Math.random(), im: y-offset+d*Math.random()};
-                var z = z0(c);
-                var i = 0;
-                while(true){
-                    z = f(z,c);
-                    if(z.re*z.re+z.im*z.im>r2){
-                        all = 0;
-                        break;
-                    }else if(i==N){
-                        break;
+            for(var kx=0; kx<=count; kx++){
+                for(var ky=0; ky<=count; ky++){
+                    var c = {re: x-offset+w*kx, im: y-offset+w*ky};
+                    var z = z0(c);
+                    var i = 0;
+                    while(true){
+                        z = f(z,c);
+                        if(z.re*z.re+z.im*z.im>r2){
+                            all = 0;
+                            break;
+                        }else if(i==N){
+                            break;
+                        }
+                        i++;
                     }
-                    i++;
+                    sum+=i;
                 }
-                sum+=i;
             }
             if(all==1){
                 rect(pset,black,px,py,n,n);
                 return 1;
             }else{
-                i = sum/sample_count;
+                i = sum/((count+1)*(count+1));
                 color = index_color(buffer,i);
                 if(i>M){sink(color,i/N,a_sink);}
                 rect(pset,color,px,py,n,n);
