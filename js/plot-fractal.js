@@ -69,7 +69,7 @@ function new_calc_rect(gx,f,z0,mx,r2,pset,N,n){
     var index_color = new_index_color(cftab["ctab"],shift);
     var buffer = [0,0,0];
     var black = [0,0,0];
-    var count = Math.round(cftab["n"].re);
+    var count = Math.round(cftab["n"].re)-1;
     var d = n/(mx*ax);
     var offset = 0.5*d;
     var M = N-20;
@@ -78,7 +78,7 @@ function new_calc_rect(gx,f,z0,mx,r2,pset,N,n){
     var Ax = 1/(mx*ax);
     var Ay = -1/(mx*ay);
 
-    if(count>1){
+    if(count>0){
         var w = d/count;
         return function(px,py){
             var x = Ax*(px-px0);
