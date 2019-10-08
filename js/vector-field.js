@@ -84,6 +84,15 @@ function vector_head(gx,color,x,y,vx,vy,L){
     line(gx,color,x1,y1,x1-a*vx+b*vy,y1+a*vy+b*vx);
 }
 
+function new_lcg(seed){
+    var m = 8388608, a=65793; b=4282663;
+    var x = seed%m;
+    return function(){
+        x = (a*x+b)%m;
+        return x/m;
+    };
+}
+
 function new_stream_line(gx,occupied,M,N,px0,py0,Ax,Ay,ds){
     var point = gx.point();
     var color0 = [120,160,220,255];
@@ -92,9 +101,13 @@ function new_stream_line(gx,occupied,M,N,px0,py0,Ax,Ay,ds){
 
     var xspace = 2/ax;
     var yspace = 2/ay;
+    var rng = new_lcg(0);
+
     return function(f,x,y,counter,velocity){
         var lastx = 0;
         var lasty = 0;
+        var first = true;
+
         for(var k=0; k<2000; k++){
             var indexj = Math.round((px0+Ax*x)/ds);
             var indexi = Math.round((py0-Ay*y)/ds);
@@ -119,7 +132,8 @@ function new_stream_line(gx,occupied,M,N,px0,py0,Ax,Ay,ds){
             color[2] = (1-alpha)*color0[2]+alpha*color1[2];
 
             point(color,ax*x,ay*y);
-            if(Math.abs(x-lastx)>xspace || Math.abs(y-lasty)>yspace){
+            if(first && rng()>0.96){first = false;}
+            if(!first && (Math.abs(x-lastx)>xspace || Math.abs(y-lasty)>yspace)){
                 lastx = x;
                 lasty = y;
                 vector_head(gx,color,ax*x,ay*y,v[0],v[1],0.8);
@@ -128,7 +142,7 @@ function new_stream_line(gx,occupied,M,N,px0,py0,Ax,Ay,ds){
             var h = velocity/r;
             x += h*v[0];
             y += h*v[1];
-        }    
+        }
     };
 }
 
