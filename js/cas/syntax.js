@@ -32,7 +32,7 @@ function vtoken_tos(a){
 
 var keywords = {
     "in": "in", "and": "&", "or": "|", "not": "not",
-    "und": "&", "oder": "|"
+    "und": "&", "oder": "|", "nicht": "not"
 };
 
 var superscript = {

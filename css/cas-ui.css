@@ -137,3 +137,22 @@ div.navi a{
   font-size: 120%;
 }
 
+table.bt{border-collapse: collapse;}
+table.bt td, table.bt th{
+  border: 1px solid #babab2;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+  text-align: left;
+  vertical-align: top;
+}
+table.bt td{
+  background-color: #f0f0ff;
+}
+table.bt th{
+  background-color: #dad8c4;
+}
+
+div.frame{
+  background-color: #f0f0ff;
+  padding: 0.5em;
+}
