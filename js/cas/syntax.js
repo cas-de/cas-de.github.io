@@ -422,6 +422,27 @@ function expression(i){
     return equivalence(i);
 }
 
+function comma_expression(i){
+    var x = expression(i);
+    var t = get_token(i);
+    if(t[0]==Symbol && t[1]==","){
+        i.index++;
+        var a = ["comma",x];
+        while(true){
+            a.push(expression(i));
+            var t = get_token(i);
+            if(t[0]==Symbol && t[1]==","){
+                i.index++;
+            }else{
+                break;
+            }
+        }
+        return a;
+    }else{
+        return x;
+    }
+}
+
 function ast(a,s){
     if(s===undefined){
         s = a;
@@ -432,7 +453,7 @@ function ast(a,s){
     }else{
         // log(compiler.vtoken_tos(a));
         var i = {index: 0, a: a, s: s};
-        return expression(i);
+        return comma_expression(i);
     }
 }
 
