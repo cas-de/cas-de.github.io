@@ -8,10 +8,34 @@ function cart(a, b, ...c){
 }
 
 function cart_pow(a,n){
-    if(n==1){
+    if(n==0){
+        return [[]];
+    }else if(n==1){
         return a.map(function(x){return [x];});
     }else{
         return cart.apply(null,Array(n).fill(a));
+    }
+}
+
+function is_well_formed(t){
+    if(t===0 || t===1){
+        return ["ok"];
+    }else if(typeof t=="string"){
+        return ["ok"];
+    }else if(Array.isArray(t)){
+        if(t[0]==="and" || t[0]==="or" || t[0]==="=>" || t[0]==="<=>"
+            || t[0]==="not"
+        ){
+            for(var i=1; i<t.length; i++){
+                var y = is_well_formed(t[i]);
+                if(y[0]=="err") return y;
+            }
+            return ["ok"];
+        }else{
+            return ["err",t];
+        }
+    }else{
+        throw "internal error";
     }
 }
 
@@ -50,7 +74,6 @@ function truth_table(t){
     var f = bool_fn_from_formula(t,variables);
     var n = variables.length;
     var dom = cart_pow([0,1],n);
-    console.log(dom);
     var tab = [];    
     for(var i=0; i<dom.length; i++){
         var a = dom[i];
@@ -78,13 +101,20 @@ function logic(){
     var output = document.getElementById("output1");
     try{
         var t = parser.ast(input.value);
-        var is_taut = cas.taut(t);
         if(t!==null){
-            out = ["<br>"];
-            out.push(info(t));
-            out.push("<br>");
-            out.push(truth_table(t));
-            output.innerHTML = out.join("");
+            var wf = is_well_formed(t);
+            if(wf[0]=="err"){
+                output.innerHTML = (
+                    "<p>Syntaxfehler: Keine logische Formel: "+
+                    htm_print.htm(wf[1])
+                );
+            }else{
+                out = ["<br>"];
+                out.push(info(t));
+                out.push("<br>");
+                out.push(truth_table(t));
+                output.innerHTML = out.join("");
+            }
         }else{
             output.innerHTML="";
         }

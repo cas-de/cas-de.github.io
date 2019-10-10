@@ -31,8 +31,11 @@ function vtoken_tos(a){
 }
 
 var keywords = {
-    "in": "in", "and": "&", "or": "|", "not": "not",
-    "und": "&", "oder": "|", "nicht": "not"
+    "in": [Symbol,"in"],
+    "not": [Symbol,"not"], "and": [Symbol,"&"], "or": [Symbol,"|"], 
+    "false": [SymbolNumber,0], "true": [SymbolNumber,1],
+    "nicht": [Symbol,"not"], "und": [Symbol,"&"], "oder": [Symbol,"|"],
+    "falsch": [SymbolNumber,0], "wahr": [SymbolNumber,1]
 };
 
 var superscript = {
@@ -73,7 +76,8 @@ function scan(s){
             }
             var id = s.slice(j,i);
             if(keywords.hasOwnProperty(id)){
-                a.push([Symbol,keywords[id],line,col]);
+                var p = keywords[id];
+                a.push([p[0],p[1],line,col]);
             }else{
                 if(a.length>0 && a[a.length-1][0]==SymbolNumber){
                     a.push([Symbol,"*",line,col]);
