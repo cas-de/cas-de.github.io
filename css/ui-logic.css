@@ -1,0 +1,15 @@
+
+table.frame{
+  border-spacing: 6px;
+  margin-left: -6px;
+}
+
+th.frame, td.frame{
+  padding: 0.5em;
+  vertical-align: top;
+}
+
+th.frame{
+  background-color: #dad8c4;
+}
+

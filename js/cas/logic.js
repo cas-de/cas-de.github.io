@@ -17,6 +17,10 @@ function cart_pow(a,n){
     }
 }
 
+function is_comma_expression(t){
+    return Array.isArray(t) && t[0]==="comma";
+}
+
 function is_well_formed(t){
     if(t===0 || t===1){
         return ["ok"];
@@ -146,6 +150,132 @@ function info(t){
     return tab.join("");
 }
 
+function oline(v){
+    return ["<span style='border-top: 2px solid black'>",v,"</span>"].join("");
+}
+
+var th_padding = "<th style='padding-top: 6px'>";
+
+function kv2(f,variables){
+    var vA = variables[0];
+    var vB = variables[1];
+    tab = ["<table class='bt'>"];
+    tab.push(["<tr>",th_padding,oline(vA),th_padding,vA,"<th>"].join(""));
+    for(var B=0; B<2; B++){
+        tab.push("<tr>");
+        for(var A=0; A<2; A++){
+            tab.push("<td>"+f([A,B]));
+        }
+        tab.push(th_padding+(B==0?oline(vB):vB));
+    }
+    tab.push("</table>");
+    return tab.join("");
+}
+
+function kv3(f,variables){
+    var vA = variables[0];
+    var vB = variables[1];
+    var vC = variables[2];
+    tab = ["<table class='bt'>"];
+    tab.push(["<tr>",
+        th_padding,oline(vA),th_padding,oline(vA),
+        th_padding,vA,th_padding,vA,"<th>"
+    ].join(""));
+    for(var B=0; B<2; B++){
+        tab.push("<tr>");
+        for(var A=0; A<2; A++){
+            if(A==0){
+                for(var C=0; C<2; C++){
+                    tab.push("<td>"+f([A,B,C]));
+                }
+            }else{
+                for(var C=1; C>=0; C--){
+                    tab.push("<td>"+f([A,B,C]));
+                }
+            }
+        }
+        tab.push(th_padding+(B==0?oline(vB):vB));
+    }
+    tab.push("<tr>");
+    for(var B=0; B<2; B++){
+        if(B==0){
+            for(var C=0; C<2; C++){
+                tab.push(th_padding+(C==0?oline(vC):vC));
+            }
+        }else{
+            for(var C=1; C>=0; C--){
+                tab.push(th_padding+(C==0?oline(vC):vC));
+            }   
+        }
+    }
+    tab.push("<th></table>");
+    return tab.join("");
+}
+
+function kv4(f,variables){
+    var vA = variables[0];
+    var vB = variables[1];
+    var vC = variables[2];
+    var vD = variables[3];
+    var th_padding = "<th style='padding-top: 6px'>";
+    tab = ["<table class='bt'>"];
+    tab.push(["<tr><th>",
+        th_padding,oline(vA),th_padding,oline(vA),
+        th_padding,vA,th_padding,vA,"<th>"
+    ].join(""));
+
+    var kv4_line = function(D,B){
+        tab.push("<tr>"+th_padding+(D==0?oline(vD):vD));
+        for(var A=0; A<2; A++){
+            if(A==0){
+                for(var C=0; C<2; C++){
+                    tab.push("<td>"+f([A,B,C,D]));
+                }
+            }else{
+                for(var C=1; C>=0; C--){
+                    tab.push("<td>"+f([A,B,C,D]));
+                }
+            }
+        }
+        tab.push(th_padding+(B==0?oline(vB):vB));
+    };
+    
+    kv4_line(0,0);
+    kv4_line(1,0);
+    kv4_line(1,1);
+    kv4_line(0,1);
+
+    tab.push("<tr><th>");
+    for(var B=0; B<2; B++){
+        if(B==0){
+            for(var C=0; C<2; C++){
+                tab.push(th_padding+(C==0?oline(vC):vC));
+            }
+        }else{
+            for(var C=1; C>=0; C--){
+                tab.push(th_padding+(C==0?oline(vC):vC));
+            }   
+        }
+    }
+    tab.push("<th></table>");
+    return tab.join("");
+}
+
+function kv(t){
+    var variables = Object.keys(cas.variables(t)).sort();
+    var f = bool_fn_from_formula(t,variables);
+    var n = variables.length;
+    if(n==2){
+        return kv2(f,variables);
+    }else if(n==3){
+        return kv3(f,variables);
+    }else if(n==4){
+        return kv4(f,variables);
+    }else{
+        return "";
+    }
+}
+
 function logic(){
     var input = document.getElementById("input1");
     var output = document.getElementById("output1");
@@ -159,10 +289,18 @@ function logic(){
                     htm_print.htm(wf[1])
                 );
             }else{
-                out = ["<br>"];
+                out = ["<table class='frame'><tr><th class='frame'>Eigenschaften<td class='frame'>"];
                 out.push(info(t));
-                out.push("<br>");
+                out.push("<tr><th class='frame'>Wahrheitstafel<td class='frame'>");
                 out.push(truth_table(t));
+                if(!is_comma_expression(t)){
+                    var kv_tab = kv(t);
+                    if(kv_tab!==""){
+                        out.push("<tr><th class='frame'>KV-Diagramm<td class='frame'>");
+                        out.push(kv_tab);
+                    }
+                }
+                out.push("</table>");
                 output.innerHTML = out.join("");
             }
         }else{

@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>CAS</title>
   <link href="css/cas-ui.css" rel="stylesheet">
+  <link href="css/ui-logic.css" rel="stylesheet">
   <script src="js/cas/cas.js"></script>
   <script src="js/cas/logic.js"></script>
   <script>main = logic;</script>
@@ -17,7 +18,8 @@
 </div>
 <br>
 <input type="button" onclick="main();" value="Untersuche">
-<input type="text" id="input1" onkeyup="handle_keys(event);" value="A and B">
+<input type="text" id="input1" spellcheck="false"
+onkeyup="handle_keys(event);" value="A and B">
 <br>
 <div class="output" id="output1">
 </div>
