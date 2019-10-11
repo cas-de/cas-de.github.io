@@ -1081,6 +1081,9 @@ function scan(s){
         }else if(s[i]=='*' && i+1<n && s[i+1]=='*'){
             a.push([Symbol,"^",line,col]);
             i+=2; col+=2;
+        }else if(s[i]=='-' && i+1<n && s[i+1]=='>'){
+            a.push([Symbol,".",line,col]);
+            i+=2; col+=2;
         }else{
             if((s[i]=='(' || s[i]=='[') && a.length>0){
                 var last = a[a.length-1];
