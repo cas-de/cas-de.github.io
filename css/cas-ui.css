@@ -114,6 +114,18 @@ span.hsop{
   margin-left: 2px;
   margin-right: 2px;
 }
+span.matrix{
+  display: inline-table;
+  vertical-align: middle;
+  border-left: 3px solid #404040;
+  border-right: 3px solid #404040;
+  border-radius: 10px;
+}
+span.mcell{
+  display: table-cell;
+  text-align: center;
+  padding: 0.5em;
+}
 
 a{color: #20506a; text-decoration: none;}
 a:hover{color: #102a40; text-decoration: underline;}

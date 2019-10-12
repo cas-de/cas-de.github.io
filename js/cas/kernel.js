@@ -557,6 +557,11 @@ expand: function(t){
                 ["*",cas.expand(["cos",a]),cas.expand(["cos",b])],
                 ["*",-1,cas.expand(["sin",a]),cas.expand(["sin",b])]
             ]);
+        }else if(t[0]==="det"){
+            var a = t[1];
+            if(cas.is_app(a) && a[0]==="matrix" && a.length==3){
+                return ["-",["*",a[1][1],a[2][2]],["*",a[1][2],a[2][1]]];
+            }
         }
         return [t[0]].concat(t.slice(1).map(cas.expand));
     }else{
@@ -689,11 +694,25 @@ diff_tab: {
         }else{
             return ["diff",t,v];
         }
+    },
+    "[]": function(t,v){
+        var a = ["[]"];
+        for(var i=1; i<t.length; i++){
+            a.push(cas.diff(t[i],v));
+        }
+        return a;
     }
 },
 
 diff: function(t,v){
-    if(cas.is_app(t)){
+    if(Array.isArray(v) && v[0]==="[]"){
+        var a = cas.grad(t,v); 
+        if(Array.isArray(a) && a[0]==="matrix"){
+            return cas.transpose(a);
+        }else{
+            return a;
+        }
+    }else if(cas.is_app(t)){
         if(cas.diff_tab.hasOwnProperty(t[0])){
             return cas.diff_tab[t[0]](t,v);
         }else if(t.length==2 && cas.is_app(t[1])){
@@ -732,11 +751,30 @@ taylor: function(t,v,a,n){
 },
 
 grad: function(t,v){
-    var y = ["[]"];
+    var a = ["[]"];
     for(var i=1; i<v.length; i++){
-        y.push(cas.diff(t,v[i]));
+        a.push(cas.diff(t,v[i]));
     }
-    return y;
+    var all_vec = true;
+    for(var i=1; i<a.length; i++){
+        if(!Array.isArray(a[i]) || a[i][0]!=="[]") all_vec = false;
+    }
+    if(all_vec){a[0] = "matrix";}
+    return a;
+
+},
+
+transpose: function(t){
+    var A = ["matrix"];
+    var n = t[1].length;
+    for(var i=1; i<n; i++){
+        var v = ["[]"];
+        for(var j=1; j<t.length; j++){
+            v.push(t[j][i]);
+        }
+        A.push(v);
+    }
+    return A;
 },
 
 variables_table: {
@@ -744,7 +782,9 @@ variables_table: {
 
 evaluate: function(t){
     if(cas.is_app(t)){
-        if(t[0]==="diff" && typeof t[2]=="string"){
+        if(t[0]==="diff" && (typeof t[2]=="string"
+            || Array.isArray(t[2]) && t[2][0]==="[]"
+        )){
             if(t.length==4){
                 if(typeof t[3]=="number"){
                     return cas.diffn(

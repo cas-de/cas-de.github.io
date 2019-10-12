@@ -128,7 +128,7 @@ list: function(t){
     for(var i=1; i<t.length; i++){
        a.push(this.ast(t[i],""));
     }
-    return ["[", a.join(","), "]"].join("");
+    return ["[", a.join(", "), "]"].join("");
 },
 app: function(t){
     var a = [];
@@ -180,6 +180,18 @@ sum: function(t,op){
         return s;
     }    
 },
+matrix: function(t,op){
+    var M = ["<span class='matrix'>"];
+    for(var i=1; i<t.length; i++){
+        M.push("<span class='tr'>");
+        for(var j=1; j<t[i].length; j++){
+            M.push("<span class='mcell'>",this.ast(t[i][j],""),"</span>");
+        }
+        M.push("</span>");
+    }
+    M.push("</span>");
+    return M.join("");
+},
 ast: function(t,op,first){
     var T;
     if(Array.isArray(t)){
@@ -228,9 +240,11 @@ ast: function(t,op,first){
             }else if(s=="diff"){
                 return this.diff(t,op);
             }else if(s=="lambda"){
-                return this.lambda(t);
+                return this.lambda(t,op);
             }else if(s=="sum"){
                 return this.sum(t,op);
+            }else if(s=="matrix"){
+                return this.matrix(t,op);
             }else if(s=="str"){
                 return ["<code>", t[1], "</code>"].join("");
             }
