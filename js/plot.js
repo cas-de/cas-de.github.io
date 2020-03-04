@@ -24,6 +24,8 @@ var sys_mode = 2;
 var sys_xyz = {};
 var max_count = 600;
 var dot_alpha = 0;
+var twidth_left = 10;
+var twidth_right = 10;
 
 var color_bg = [255,255,255,255];
 var color_axes = [160,160,160];

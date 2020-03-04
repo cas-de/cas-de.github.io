@@ -1,6 +1,4 @@
 
-
-ftab["tw"] = 10;
 ftab["step"] = 0.001;
 
 function runge_kutta_system_unilateral(f,h,N,x0,y0){
@@ -86,9 +84,10 @@ function ode_system(t){
     }else{
         p = p.slice(0,v.length+1);
     }
-    var w = ftab["tw"];
+    var wm = twidth_left;
+    var wp = twidth_right;
     var h = ftab["step"];
-    var vf = runge_kutta_system(f,h,-w,w,p[0],p.slice(1));
+    var vf = runge_kutta_system(f,h,-wm,wp,p[0],p.slice(1));
     for(var i=0; i<v.length; i++){
         ftab[v[i]] = vf[i];
     }
@@ -202,9 +201,10 @@ function ode_vec(t){
     }else{
         p = p.slice(0,order+1);
     }
-    var w = ftab["tw"];
+    var wm = twidth_left;
+    var wp = twidth_right;
     var h = ftab["step"];
-    var fv = runge_kutta_vec(f,h,-w,w,p[0],p.slice(1));
+    var fv = runge_kutta_vec(f,h,-wm,wp,p[0],p.slice(1));
     ftab[v] = fv;
     id_type_table[v] = [TypeVector];
 }

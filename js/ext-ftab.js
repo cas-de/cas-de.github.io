@@ -1273,6 +1273,11 @@ function dot(a){
     dot_alpha = a;
 }
 
+function set_twidth(left,right){
+    twidth_left = left;
+    twidth_right = right==undefined ? left : right;
+}
+
 extension_table.ftab = {
 PT: ChebyshevT, PU: ChebyshevU, PH: Hermite, 
 PP: Legendre, PL: Laguerre, bc: bc, s1: s1, s2: s2,
@@ -1300,7 +1305,7 @@ cdfGamma: cdfGamma, pdfGamma: pdfGamma,
 cdfBeta: cdfBeta, pdfBeta: pdfBeta, pmfB: pmfB, cdfB: cdfB,
 cmfG: pmfG, cdfG: cdfG, pmfH: pmfH, cdfH: cdfH,
 pmfP: pmfP, cdfP: cdfP, pmfLog: pmfLog, cdfLog: cdfLog,
-level: quality_level, dot: dot
+level: quality_level, dot: dot, tw: set_twidth
 };
 
 
