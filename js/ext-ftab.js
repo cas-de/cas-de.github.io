@@ -1034,6 +1034,14 @@ function count(p,a){
     return y;
 }
 
+function enumerate(a){
+    var b = [];
+    for(var i=0; i<a.length; i++){
+        b.push([i,a[i]]);
+    }
+    return b;
+}
+
 function sample(F){
     return invab(F,Math.random(),-100,100);
 }
@@ -1305,7 +1313,8 @@ cdfGamma: cdfGamma, pdfGamma: pdfGamma,
 cdfBeta: cdfBeta, pdfBeta: pdfBeta, pmfB: pmfB, cdfB: cdfB,
 cmfG: pmfG, cdfG: cdfG, pmfH: pmfH, cdfH: cdfH,
 pmfP: pmfP, cdfP: cdfP, pmfLog: pmfLog, cdfLog: cdfLog,
-level: quality_level, dot: dot, tw: set_twidth
+level: quality_level, dot: dot, tw: set_twidth,
+enumerate: enumerate
 };
 
 
