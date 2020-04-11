@@ -479,9 +479,9 @@ function scan(s){
             flush_node(a,node);
             a.push([Symbol,"**"]);
             i+=2;
-        }else if(i+1<n && s[i]=='_' && s[i+1]=='_'){
+        }else if(i+1<n && s[i]=='/' && s[i+1]=='/'){
             flush_node(a,node);
-            a.push([Symbol,"__"]);
+            a.push([Symbol,"//"]);
             i+=2;
         }else if(i+1<n && s[i]=='[' && s[i+1]=='/'){
             flush_node(a,node);
@@ -514,7 +514,11 @@ function scan(s){
         }else if(s[i]==']'){
             flush_node(a,node);
             a.push([Symbol,s[i]]);
-            i+=1;        
+            i+=1;
+        }else if(s[i]==':'){
+            node.push(":");
+            i++;
+            while(i<n && s[i]=='/'){node.push("/"); i++;}
         }else{
             node.push(s[i]);
             i++;
@@ -854,8 +858,8 @@ function ast(i,stop){
                 wiki_syntax(a,i,"`","tt");
             }else if(t[1]=="**"){
                 wiki_syntax(a,i,"**","b");
-            }else if(t[1]=="__"){
-                wiki_syntax(a,i,"__","i");
+            }else if(t[1]=="//"){
+                wiki_syntax(a,i,"//","i");
             }else if(t[1]=="```"){
                 wiki_syntax(a,i,"```","code");
             }else if(t[1]=="["){
