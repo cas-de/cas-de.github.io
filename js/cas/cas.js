@@ -1,6 +1,7 @@
 
 var conf = {
-    debug_mode: false
+    debug_mode: false,
+    root: ""
 };
 
 function load_async(path,callback){
@@ -93,8 +94,8 @@ function handle_keys(event){
 }
 
 window.onload = function(){
-    load("js/cas/syntax.js");
-    load("js/cas/kernel.js");
-    load("js/cas/print.js");
+    load(conf.root+"js/cas/syntax.js");
+    load(conf.root+"js/cas/kernel.js");
+    load(conf.root+"js/cas/print.js");
 };
 
