@@ -3359,9 +3359,10 @@ function link(position,regard_zscale){
     var pos = "";
     var t = graphics.pos;
     if(position && (t[0]!=0 || t[1]!=0)){
-        var n = Math.max(0,1+Math.round(Math.log(ax)));
-        var t0 = t[0].toFixed(n);
-        var t1 = t[1].toFixed(n);
+        var nx = Math.max(0,2+Math.round(lg(ax)));
+        var ny = Math.max(0,2+Math.round(lg(ay)));
+        var t0 = t[0].toFixed(nx);
+        var t1 = t[1].toFixed(ny);
         pos = (scale==""?";;":",")+"P("+t0+","+t1+")";
     }
     out.innerHTML = "<p style='font-size: 80%'>"+url+"?"+encode_query(s+scale+pos);

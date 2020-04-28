@@ -950,6 +950,11 @@ function factor(n){
     }
     var a,k,m;
     a = [];
+    if(n<=0){
+        if(n==0){return [[0,1]];}
+        n = -n;
+        a.push([-1,1]);
+    }
     k = 2;
     while(k<=n){
         m = 0;

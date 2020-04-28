@@ -22,7 +22,14 @@ function new_crc32(){
     }
 };
 
-var hash = new_crc32();
+function new_hash_hex() {
+    var hash = new_crc32();
+    return function(str){
+        return ("00000000"+hash(str).toString(16)).slice(-8);
+    }
+}
+
+var hash = new_hash_hex();
 
 function check_isprime(buffer){
     var count = 0;
@@ -41,11 +48,11 @@ function check_isprime(buffer){
 
 function check_factor(buffer){
     var a = [];
-    for(var k=0; k<10000; k++){
+    for(var k=-10; k<10000; k++){
         a.push(JSON.stringify(factor(k)));
     }
-    var h = hash(a.join(""));
-    if(h != 1121456376){
+    var h = hash(a.join(","));
+    if(h != "57042aa7"){
         buffer.push("<p>Factor failed.");
         return "err";
     }

@@ -1,0 +1,4 @@
+
+* Vergleich von Listen nicht möglich
+* Modular: Inverse, Wurzel, Logarithmus
+
