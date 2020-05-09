@@ -10,13 +10,24 @@ function move_refresh(gx){
 
 var tau = 2*Math.PI;
 cftab["z0"] = function(c){return {re:0,im:0};};
-cftab["N"] = {re:200,im:0};
+cftab["N"] = {re:400,im:0};
 cftab["n"] = {re:1,im:0};
-cftab["ctab"] = [[1,1,1], [1,0.8,0], [0,0.2,0.6]];
 cftab["r"] = {re:10,im:0};
 cftab["shift"] = {re:0,im:0};
+cftab["cgrad"] = {re:1.0,im:0};
 ftab["debug"] = debug_mode;
+ftab["ctab"] = ctab;
 var debug = false;
+
+cftab["ctab0"] = [[1,1,1], [1,0.8,0], [0,0.2,0.6]];
+cftab["ctab1"] = [
+[1,1,1],[1,0.92,0.5],[1,0.8,0.1],[0.9,0.6,0],
+[0.4,0.1,0.25],[0.07,0,0.3],[0.1,0.3,0.64]];
+cftab["ctab2"] = [
+[1,1,1],[1,0.9,0.6],[1,0.72,0],[0.7,0.5,0.3],[0.2,0.3,0.34],
+[0.1,0.1,0.38],[0.2,0.3,0.6],[0.2,0.5,0.83]];
+cftab["ctab3"] = [[1,1,1],[1,1,1],[0,0,0]];
+var ctab_pointer = cftab["ctab0"];
 
 function debug_mode(){
     debug = true;
@@ -26,6 +37,14 @@ function submit(gx){
     system(gx,0.02,0.2);
     flush(gx);
     labels(gx);
+}
+
+function ctab(a){
+    if(Array.isArray(a)){
+        ctab_pointer = a;
+    }else{
+        ctab_pointer = cftab["ctab"+Math.round(a)];
+    }
 }
 
 function index_color(t,i){
@@ -46,8 +65,9 @@ function new_index_color(color_array,shift){
     var fr = pli(0,d,ar);
     var fg = pli(0,d,ag);
     var fb = pli(0,d,ab);
+    var gradient = 0.3*cftab["cgrad"].re;
     return function(t,i){
-        var x = (0.3*Math.log(i/10+1)+shift)%1;
+        var x = (gradient*Math.log(i/10+1)+shift)%1;
         t[0] = Math.floor(255*fr(x));
         t[1] = Math.floor(255*fg(x));
         t[2] = Math.floor(255*fb(x));
@@ -66,7 +86,7 @@ function new_calc_rect(gx,f,z0,mx,r2,pset,N,n){
     var px0 = gx.px0;
     var py0 = gx.py0;
     var shift = Math.abs(cftab["shift"].re);
-    var index_color = new_index_color(cftab["ctab"],shift);
+    var index_color = new_index_color(ctab_pointer,shift);
     var buffer = [0,0,0];
     var black = [0,0,0];
     var count = Math.round(cftab["n"].re)-1;
