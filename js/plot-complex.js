@@ -28,7 +28,8 @@ var cftab = {
     pi: complex(Math.PI,0), tau: complex(2*Math.PI,0),
     e: complex(Math.E,0), i: complex(0,1), nan: complex(NaN,NaN),
     deg: complex(Math.PI/180,0), grad: complex(Math.PI/180,0),
-    gon: complex(Math.PI/200,0), gc: complex(GAMMA,0)
+    gon: complex(Math.PI/200,0), gc: complex(GAMMA,0),
+    gr: complex(PHI,0)
 };
 
 ftab["colorfn"] = colorfn;

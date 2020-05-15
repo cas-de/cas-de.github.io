@@ -1277,6 +1277,36 @@ function cdfLog(x,p){
     return s;
 }
 
+function simple_moving_average(a,n) {
+    if(n==undefined){n = 2;}
+    var b = [];
+    for(var t=0; t<a.length; t++) {
+        var count = 0;
+        var s = 0;
+        for(var i=0; i<n; i++) {
+            if(t>=i) {count += 1; s += a[t-i];}
+        }
+        b.push(s/count);
+    }
+    return b;
+}
+
+function central_moving_average(a,n) {
+    if(n==undefined){n = 3;}
+    var b = [];
+    var m = Math.round(0.5*(n-1));
+    var len = a.length;
+    for(var t=0; t<len; t++) {
+        var count = 0;
+        var s = 0;
+        for(var i=0; i<n; i++) {
+            if(t+m>=i && t+m-i<len) {count += 1; s += a[t+m-i];}
+        }
+        b.push(s/count);
+    }
+    return b;
+}
+
 function quality_level(n){
     if(n==undefined) n = 0;
     max_count = 600*Math.pow(10,n);
@@ -1319,7 +1349,8 @@ cdfBeta: cdfBeta, pdfBeta: pdfBeta, pmfB: pmfB, cdfB: cdfB,
 cmfG: pmfG, cdfG: cdfG, pmfH: pmfH, cdfH: cdfH,
 pmfP: pmfP, cdfP: cdfP, pmfLog: pmfLog, cdfLog: cdfLog,
 level: quality_level, dot: dot, tw: set_twidth,
-enumerate: enumerate
+enumerate: enumerate, sma: simple_moving_average,
+smac: central_moving_average
 };
 
 
