@@ -1321,8 +1321,15 @@ function set_twidth(left,right){
     twidth_right = right==undefined ? left : right;
 }
 
-function chr(x) {
-    return String.fromCharCode(x);
+function bin(x) {return "0b"+x.toString(2);}
+function oct(x) {return "0o"+x.toString(8);}
+function hex(x) {return "0x"+x.toString(16);}
+function chr(x) {return (Array.isArray(x)?
+    x.map(function(t){return String.fromCharCode(t);}):
+    String.fromCharCode(x));
+}
+function ord(s) {
+    return Array.from(s).map(function(x){return x.codePointAt(0);});
 }
 
 extension_table.ftab = {
@@ -1352,7 +1359,8 @@ cdfGamma: cdfGamma, pdfGamma: pdfGamma,
 cdfBeta: cdfBeta, pdfBeta: pdfBeta, pmfB: pmfB, cdfB: cdfB,
 cmfG: pmfG, cdfG: cdfG, pmfH: pmfH, cdfH: cdfH,
 pmfP: pmfP, cdfP: cdfP, pmfLog: pmfLog, cdfLog: cdfLog,
-level: quality_level, dot: dot, tw: set_twidth, chr: chr,
+level: quality_level, dot: dot, tw: set_twidth,
+chr: chr, ord: ord, bin: bin, oct: oct, hex: hex, 
 enumerate: enumerate, sma: simple_moving_average,
 smac: central_moving_average
 };
