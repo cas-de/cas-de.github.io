@@ -924,16 +924,16 @@ function calc_cmd(cmd){
     });
 }
 
-function isalpha(s){
-    return /^[a-zäöü]+$/i.test(s);
+function isalpha(c){
+    return /^[a-z]+$/i.test(c) || c.charCodeAt(0)>127;
 }
 
-function isdigit(s){
-    return /^\d+$/.test(s);
+function isdigit(c){
+    return /^\d+$/.test(c);
 }
 
-function isspace(s){
-    return s==' ' || s=='\t' || s=='\n';
+function isspace(c){
+    return c==' ' || c=='\t' || c=='\n';
 }
 
 function str(x,ftos,newline){

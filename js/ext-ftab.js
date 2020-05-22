@@ -1321,6 +1321,10 @@ function set_twidth(left,right){
     twidth_right = right==undefined ? left : right;
 }
 
+function chr(x) {
+    return String.fromCharCode(x);
+}
+
 extension_table.ftab = {
 PT: ChebyshevT, PU: ChebyshevU, PH: Hermite, 
 PP: Legendre, PL: Laguerre, bc: bc, s1: s1, s2: s2,
@@ -1348,7 +1352,7 @@ cdfGamma: cdfGamma, pdfGamma: pdfGamma,
 cdfBeta: cdfBeta, pdfBeta: pdfBeta, pmfB: pmfB, cdfB: cdfB,
 cmfG: pmfG, cdfG: cdfG, pmfH: pmfH, cdfH: cdfH,
 pmfP: pmfP, cdfP: cdfP, pmfLog: pmfLog, cdfLog: cdfLog,
-level: quality_level, dot: dot, tw: set_twidth,
+level: quality_level, dot: dot, tw: set_twidth, chr: chr,
 enumerate: enumerate, sma: simple_moving_average,
 smac: central_moving_average
 };
