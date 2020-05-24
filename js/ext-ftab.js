@@ -897,10 +897,12 @@ function lcm_variadic(){
 
 function isprime(n){
     n = Math.round(n);
-    if(n<2) return 0;
-    var m = Math.floor(Math.sqrt(n));
-    for(var k=2; k<=m; k++){
+    if(n<4) return n>1?1:0;
+    if(n%2==0 || n%3==0) return 0;
+    var k = 5, w = 2, m = Math.floor(Math.sqrt(n));
+    while(k<=m){
         if(n%k==0) return 0;
+        k += w; w = 6-w;
     }
     return 1;
 }
@@ -910,9 +912,7 @@ function euler_phi(n){
     if(n<1) return NaN;
     var y = 1;
     for(var p=2; p<=n; p++){
-        if(isprime(p) && n%p==0){
-            y = y*(1-1/p);
-        }
+        if(isprime(p) && n%p==0){y = y*(1-1/p);}
     }
     return Math.round(n*y);
 }
@@ -968,9 +968,7 @@ function factor(n){
 
 function pcf(x){
     var y = 0;
-    for(var k=1; k<=x; k++){
-        y+=isprime(k);
-    }
+    for(var k=1; k<=x; k++){y+=isprime(k);}
     return y;
 }
 
@@ -1321,15 +1319,22 @@ function set_twidth(left,right){
     twidth_right = right==undefined ? left : right;
 }
 
-function bin(x) {return "0b"+x.toString(2);}
-function oct(x) {return "0o"+x.toString(8);}
-function hex(x) {return "0x"+x.toString(16);}
-function chr(x) {return (Array.isArray(x)?
+function bin(x){return "0b"+x.toString(2);}
+function oct(x){return "0o"+x.toString(8);}
+function hex(x){return "0x"+x.toString(16);}
+function chr(x){return (Array.isArray(x)?
     x.map(function(t){return String.fromCharCode(t);}):
     String.fromCharCode(x));
 }
-function ord(s) {
+function ord(s){
     return Array.from(s).map(function(x){return x.codePointAt(0);});
+}
+
+function bench(f,x){
+    var start = new Date();
+    var y = f(x);
+    var end = new Date();
+    return [end-start,y];
 }
 
 extension_table.ftab = {
@@ -1362,7 +1367,7 @@ pmfP: pmfP, cdfP: cdfP, pmfLog: pmfLog, cdfLog: cdfLog,
 level: quality_level, dot: dot, tw: set_twidth,
 chr: chr, ord: ord, bin: bin, oct: oct, hex: hex, 
 enumerate: enumerate, sma: simple_moving_average,
-smac: central_moving_average
+smac: central_moving_average, bench: bench
 };
 
 
