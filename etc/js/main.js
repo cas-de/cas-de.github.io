@@ -96,10 +96,25 @@ var macro_tab_mathml = {
 "cosh": "<mi>cosh</mi>",
 "tanh": "<mi>tanh</mi>",
 "coth": "<mi>coth</mi>",
+
 "arcsin": "<mi>arcsin</mi>",
 "arccos": "<mi>arccos</mi>",
 "arctan": "<mi>arctan</mi>",
 "arccot": "<mi>arccot</mi>",
+"arsinh": "<mi>arsinh</mi>",
+"arcosh": "<mi>arcosh</mi>",
+"artanh": "<mi>artanh</mi>",
+"arcoth": "<mi>arcoth</mi>",
+
+"asin": "<mi>arcsin</mi>",
+"acos": "<mi>arccos</mi>",
+"atan": "<mi>arctan</mi>",
+"acot": "<mi>arccot</mi>",
+"asinh": "<mi>arsinh</mi>",
+"acosh": "<mi>arcosh</mi>",
+"atanh": "<mi>artanh</mi>",
+"acoth": "<mi>arcoth</mi>",
+
 "arg": "<mi>arg</mi>",
 "deg": "<mi>deg</mi>",
 "det": "<mi>det</mi>",
@@ -1429,7 +1444,21 @@ var tex_substitution_table = {
 "tr": "\\operatorname{tr}",
 "GL": "\\operatorname{GL}",
 "var": "\\operatorname{var}",
-"dd": "\\mathrm d"
+"dd": "\\mathrm d",
+
+"arccot": "\\operatorname{arccot}",
+"arsinh": "\\operatorname{arsinh}",
+"arcosh": "\\operatorname{arcosh}",
+"artanh": "\\operatorname{artanh}",
+"arcoth": "\\operatorname{arcoth}",
+"asin": "\\operatorname{arcsin}",
+"acos": "\\operatorname{arccos}",
+"atan": "\\operatorname{arctan}",
+"acot": "\\operatorname{arccot}",
+"asinh": "\\operatorname{arsinh}",
+"acosh": "\\operatorname{arcosh}",
+"atanh": "\\operatorname{artanh}",
+"acoth": "\\operatorname{arcoth}"
 };
 
 function tex_export_tex(buffer,s){
