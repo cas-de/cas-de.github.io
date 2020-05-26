@@ -45,6 +45,16 @@
   >Differentialrechnung</a>
 </ol>
 
+<h3>Quadratur</h3>
+<ol>
+<li><a href="../plot.htm?f(x);%20f(x):=1/cosh(10(x-0.2))%5e2+1/cosh(100(x-0.4))%5e4+1/cosh(1000(x-0.6))%5e6;%20calc(%22bench(f-%3eint(0,1,f,100),f)%22);;scale(0.05,0.2),P(0.347,0.604)"
+  >Test-Integral (Cranley and Patterson, 1971)</a><br>&mdash; korrekter Wert: 0.21080273550054927737564&hellip;
+<li><a href="../plot.htm?f(x);%20f(x):=sin(x+e%5ex);%20calc(%22bench(f-%3eint(0,8,f,10),f)%22)"
+  >Test-Integral (Rump, 2010)</a><br>&mdash; korrekter Wert: 0.34740017265&hellip;
+<li><a href="../plot.htm?f(x);%20f(x):=(e%5ex-floor(e%5ex))*sin(x+e%5ex);%20calc(%22bench(f-%3eint(0,8,f,10),f)%22)"
+  >Test-Integral</a><br>&mdash; korrekter Wert: 0.098651704478365206119658&hellip;
+</ol>
+
 </body>
 </html>
 

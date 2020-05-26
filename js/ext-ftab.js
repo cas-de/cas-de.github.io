@@ -1337,6 +1337,21 @@ function bench(f,x){
     return [end-start,y];
 }
 
+function partition(a,p){
+    var m = {};
+    for(var i=0; i<a.length; i++){
+        var y = p(a[i]);
+        if(m.hasOwnProperty(y)){
+            m[y][1].push(a[i]);
+        }else{
+            m[y] = [y,[a[i]]];
+        }
+    }
+    var b = Object.keys(m).map(function(y){return m[y];});
+    b.sort(function(x,y){return x[0]<y[0]?-1:x[0]>y[0]?1:0;});
+    return b;
+}
+
 extension_table.ftab = {
 PT: ChebyshevT, PU: ChebyshevU, PH: Hermite, 
 PP: Legendre, PL: Laguerre, bc: bc, s1: s1, s2: s2,
@@ -1367,7 +1382,7 @@ pmfP: pmfP, cdfP: cdfP, pmfLog: pmfLog, cdfLog: cdfLog,
 level: quality_level, dot: dot, tw: set_twidth,
 chr: chr, ord: ord, bin: bin, oct: oct, hex: hex, 
 enumerate: enumerate, sma: simple_moving_average,
-smac: central_moving_average, bench: bench
+smac: central_moving_average, bench: bench, partition: partition
 };
 
 
