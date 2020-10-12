@@ -814,9 +814,44 @@ function transpose(A){
     return B;
 }
 
+function cagm(a,b){
+    var ah,bh;
+    for(var i=0; i<20; i++){
+        ah = cmulr(cadd(a,b),0.5);
+        bh = csqrt(cmul(a,b));
+        a = ah; b = bh;
+        if(cabs(csub(a,b))<1E-15) break;
+    }
+    return a;
+}
+
+function ceiK(m){
+    return crdiv(0.5*Math.PI,cagm({re:1,im:0},csqrt(crsub(1,m))));
+}
+
+function ceiE_iter(x,y,a,b){
+    var xh,yh,ah,bh;
+    for(var i=0; i<20; i++){
+        xh = cmulr(cadd(x,y),0.5);
+        yh = csqrt(cmul(x,y));
+        ah = cmulr(cadd(a,b),0.5);
+        bh = cdiv(cadd(cmul(a,y),cmul(b,x)),cadd(x,y));
+        x = xh; y = yh; a = ah; b = bh;
+        if(cabs(csub(x,y))<1E-15 && cabs(csub(a,b))<1E-15) break;
+    }
+    return [x,a];
+}
+
+function ceiE(m){
+    var d = crsub(1,m);
+    var t = ceiE_iter({re:1,im:0},csqrt(d),{re:1,im:0},d);
+    return cmulr(cdiv(t[1],t[0]),0.5*Math.PI);
+}
+
 extension_table.ftab = {
     Si: "cSi", Ci: "cCi", Ci90: "cCi90", Cin: "cCin",
     E1: "cE1", Ei: "cEi", Ein: "cEin", li: "cli", Li: "cLi",
+    K: "ceiK", E: "ceiE", agm: "cagm",
     zeta: "czeta_variadic", pseq: "cprime_sequence",
     psi: "cpsi", ff: "cffac", rf: "crfac", bc: "cbc",
     erf: "cerf", erfc: "cerfc", B: "cbernoulliB", Bm: "cbernoulliBm",
