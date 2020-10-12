@@ -32,7 +32,8 @@ function vtoken_tos(a){
 
 var keywords = {
     "in": [Symbol,"in"],
-    "not": [Symbol,"not"], "and": [Symbol,"&"], "or": [Symbol,"|"], 
+    "not": [Symbol,"not"], "and": [Symbol,"&"], "or": [Symbol,"|"],
+    "xor": [Symbol,"xor"],
     "false": [SymbolNumber,0], "true": [SymbolNumber,1],
     "nicht": [Symbol,"not"], "und": [Symbol,"&"], "oder": [Symbol,"|"],
     "falsch": [SymbolNumber,0], "wahr": [SymbolNumber,1]
@@ -385,10 +386,10 @@ function and_expression(i){
 function or_expression(i){
     var x = and_expression(i);
     var t = get_token(i);
-    while(t[0]==Symbol && t[1]=="|"){
+    while(t[0]==Symbol && (t[1]=="|" || t[1]=="xor")){
         i.index++;
         var y = and_expression(i);
-        x=["or",x,y];
+        x = [t[1]=="|"?"or":"xor",x,y];
         t = get_token(i);
     }
     return x;

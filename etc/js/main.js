@@ -364,7 +364,9 @@ var macro_tab_mathml = {
 "tr": "<mi>tr</mi>",
 "GL": "<mi>GL</mi>",
 "var": "<mi>var</mi>",
-"dd": "<mo mathvariant='normal' lspace='0px' rspace='0px'>d</mo>"
+"dd": "<mo mathvariant='normal' lspace='0px' rspace='0px'>d</mo>",
+"Hom": "<mi>Hom</mi>",
+"sgn": "<mi>sgn</mi>"
 };
 
 var macro_symbol_table = {
@@ -1133,7 +1135,7 @@ function tex_macro_mathml(buffer,id,a,opt,context){
 }
 
 var under_over_table = {
-    "sum":0, "lim":0, "coprod":0,
+    "sum":0, "prod":0, "coprod":0, "lim":0,
     "bigcap":0, "bigcup":0, "bigwedge":0, "bigvee":0,
     "underbrace":0, "overbrace":0, "ub":0, "ob":0,
     "_limits_":0
@@ -1445,6 +1447,8 @@ var tex_substitution_table = {
 "GL": "\\operatorname{GL}",
 "var": "\\operatorname{var}",
 "dd": "\\mathrm d",
+"Hom": "\\operatorname{Hom}",
+"sgn": "\\operatorname{sgn}",
 
 "arccot": "\\operatorname{arccot}",
 "arsinh": "\\operatorname{arsinh}",

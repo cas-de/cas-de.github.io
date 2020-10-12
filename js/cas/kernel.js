@@ -1031,6 +1031,7 @@ eval_dict: {
     "not": function(a){return !a[0]? 1: 0;},
     "=>" : function(a){return !a[0]||a[1]? 1: 0;},
     "<=>": function(a){return a[0]==a[1]? 1: 0;},
+    "xor": function(a){return !(a[0]==a[1])? 1: 0;},
     "+"  : function(a){return a[0]+a[1];},
 },
 

@@ -55,6 +55,29 @@
   >Test-Integral</a><br>&mdash; korrekter Wert: 0.098651704478365206119658&hellip;
 </ol>
 
+<h3>Bug-Archiv</h3>
+<p><b>Bug, Herbst 2020.</b> Eine beliebige Funktion mit
+Namen <code>I</code>, bspw.
+<code>I(x):=x</code> hatte <code>2I(x)=[]</code> für jede Zahl
+<code>x</code> zur Folge. Ursache: <code>I(n)</code> war die
+n&times;n-Einheitsmatrix und in <code>id_type_table</code>
+&ndash; für <i>Bezeichner-Typisierungstabelle</i> &ndash;
+gelistet. Das Problem trat bei Redefinition von allen
+darin gelisteten Funktionen auf. Bei der Typinferenz wurde nun nicht
+überprüft, ob die Bedeutung von <code>I</code> durch Definition
+einer globalen Variable überschrieben wurde. Diese Prüfung ist
+auch nicht ohne weiteres möglich. Daraus ergibt sich, dass die
+Typisierung streng genommen Teil des Tabelleneintrags in der
+Bezeichnertabelle sein sollte. Dann würde der gesamte Eintrag
+bei Redefinition automatisch überschrieben, das Problem träte
+per se nicht auf.
+
+<p><b>Behebung.</b> Fürs Erste sollte <code>I</code> in
+<code>idm</code> umbenannt werden. Die anderen Einträge in
+<code>id_type_table</code> waren
+<code>unit, nabla, rot, diag, tp, expm, jacobi</code>, also
+weniger problematisch.
+
 </body>
 </html>
 

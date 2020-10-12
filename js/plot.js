@@ -1548,7 +1548,7 @@ var id_type_table = {
     "unit": [TypeVector],
     "nabla": [TypeVector],
     "rot": [TypeMatrix],
-    "I": [TypeMatrix],
+    "idm": [TypeMatrix],
     "diag": [TypeMatrix],
     "tp": [TypeMatrix],
     "expm": [TypeMatrix],
@@ -3381,9 +3381,10 @@ async function update_on_resize(){
     }
 }
 
-function plot_img(w,h){
+function plot_img(w,h,fmt){
     if(w==undefined) w = 360;
     if(h==undefined) h = Math.round(w/1.5);
+    if(fmt==undefined) fmt = "png";
     var canvas = document.createElement("canvas");
     canvas.width = w;
     canvas.height = h;
@@ -3400,7 +3401,7 @@ function plot_img(w,h){
     graphics = gx;
     update(gx);
     graphics = last_gx;
-    var s = canvas.toDataURL("image/png");
+    var s = canvas.toDataURL("image/"+fmt);
     var img = "<img align=\"top\" src=\""+s+"\"/>";
     return img;
 }

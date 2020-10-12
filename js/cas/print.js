@@ -17,13 +17,13 @@ order: {
     "<": 10, ">": 10, "<=": 10, ">=": 10,
     "not": 9,
     "and": 8,
-    "or": 6,
+    "or": 6, "xor": 6,
     "=>": 4,
     "<=>": 2,
     "": 0,
 },
 associative: {
-    "+": 1, "*": 1, "and": 1, "or": 1
+    "+": 1, "*": 1, "and": 1, "or": 1, "xor": 1
 },
 alt_name: {
     "alpha": "&alpha;",
@@ -237,6 +237,8 @@ ast: function(t,op,first){
                 return this.operator(t,"=>",op,"&nbsp;&rArr;&nbsp;");
             }else if(s=="<=>"){
                 return this.operator(t,"<=>",op,"&nbsp;&hArr;&nbsp;");
+            }else if(s=="xor"){
+                return this.operator(t,"xor",op,"&nbsp;&oplus;&nbsp;");
             }else if(s=="diff"){
                 return this.diff(t,op);
             }else if(s=="lambda"){

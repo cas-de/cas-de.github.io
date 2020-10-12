@@ -825,9 +825,10 @@ function plot(gx){
     system_xyz(gx);
 }
 
-function plot_img(w,h){
+function plot_img(w,h,fmt){
     if(w==undefined) w = 360;
     if(h==undefined) h = Math.round(w/1.5);
+    if(fmt==undefined) fmt = "jpeg";
     var canvas = document.createElement("canvas");
     canvas.width = w;
     canvas.height = h;
@@ -841,7 +842,7 @@ function plot_img(w,h){
     graphics = gx;
     update(gx);
     graphics = last_gx;
-    var s = canvas.toDataURL("image/jpeg");
+    var s = canvas.toDataURL("image/"+fmt);
     var img = "<img align=\"top\" src=\""+s+"\"/>";
     return img;
 }

@@ -28,7 +28,7 @@ function is_well_formed(t){
         return ["ok"];
     }else if(Array.isArray(t)){
         if(t[0]==="and" || t[0]==="or" || t[0]==="=>" || t[0]==="<=>"
-            || t[0]==="not" || t[0]==="comma"
+            || t[0]==="not" || t[0]==="xor" || t[0]==="comma"
         ){
             for(var i=1; i<t.length; i++){
                 var y = is_well_formed(t[i]);
