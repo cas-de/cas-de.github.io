@@ -407,7 +407,7 @@ function polygonal_chain(t,points){
             for(var i=0; i<a.length; i++){
                 var t = a[i];
                 gx.circle(color,t[0],t[1],4,true);
-            }        
+            }
         }
 
         flush(gx);
@@ -423,8 +423,44 @@ function cmd_chain(t){
     polygonal_chain(t,true);
 }
 
+function area(t){
+    infer_type(t[1]);
+    infer_type(t[2]);
+    infer_type(t[3]);
+    var a = compile(t[1],[])();
+    var b = compile(t[2],[])();
+    var f = compile(t[3],["x"]);
+    var gab = false;
+    if(t.length>4){
+        infer_type(t[4]);
+        var g = compile(t[4],["x"]);
+        var gab = function(x){
+            return (a<x && x<b)?g(x):NaN;
+        };
+    }else{
+        var g = function(x){return 0;}
+    }
+    var cond = function(x,y){
+        var y0 = f(x);
+        var y1 = g(x);
+        if(y0<y1){
+            return (a<x && x<b) && (y0<y && y<y1);
+        }else{
+            return (a<x && x<b) && (y1<y && y<y0);
+        }
+    };
+    var fab = function(x){
+        return (a<x && x<b)?f(x):NaN;
+    };
+    var color = [140,100,0,255];
+    plot_bool(graphics,cond,color,1,false);
+    plot_async(graphics,fab,color);
+    if(gab){plot_async(graphics,gab,color);}
+}
+
 extension_table.cmd = {
     "=": equation, slider: slider, Regler: slider,
-    ani: ani, vec: vec, line: cmd_line, chain: cmd_chain
+    ani: ani, vec: vec, line: cmd_line, chain: cmd_chain,
+    area: area
 };
 

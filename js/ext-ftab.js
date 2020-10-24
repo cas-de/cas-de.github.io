@@ -1352,6 +1352,31 @@ function partition(a,p){
     return b;
 }
 
+function stringify(x){
+    if(Array.isArray(x)){
+        return "["+x.map(stringify).join(", ")+"]";
+    }else if(typeof x == "number"){
+        return x<0?"\u2212"+Math.abs(x):x;
+    }else{
+        return x;
+    }
+}
+
+function print(){
+    var gx = graphics;
+    var a = Array.prototype.slice.call(arguments);
+    var s = a.slice(2).map(stringify).join("");
+    if(gx.label_apps == undefined) {gx.label_apps = [];}
+    gx.label_apps.push(function(){
+        var context = gx.context;
+        var px = gx.px0+gx.mx*ax*a[0];
+        var py = gx.py0-gx.my*ay*a[1];
+        context.fillStyle = gx.font_color;
+        context.textAlign = "left";
+        context.fillText(s,px,py);
+    });
+}
+
 extension_table.ftab = {
 PT: ChebyshevT, PU: ChebyshevU, PH: Hermite, 
 PP: Legendre, PL: Laguerre, bc: bc, s1: s1, s2: s2,
@@ -1382,7 +1407,8 @@ pmfP: pmfP, cdfP: cdfP, pmfLog: pmfLog, cdfLog: cdfLog,
 level: quality_level, dot: dot, tw: set_twidth,
 chr: chr, ord: ord, bin: bin, oct: oct, hex: hex, 
 enumerate: enumerate, sma: simple_moving_average,
-smac: central_moving_average, bench: bench, partition: partition
+smac: central_moving_average, bench: bench, partition: partition,
+print: print
 };
 
 

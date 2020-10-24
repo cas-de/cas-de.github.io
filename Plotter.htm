@@ -49,6 +49,10 @@
   >Tangente an eine Funktion</a>.
 <li><a href="plot.htm?int(0,x,t.sin(t)/t)"
   >Eine Integralfunktion</a>.
+<li><a href="plot.htm?area(0,2,x%5e2)"
+  >Fläche unter dem Graph</a>.
+<li><a href="plot.htm?area(0,2,x%5e2+1,x)"
+  >Fläche zwischen Graphen</a>.
 <li><a href="plot.htm?int(0,10,t.t%5e(x-1)*e%5e(-t))"
   >Die Gammafunktion als Parameterintegral</a>.
 <li><a href="plot.htm?x%5en%20f%C3%BCr%20n%20in%20-4:4"
@@ -97,7 +101,7 @@
   >Eine Helix</a>.
 <li><a href="plot.htm?%5bcos(t)+cos(2pi/m*n),sin(t)+sin(2pi/m*n)%5d%20for%20n%20in%200:m-1;%20m:=6"
   >Eine Schar von Parameterkurven</a>.
-<li><a href="plot.htm?%5b(1-a)*(cos(t)-8)+a*(cos(t)+8),(1-a)*sin(t)+a*sin(2t)/2%5d%20for%20a%20in%200:1:0.2"
+<li><a href="plot.htm?(1-a)*%5bcos(t),sin(t)%5d+a*(sin(5t)/4+1)*%5bcos(t),sin(t)%5d;%20Regler(a,0,1)"
   >Metamorphose</a>.
 <li><a href="plot.htm?rot(45grad)*%5b4cos(t),sin(t)%5d"
   >Eine Rotationsmatrix anwenden</a>.
@@ -186,6 +190,8 @@
   >Der Lorenz-Attraktor</a>.
   <a href="plot.htm?%5bx(t),z(t)%5d;%20%5bx,y,z%5d%27=%5b10(y-x),x*(28-z)-y,x*y-8/3*z%5d;%20p:=%5b0,1,0,20%5d;%20t1:=40;%20tw(40);;scale(5),P(0,20)"
   >Projektion auf die xz-Ebene</a>.
+<li><a href="plot.htm?s(t),i(t),r(t);%20%5bs,i,r%5d%27=%5b-beta*s*i,beta*s*i-gamma*i,gamma*i%5d;%20p:=%5b0,1-i0,i0,0%5d;%20i0:=0.001;%20beta:=R0*gamma;%20R0:=2;%20gamma:=1/4;%20tw(0,160);;scale(5,0.2),P(39.2,0.492)"
+  >Klassisches SIR-Modell</a>.
 </ul>
 
 <br>

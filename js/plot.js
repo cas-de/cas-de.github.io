@@ -108,7 +108,7 @@ var cmd_tab = {
 };
 
 var plot_cmd_tab = {
-    vec:0, line:0, chain:0
+    vec:0, line:0, chain:0, area:0
 };
 
 // begin localisation
@@ -2249,6 +2249,11 @@ function labels(gx){
             context.fillText(s,clamp(px0-10,28+10*(s.length-2),w-16),py+6);
         }
     }
+    if(gx.label_apps){
+        for(var i=0; i<gx.label_apps.length; i++){
+            gx.label_apps[i]();
+        }
+    }
 }
 
 function sleep(ms){
@@ -2712,11 +2717,11 @@ function bisection_bool(state,f,a,b){
     return m;
 }
 
-function plot_bool(gx,f,color,n){
+function plot_bool(gx,f,color,n,point_cond){
     var W = gx.w;
     var H = gx.h;
     var px,py,x,y,z;
-    var point = gx.point();
+    var point = point_cond==undefined?gx.point():function(){};
     var pseta = gx.pseta_median;
     var alpha = dark?0.3:0.4;
     var pset = function(color,x,y){pseta(color,x,y,alpha);}
@@ -3286,6 +3291,7 @@ function switch_hud(){
 function update(gx){
     var out = document.getElementById("out");
     out.innerHTML = "";
+    if(graphics.label_apps){gx.label_apps = [];}
     try{
         plot(gx);
     }catch(e){
