@@ -423,6 +423,33 @@ function cmd_chain(t){
     polygonal_chain(t,true);
 }
 
+function plot_area(gx,f,g,a,b,color){
+    var x,px,py,pgx,pfx,p0,p1;
+    var W = gx.w;
+    var H = gx.h;
+    var pseta = gx.pseta_median;
+    var alpha = dark?0.3:0.4;
+    var pset = function(color,x,y){pseta(color,x,y,alpha);}
+    var px0 = gx.px0;
+    var py0 = gx.py0;
+    var Ax = gx.mx*ax;
+    var Ay = gx.mx*ay;
+
+    var pxa = Math.round(Math.max(0,px0+Ax*a));
+    var pxb = Math.min(W,px0+Ax*b);
+    for(px=pxa; px<pxb; px+=1){
+        x = (px-px0)/Ax;
+        pgx = Math.round(py0-Ay*g(x));
+        pfx = Math.round(py0-Ay*f(x));
+        if(pfx<pgx){p0 = pfx; p1 = pgx;} else {p0 = pgx; p1 = pfx;}
+        p0 = Math.max(0,p0);
+        p1 = Math.min(H,p1);
+        for(py=p0; py<p1; py+=1){rect(pset,color,px,py,1,1);}
+    }
+    flush(gx);
+    labels(gx);
+}
+
 function area(t){
     infer_type(t[1]);
     infer_type(t[2]);
@@ -434,26 +461,13 @@ function area(t){
     if(t.length>4){
         infer_type(t[4]);
         var g = compile(t[4],["x"]);
-        var gab = function(x){
-            return (a<x && x<b)?g(x):NaN;
-        };
+        var gab = function(x){return (a<x && x<b)?g(x):NaN;};
     }else{
         var g = function(x){return 0;}
     }
-    var cond = function(x,y){
-        var y0 = f(x);
-        var y1 = g(x);
-        if(y0<y1){
-            return (a<x && x<b) && (y0<y && y<y1);
-        }else{
-            return (a<x && x<b) && (y1<y && y<y0);
-        }
-    };
-    var fab = function(x){
-        return (a<x && x<b)?f(x):NaN;
-    };
+    var fab = function(x){return (a<x && x<b)?f(x):NaN;};
     var color = [140,100,0,255];
-    plot_bool(graphics,cond,color,1,false);
+    plot_area(graphics,f,g,a,b,color);
     plot_async(graphics,fab,color);
     if(gab){plot_async(graphics,gab,color);}
 }

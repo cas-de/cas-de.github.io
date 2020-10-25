@@ -2392,6 +2392,7 @@ function new_fplot_rec(buffer,gx,color,point,y0,wy,count){
     var yb = y0+wy;
     var YA = y0-2*wy;
     var YB = y0+2*wy;
+    var len = buffer.length;
     return function fplot_rec(depth,f,a,b,d){
         var delta_max = 0;
         var y0 = f(a);
@@ -2406,7 +2407,7 @@ function new_fplot_rec(buffer,gx,color,point,y0,wy,count){
             }
             y0 = y;
         }
-        if(delta_max>0.02/ay && depth<6){
+        if(delta_max>0.02/ay && depth<len){
             buffer[depth].push(function(){
                 count.value++;
                 var n = 10;
@@ -2755,6 +2756,7 @@ function plot_bool(gx,f,color,n,point_cond){
             x = (px-px0)/gx.mx/ax;
             y = -(py-py0)/gx.mx/ay;
             z = f(x,y);
+            // todo: pset fehlt
             if(z!=state){
                 if(state!=undefined){
                     var g = function(y){return f(x,y);};
