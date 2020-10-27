@@ -1305,9 +1305,10 @@ function central_moving_average(a,n) {
     return b;
 }
 
-function quality_level(n){
+function quality_level(n,k){
     if(n==undefined) n = 0;
     max_count = 600*Math.pow(10,n);
+    if(k!=undefined){sample_distance = 0.01/k;}
 }
 
 function dot(a){

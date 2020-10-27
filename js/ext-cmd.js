@@ -235,20 +235,26 @@ function round_prec(x,n){
     return Math.round(m*x)/m;
 }
 
+function identity(x){
+    return x;
+}
+
 var slider_table = {};
 
 function slider(t){
     var id = t[1];
     var a = compile(t[2],[])();
     var b = compile(t[3],[])();
+    var mapping = t.length<5 ? identity : compile(t[4],[])();
     if(slider_table.hasOwnProperty(id)){
         var range = slider_table[id];
         range[0] = a;
         range[1] = b;
+        range[2] = mapping;
         return;
     }
     
-    var range = [a,b];
+    var range = [a,b,mapping];
     slider_table[id] = range;
     ftab_set(id,a);
 
@@ -265,8 +271,9 @@ function slider(t){
     out.innerHTML = range[0];
 
     slider.addEventListener("input",function(){
+        var mapping = range[2];
         var t = this.value/100;
-        var x = range[0]*(1-t)+range[1]*t;
+        var x = mapping(range[0]*(1-t)+range[1]*t);
         var size = 100/Math.abs(range[1]-range[0]);
         var n = 1+Math.round(Math.max(0,lg(size)));
         x = round_prec(x,n);

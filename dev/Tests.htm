@@ -55,8 +55,14 @@
   >Test-Integral</a><br>&mdash; korrekter Wert: 0.098651704478365206119658&hellip;
 </ol>
 
+<h3>Eingaben</h3>
+<ol>
+<li><a href="../plot.htm?x%C2%B2">x²</a> &mdash; Exponenten via Sonderzeichen
+<li><a href="../plot.htm?%CE%A6(x);%20%CE%A6(x):=0.5+0.5*erf(x/sqrt(2))">Φ(x); Φ(x):=0.5+0.5*erf(x/sqrt(2))</a> &mdash; griechische Buchstaben
+</ol>
+
 <h3>Bug-Archiv</h3>
-<p><b>Bug, Herbst 2020.</b> Eine beliebige Funktion mit
+<p><b>Bug 1, Herbst 2020.</b> Eine beliebige Funktion mit
 Namen <code>I</code>, bspw.
 <code>I(x):=x</code> hatte <code>2I(x)=[]</code> für jede Zahl
 <code>x</code> zur Folge. Ursache: <code>I(n)</code> war die
@@ -77,6 +83,20 @@ per se nicht auf.
 <code>id_type_table</code> waren
 <code>unit, nabla, rot, diag, tp, expm, jacobi</code>, also
 weniger problematisch.
+
+<p><b>Bug 2, Herbst 2020.</b> Gestattung von Unicode-Bezeichnern
+hat im Tokenizer die Sonderzeichen mit Werten über
+127 überschattet. Dies betraf das Gradzeichen und die
+hochgestellten Ziffern. Zudem war nicht jedes Unicode-Zeichen
+in Bezeichnern erlaubt, da der Code-Generator lokale
+Variablen als JavaScript-Bezeichner erzeugt, die alphabetisch
+sein müssen.
+
+<p><b>Behebung.</b> Unicode-Bezeichner wurden auf den Bereich von
+0x00C0 bis 0x2000 eingeschränkt. Der Code-Generator müsste bei lokalen
+Variablen die Bezeichner auf abstrakte nummerierte Symbole abbilden oder
+non-ASCII-Zeichen escapen. Für ein hypothetisches Debugging wäre Escapen
+die bessere Option.
 
 </body>
 </html>

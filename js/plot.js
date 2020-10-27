@@ -26,6 +26,7 @@ var max_count = 600;
 var dot_alpha = 0;
 var twidth_left = 10;
 var twidth_right = 10;
+var sample_distance = 0.01;
 
 var color_bg = [255,255,255,255];
 var color_axes = [160,160,160];
@@ -925,7 +926,7 @@ function calc_cmd(cmd){
 }
 
 function isalpha(c){
-    return /^[a-z]+$/i.test(c) || c.charCodeAt(0)>127;
+    return /^[a-z\u00C0-\u2000]+$/i.test(c);
 }
 
 function isdigit(c){
@@ -2577,12 +2578,12 @@ async function vplot(gx,f,d,cond,color){
 
 async function plot_async(gx,f,color){
     if(gx.sync_mode==true){
-        fplot(gx,f,0.01,false,color);
+        fplot(gx,f,sample_distance,false,color);
     }else{
         if(gx.animation){
-            fplot(gx,f,0.01,false,color);
+            fplot(gx,f,sample_distance,false,color);
         }else{
-            fplot(gx,f,0.01,true,color);
+            fplot(gx,f,sample_distance,true,color);
         }
     }
 }
@@ -2756,7 +2757,6 @@ function plot_bool(gx,f,color,n,point_cond){
             x = (px-px0)/gx.mx/ax;
             y = -(py-py0)/gx.mx/ay;
             z = f(x,y);
-            // todo: pset fehlt
             if(z!=state){
                 if(state!=undefined){
                     var g = function(y){return f(x,y);};
