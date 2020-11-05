@@ -78,13 +78,13 @@
 <td>f(x,y):=x&sdot;y
 <td>Funktionsdefinition.
 <tr>
-<td><code>x.2x</code>
+<td><code>x-&gt;2x</code>
 <td>x&nbsp;&#8614;&nbsp;2x
-<td>Lambda-Ausdruck.
+<td>Namenlose Funktion.
 <tr>
-<td><code>(x,y).x*y</code>
+<td><code>(x,y)-&gt;x*y</code>
 <td>(x,y)&nbsp;&#8614;&nbsp;x&sdot;y
-<td>Lambda-Ausdruck.
+<td>Namenlose Funktion.
 <tr>
 <td><code>f'(a)</code>
 <td>f'(a)
@@ -147,25 +147,25 @@
 <th>Mathematik
 <th>Erklärung
 <tr>
-<td><code>diff(x.f(x),a)</code>
+<td><code>diff(x-&gt;f(x),a)</code>
 <td>df(x)/dx|<sub>x=a</sub>
 <td>Ableitung von f an der Stelle a.
 <tr>
-<td><code>diff(x.f(x),a,n)</code>
+<td><code>diff(x-&gt;f(x),a,n)</code>
 <td>(d/dx)<sup>n</sup>&nbsp;f(x)|<sub>x=a</sub>
 <td>Die n-te Ableitung von f bei a.
 <tr>
-<td><code>sum(a,b,k.f(k))</code>
+<td><code>sum(a,b,k-&gt;f(k))</code>
 <td>&sum;<sub>k&in;[a,b]</sub>&nbsp;f(k)
-<td>Summe.
+<td>Summe. Kurz <code>sum(a,b,f)</code>.
 <tr>
-<td><code>prod(a,b,k.f(k))</code>
+<td><code>prod(a,b,k-&gt;f(k))</code>
 <td>&prod;<sub>k&in;[a,b]</sub>&nbsp;f(k)
-<td>Produkt.
+<td>Produkt. Kurz <code>prod(a,b,f)</code>.
 <tr>
-<td><code>int(a,b,x.f(x))</code>
+<td><code>int(a,b,x-&gt;f(x))</code>
 <td>&int;<sub>[a,b]</sub>&nbsp;f(x)&nbsp;dx
-<td>Bestimmtes Integral.
+<td>Bestimmtes Integral. Kurz <code>int(a,b,f)</code>.
 <tr>
 <td><code>inv(f,x,a,b)</code>
 <td>(f|<sub>[a,b]</sub>)<sup>&minus;1</sup>(x)
@@ -380,8 +380,8 @@
 <h3 id="antiderivatives">Integralfunktionen</h3>
 <table class="bt">
 <tr>
-<th>Function
-<th>Explanation
+<th>Funktion
+<th>Erklärung
 <tr>
 <td><code>Ei(x)</code>
 <td>Integralexponentialfunktion.

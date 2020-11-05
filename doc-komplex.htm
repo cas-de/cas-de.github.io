@@ -78,13 +78,13 @@
 <td>f(x,y):=x&sdot;y
 <td>Definition einer Funktion.
 <tr>
-<td><code>z.2z</code>
+<td><code>z-&gt;2z</code>
 <td>z&nbsp;&#8614;&nbsp;2z
-<td>Lambda-Ausdruck.
+<td>Namenlose Funktion.
 <tr>
-<td><code>(x,y).x*y</code>
+<td><code>(x,y)-&gt;x*y</code>
 <td>(x,y)&nbsp;&#8614;&nbsp;x&sdot;y
-<td>Lambda-Ausdruck.
+<td>Namenlose Funktion.
 <tr>
 <td><code>f'(a)</code>
 <td>f'(a)
@@ -123,27 +123,27 @@
 <th>Mathematik
 <th>Erklärung
 <tr>
-<td><code>diff(z.f(z),a)</code>
+<td><code>diff(z-&gt;f(z),a)</code>
 <td>df(z)/dz|<sub>z=a</sub>
 <td>Komplexe Ableitung von f an der Stelle&nbsp;a.
 <tr>
-<td><code>diff(z.f(z),a,n)</code>
+<td><code>diff(z-&gt;f(z),a,n)</code>
 <td>(d/dz)<sup>n</sup>&nbsp;f(z)|<sub>z=a</sub>
-<td>Die n-te Ableitung von f bei a.
+<td>Die n-te Ableitung von&nbsp;f bei&nbsp;a.
 <tr>
-<td><code>sum(a,b,k.f(k))</code>
+<td><code>sum(a,b,k-&gt;f(k))</code>
 <td>&sum;<sub>k&in;[a,b]</sub>&nbsp;f(k)
 <td>Summe.
 <tr>
-<td><code>prod(a,b,k.f(k))</code>
+<td><code>prod(a,b,k-&gt;f(k))</code>
 <td>&prod;<sub>k&in;[a,b]</sub>&nbsp;f(k)
 <td>Produkt.
 <tr>
-<td><code>int([a,b],z.f(z))</code>
+<td><code>int([a,b],z-&gt;f(z))</code>
 <td>&int;<sub>&gamma;</sub>&nbsp;f(z)&nbsp;dz
 <td>Wegintegral, &gamma;=Strecke [a,b].
 <tr>
-<td><code>int([a,b,c],z.f(z))</code>
+<td><code>int([a,b,c],z-&gt;f(z))</code>
 <td>&int;<sub>&gamma;</sub>&nbsp;f(z)&nbsp;dz
 <td>Wegintegral, &gamma;=[a,b]&oplus;[b,c].
 <tr>
