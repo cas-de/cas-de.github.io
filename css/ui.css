@@ -1,11 +1,16 @@
 
 body{
+  font-family: "DejaVu Sans", "Verdana", sans-serif;
   font-size: 140%;
   overflow: hidden;
-  font-family: "DejaVu Sans", "Verdana", sans-serif;
 }
-
-input{font-size: 90%;}
+input{
+  font-family: "Ubuntu", sans-serif;
+  font-size: 90%;
+}
+.mono{
+  font-family: "DejaVu Sans Mono", monospace;
+}
 #menu{margin-left: 10px;}
 #inputf{width: 320px;}
 @media(max-width: 360px){
@@ -18,7 +23,16 @@ input{font-size: 90%;}
   body{margin-top: 0px;}
   body{font-size: 120%;}
 }
-
+input[type=text]{
+  border: 2px solid #808080;
+  border-radius: 6px;
+  padding-left: 6px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+input[type=text]:focus{
+  outline: none;
+}
 input[type=button]{
   background-image: linear-gradient(#ffffff,#ebebea);
   border: 1px solid #bababa;
@@ -37,23 +51,11 @@ input[type=button]:active{
   background-image: linear-gradient(#d0d0d0,#f0f0f0);
 }
 
-input[type=button]::-moz-focus-inner {
-  border: 0;
-}
-
-input[type=button]:focus{
-  outline: none;
-}
-
 #inputf{
   background-color: #fafaffea;
   border: 2px solid #00004080;
   border-radius: 8px;
   padding-left: 6px;
-}
-
-#inputf:focus{
-  outline: none;
 }
 
 canvas.main-canvas{
@@ -62,10 +64,6 @@ canvas.main-canvas{
   top: 0px;
   border: thin solid #a0a0a0;
   z-index: -1;
-}
-
-.mono{
-  font-family: "DejaVu Sans Mono", monospace;
 }
 
 .hud{

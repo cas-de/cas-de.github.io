@@ -16,8 +16,8 @@ body{
   body{margin-left: 6%; margin-right: 4%;}
 }
 @media(max-width: 26em){
-  body{margin-left: 2%; margin-right: 1%;}
-  ol, ul{padding-left: 2em; line-height: 1.2em;}
+  body{margin-left: 2%; margin-right: 1%; line-height: 1.2em;}
+  ol, ul{padding-left: 2em;}
 }
 h1,h2,h3,h4{color: #463c20;}
 
