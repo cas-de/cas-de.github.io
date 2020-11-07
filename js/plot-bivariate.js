@@ -721,7 +721,7 @@ async function plot_level_set(gx,f,z0,n,d,N,epsilon,cond){
 function plot_node_bivariate(gx,t,index){
     var m = gtile;
     if(Array.isArray(t) && t[0]==="for"){
-        node_loop(plot_node_bivariate,gx,t,index);
+        node_loop(plot_node_bivariate,t,gx,index);
     }else if(Array.isArray(t) && t[0]==="="){
         var f = compile(t[1],["x","y"]);
         var z0 = compile(t[2],[])();

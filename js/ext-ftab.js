@@ -673,9 +673,7 @@ function det(A){
 function trace(A){
     var n = A.length;
     var y = 0;
-    for(var i=0; i<n; i++){
-        y+=A[i][i];
-    }
+    for(var i=0; i<n; i++){y+=A[i][i];}
     return y;
 }
 
@@ -685,9 +683,7 @@ function transpose(A){
     var B = [];
     for(var j=0; j<n; j++){
         var v = [];
-        for(var i=0; i<m; i++){
-            v.push(A[i][j]);
-        }
+        for(var i=0; i<m; i++){v.push(A[i][j]);}
         B.push(v);
     }
     return B;
@@ -744,10 +740,28 @@ function jacobih(h){
         }else{
             return transpose([
                 mul_st(0.5/h,sub_tt(f(x[0]+h,x[1],x[2]),f(x[0]-h,x[1],x[2]))),
-                mul_st(0.5/h,sub_tt(f(x[0],x[1]+h,x[2])-f(x[0],x[1]-h,x[2]))),
-                mul_st(0.5/h,sub_tt(f(x[0],x[1],x[2]+h)-f(x[0],x[1],x[2]-h)))
+                mul_st(0.5/h,sub_tt(f(x[0],x[1]+h,x[2]),f(x[0],x[1]-h,x[2]))),
+                mul_st(0.5/h,sub_tt(f(x[0],x[1],x[2]+h),f(x[0],x[1],x[2]-h)))
             ]);
         }
+    };
+}
+
+function metrich(h){
+    var jacobi = jacobih(h);
+    var mul = mul_matrix_matrix;
+    return function(f,x){
+        var J = jacobi(f,x);
+        return mul(transpose(J),J);
+    };
+}
+
+function cartanh(h){
+    var jacobi = jacobih(h);
+    var sub_tt = sub_tensor_tensor;
+    return function(f,x){
+        var J = jacobi(f,x);
+        return sub_tt(J,transpose(J));
     };
 }
 
@@ -759,9 +773,33 @@ function divoph(h){
                 (F(x[0],x[1]+h)[1]-F(x[0],x[1]-h)[1])/(2*h)
             );
         }else{
-            return NaN;
+            return (
+                (F(x[0]+h,x[1],x[2])[0]-F(x[0]-h,x[1],x[2])[0])/(2*h)+
+                (F(x[0],x[1]+h,x[2])[1]-F(x[0],x[1]-h,x[2])[1])/(2*h)+
+                (F(x[0],x[1],x[2]+h)[2]-F(x[0],x[1],x[2]-h)[2])/(2*h)
+            );
         }
     };
+}
+
+function curlh(h){
+    return function curl(F,x){
+        if(x.length==2){
+            return [0,0,(
+                (F(x[0]+h,x[1])[1]-F(x[0]-h,x[1])[1])-
+                (F(x[0],x[1]+h)[0]-F(x[0],x[1]-h)[0])
+            )/(2*h)];
+        }else if(x.length==3){
+            return [
+                ((F(x[0],x[1]+h,x[2])[2]-F(x[0],x[1]-h,x[2])[2])-
+                 (F(x[0],x[1],x[2]+h)[1]-F(x[0],x[1],x[2]-h)[1]))/(2*h),
+                ((F(x[0],x[1],x[2]+h)[0]-F(x[0],x[1],x[2]-h)[0])-
+                 (F(x[0]+h,x[1],x[2])[2]-F(x[0]-h,x[1],x[2])[2]))/(2*h),
+                ((F(x[0]+h,x[1],x[2])[1]-F(x[0]-h,x[1],x[2])[1])-
+                 (F(x[0],x[1]+h,x[2])[0]-F(x[0],x[1]-h,x[2])[0]))/(2*h)
+            ];
+        }
+    }
 }
 
 function rotation_matrix(phi){
@@ -1378,6 +1416,25 @@ function print(){
     });
 }
 
+function pprint(){
+    var gx = graphics;
+    var a = Array.prototype.slice.call(arguments);
+    var s = a.slice(2).map(stringify).join("");
+    if(gx.label_apps == undefined) {gx.label_apps = [];}
+    gx.label_apps.push(function(){
+        var context = gx.context;
+        var px = gx.px0+gx.mx*ax*a[0];
+        var py = gx.py0-gx.my*ay*a[1];
+        context.fillStyle = gx.font_color;
+        context.textAlign = "left";
+        context.fillText(s,px+6,py-6);
+        context.fillStyle = "#000000";
+        context.beginPath();
+        context.arc(px,py,5,0,2*Math.PI);
+        context.fill(); 
+    });
+}
+
 extension_table.ftab = {
 PT: ChebyshevT, PU: ChebyshevU, PH: Hermite, 
 PP: Legendre, PL: Laguerre, bc: bc, s1: s1, s2: s2,
@@ -1387,7 +1444,9 @@ table: table, Wertetabelle: table, Delta: Delta,
 Si: Si, Ci: Ci, det: det, unit: unit_vector, I: idm,
 diag: diag_variadic, _matrix_pow_: matrix_pow, expm: expm,
 _vdiff_: vdiff, nabla: nablah(0.001), divop: divoph(0.001),
-jacobi: jacobih(0.001), _mulvm_: mul_vector_matrix,
+jacobi: jacobih(0.001), metric: metrich(0.001),
+curl: curlh(0.001), cartan: cartanh(0.001),
+_mulvm_: mul_vector_matrix,
 apply: apply, rot: rotation_matrix, tr: trace, tp: transpose,
 pli: pli_general, L: laplace_transform, delta: delta,
 gcd: gcd_variadic, ggT: gcd_variadic,
@@ -1409,7 +1468,7 @@ level: quality_level, dot: dot, tw: set_twidth,
 chr: chr, ord: ord, bin: bin, oct: oct, hex: hex, 
 enumerate: enumerate, sma: simple_moving_average,
 smac: central_moving_average, bench: bench, partition: partition,
-print: print
+print: print, Punkt: pprint
 };
 
 

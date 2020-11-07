@@ -45,8 +45,12 @@
   >Eine Funktion und ihre ersten drei Ableitungen</a>.
 <li><a href="plot.htm?f(x);%20f(x):=x*(x-2);;calc(%22Nullstellen(f,-10,10)%22)"
   >Nullstellen einer Funktion</a>.
+  <a href="plot.htm?f(x);%20f(x):=x*(x-2),%20Punkt(x,f(x),rd(x,4))%20f%C3%BCr%20x%20in%20Nullstellen(f,-10,10)"
+  >Eintragung</a>.
 <li><a href="plot.htm?f(x),%20f(a)+f%27(a)*(x-a);%20a:=1;%20f(x):=sin(x)"
   >Tangente an eine Funktion</a>.
+  <a href="plot.htm?f(x),%20f(a)+f%27(a)*(x-a);%20f(x):=sin(x);%20Regler(a,0,10)"
+  >Mit Regler</a>.
 <li><a href="plot.htm?int(0,x,t.sin(t)/t)"
   >Eine Integralfunktion</a>.
 <li><a href="plot.htm?area(0,2,x%5e2)"
@@ -260,14 +264,21 @@
 <ul>
 <li><a href="Vektorfeld.htm?%5bx,y%5d"
   >Ein Vektorfeld</a>. <a href="Vektorfeld.htm?%5bx,y%5d;%20stream(1)"
-  >Stromlinien</a>.
+  >Stromlinien</a>. <a href="Vektorfeld.htm?%5bx,y%5d;%20dyn(1)"
+  >Pfeile mit Länge</a>.
 <li><a href="Vektorfeld.htm?y%27=x*y,%20%5b1,x*y%5d;%20p:=%5b0,1%5d"
   >Richtungsfeld einer Dgl</a>. <a href="Vektorfeld.htm?%5b1,x*y%5d;%20stream(1)"
   >Stromlinien</a>.
 <li><a href="Vektorfeld.htm?(y%27=y-x;%20p:=%5b0,n%5d)%20f%C3%BCr%20n%20in%20-4:4,%20%5b1,y-x%5d"
   >Richtungsfeld und Lösungskurven</a>.
-<li><a href="Vektorfeld.htm?nabla(U,%5bx,y%5d);%20U(x,y):=1/abs(%5bx,y%5d);;scale(0.1)"
+<li><a href="Vektorfeld.htm?grad(U,%5bx,y%5d);%20U(x,y):=1/abs(%5bx,y%5d);;scale(0.1)"
   >Gradientenfeld zu einem Skalarfeld</a>.
+<li><a href="plot-bivariat.htm?div(F,%5bx,y%5d);%20F(x,y):=%5bx*y%5e2,x%5e2*y%5d;;scale(0.1)"
+  >Divergenz eines Vektorfelds</a>. 
+<a href="Vektorfeld.htm?div(F,%5bx,y%5d);%20F(x,y):=%5bx*y%5e2,x%5e2*y%5d"
+  >Heatmap</a>. 
+<li><a href="Vektorfeld.htm?diff(F,%5bx,y%5d);%20F(x,y):=%5bx*y,x%5e2+y%5e2%5d;%20dyn(1)"
+  >Differential eines Vektorfelds als Jacobi-Matrix</a>.
 <li><a href="Netz-reell.htm?%5bu+v,v%5d"
   >Lineare Koordinatentransformation</a>.
   <a href="Netz-reell.htm?%5b%5b1,1%5d,%5b0,1%5d%5d*%5bu,v%5d"

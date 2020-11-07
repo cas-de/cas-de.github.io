@@ -16,7 +16,7 @@ async function plot_zero_set_fast(gx,f,color){
 
 function plot_node(gx,t,color){
     if(Array.isArray(t) && t[0]==="for"){
-        node_loop(plot_node,gx,t,color);
+        node_loop(plot_node,t,gx,color);
     }else{
         infer_type(t);
         var f = ccompile(t,["z"]);

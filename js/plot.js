@@ -71,7 +71,7 @@ var ftab = {
     div: div, mod: mod, diveuc: diveuc, modeuc: modeuc,
     divtrunc: divtrunc, modtrunc: modtrunc,
     rect: rectangle, tri: triangle,
-    rd: Math.round, trunc: Math.trunc, frac: frac,
+    rd: round, trunc: Math.trunc, frac: frac,
     sqrt: Math.sqrt, cbrt: cbrt, rt: root, root: root,
     exp: Math.exp, expm1: Math.expm1,
     log: log, ln: Math.log, lg: lg, ld: ld, lb: ld,
@@ -219,6 +219,15 @@ function range(a,b,step){
             x = a+i*step;
         }
         return y;
+    }
+}
+
+function round(x,n){
+    if(n===undefined){
+        return Math.round(x);
+    }else{
+        var m = Math.pow(10,n);
+        return Math.round(m*x)/m;
     }
 }
 
@@ -1542,18 +1551,21 @@ var TypeVector = 1;
 var TypeMatrix = 2;
 var type_op_table = {
     "[]":0, "+":0, "-":0, "*":0, "/":0, "^":0, "~":0,
-    "abs":0, "index":0, "fn":0, "diff":0
+    "abs":0, "index":0, "fn":0, "diff":0, "div":0, "grad":0
 };
 
 var id_type_table = {
     "unit": [TypeVector],
     "nabla": [TypeVector],
+    "curl": [TypeVector],
     "rot": [TypeMatrix],
     "idm": [TypeMatrix],
     "diag": [TypeMatrix],
     "tp": [TypeMatrix],
     "expm": [TypeMatrix],
-    "jacobi": [TypeMatrix]
+    "jacobi": [TypeMatrix],
+    "metric": [TypeMatrix],
+    "cartan": [TypeMatrix]
 };
 
 function assign(x,y){
@@ -1661,6 +1673,13 @@ function infer_type(t,local_variables){
                         return TypeVector;
                     }
                 }else if(T[2]===TypeVector){
+                    t[0] = "nabla";
+                    return TypeVector;
+                }
+            }else if(t[0]==="div"){
+                if(T[2]===TypeVector){t[0] = "divop";}
+            }else if(t[0]==="grad"){
+                if(T.length>2){
                     t[0] = "nabla";
                     return TypeVector;
                 }
@@ -2938,7 +2957,7 @@ function repr(x){
     return Array.isArray(x)?["[]"].concat(x):x;
 }
 
-function node_loop(callback,gx,t,color){
+function node_loop(callback,t,gx,color){
     var v = t[2][1];
     var a = compile(t[2][2],[])();
     var node = t[1];
@@ -2951,7 +2970,11 @@ function node_loop(callback,gx,t,color){
             t = t[1];
             if(t===null) continue;
         }
-        callback(gx,t,color);
+        if(gx===undefined){
+            callback(t);
+        }else{
+            callback(gx,t,color);
+        }
     }
 }
 
@@ -2962,7 +2985,7 @@ var bool_result_ops = {
 function plot_node_basic(gx,t,color){
     var f;
     if(Array.isArray(t) && t[0]==="for"){
-        node_loop(plot_node,gx,t,color);
+        node_loop(plot_node,t,gx,color);
     }else if(Array.isArray(t) && t[0]===lang_points){
         if(t.length==2){
             var a = compile(t[1],[])();
@@ -3058,20 +3081,21 @@ function eval_cmd(t){
 }
 
 function eval_statements(t){
-    if(Array.isArray(t) && (t[0]==="block" || t[0]===";")){
+    var is_array = Array.isArray(t);
+    if(is_array && (t[0]==="block" || t[0]===";")){
         for(var i=1; i<t.length; i++){
             eval_statements(t[i]);
         }
+    }else if(is_array && t[0]===":="){
+        global_definition(t);
+    }else if(is_array && t[0]==="for"){
+        node_loop(eval_statements,t);
+    }else if(is_array && typeof t[0]=="string" &&
+        cmd_tab.hasOwnProperty(t[0])
+    ){
+        eval_cmd(t);
     }else{
-        if(Array.isArray(t) && t[0]===":="){
-            global_definition(t);
-        }else if(Array.isArray(t) && typeof t[0]=="string" &&
-            cmd_tab.hasOwnProperty(t[0])
-        ){
-            eval_cmd(t);
-        }else{
-            eval_node(t);
-        }
+        eval_node(t);
     }
 }
 

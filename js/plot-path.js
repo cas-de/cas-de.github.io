@@ -34,7 +34,7 @@ async function vcplot_async(gx,f,color){
 
 function plot_node(gx,t,color){
     if(Array.isArray(t) && t[0]==="for"){
-        node_loop(plot_node,gx,t,color);
+        node_loop(plot_node,t,gx,color);
     }else{
         var f = ccompile(t,["t"]);
         vcplot_async(gx,f,color);

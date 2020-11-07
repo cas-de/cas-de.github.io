@@ -193,6 +193,12 @@ function plot_node(gx,t,color){
             }else{
                 plot_vector_field(gx,f);
             }
+        }else if(T==TypeMatrix){
+            var f = compile(t,["x","y"]);
+            var f0 = function(x,y){return f(x,y)[0];}
+            var f1 = function(x,y){return f(x,y)[1];}
+            plot_vector_field(gx,f0);
+            plot_vector_field(gx,f1);
         }else{
             plot_node_basic(gx,t,color);
         }
