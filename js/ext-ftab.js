@@ -866,8 +866,8 @@ function pli_fn(f,xa,xb,d){
 function pli_general(x,y,z,w){
     if(y==undefined || z==undefined){
         return pli_nodes(x);
-    }else if(w==undefined){
-        return pli(x,y,z);
+    }else if(typeof(x)=="number"){
+        return pli(x,y,z,w);
     }else{
         return pli_fn(x,y,z,w);
     }
@@ -1428,7 +1428,7 @@ function pprint(){
         context.fillStyle = gx.font_color;
         context.textAlign = "left";
         context.fillText(s,px+6,py-6);
-        context.fillStyle = "#000000";
+        context.fillStyle = dark ? "#dcb414" : "#000000";
         context.beginPath();
         context.arc(px,py,5,0,2*Math.PI);
         context.fill(); 

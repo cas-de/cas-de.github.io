@@ -8,10 +8,9 @@
 <body>
 
 <table class="navigation">
-<tr>
-<td><a href="index.html">Home</a>
-<td><a href="plot.htm">Neu</a>
-<td><a href="Plotter.htm">Auswahl</a>
+<tr><td><a href="index.html">Home</a>
+| <a href="plot.htm">Neu</a>
+| <a href="Plotter.htm">Auswahl</a>
 </table>
 
 <h2>Anleitung zum Funktionenplotter</h2>
@@ -37,7 +36,6 @@
 <li><a href="#Befehle">Befehle</a>
 <li><a href="#Parameterkurven">Parameterkurven</a>
 <li><a href="#Parameterfleachen">Parameterflächen</a>
-<li><a href="#input-examples">Eingabe-Beispiele</a>
 </ol>
 
 <h3 id="syntax">Syntax</h3>
@@ -353,7 +351,7 @@
 <td>Gamma-Funktion &Gamma;(x).
 <tr>
 <td><code>fac(x)</code>
-<td>Fakultät, d.h. <code>gamma(x+1)</code>.
+<td>Fakultät, als <code>gamma(x+1)</code>.
 <tr>
 <td><code>gamma(a,x)</code>
 <td>Untere unvollständige Gamma-Funktion &gamma;(a,x).
@@ -961,72 +959,6 @@ mit <code>x=t[0]</code> und <code>y=t[1]</code>.
 <td><code>alpha:=0.94</code>
 <td>Transparenzfaktor für Flächen.
 </table>
-
-<br>
-<h3 id="input-examples">Eingabe-Beispiele</h3>
-<dl class="input">
-<dt><a href="plot.htm?sin(x)">sin(x)</a>
-<dd>Eine explizite Funktion.
-
-<dt><a href="plot.htm?sin(x);scale(0.1),P(pi,0)"
->sin(x);scale(0.1),P(pi,0)</a>
-<dd>Zeichne eine Funktion an der Position <code>P(x,y)</code>
-mit der Skalierung <code>scale(dx,dy=dx)</code>.
-
-<dt><a href="plot.htm?sin(x);;scale(0.1),P(pi,0)"
->sin(x);;scale(0.1),P(pi,0)</a>
-<dd>Alles hinter zwei Semikolons wird nur einmal
-ausgeführt und dann entfernt.
-
-<dt><a href="plot.htm?sin(x),cos(x),tan(x),cot(x)">sin(x),cos(x),tan(x),cot(x)</a>
-<dd>Viele Funktionen.
-
-<dt><a href="plot.htm?x%5e2-y%5e2=1">x^2-x^2=1</a>
-<dd>Eine implizite Funktion.
-
-<dt><a href="plot.htm?x%5e2-y%5e2=1,x,-x">x^2-x^2=1,x,-x</a>
-<dd>Eine implizite Funktion und ihre Asymptoten.
-
-<dt><a href="plot.htm?f(x):=ln(x),f(x),f%27(x)"
->f(x):=ln(x),f(x),f'(x)</a>
-<dd>Eine Funktion und ihre Ableitung.
-
-<dt><a href="plot.htm?f(x):=sin(x),a:=2,f(x),f(a)+f%27(a)*(x-a)"
->f(x):=sin(x),a:=2,f(x),f(a)+f'(a)*(x-a)</a>
-<dd>Tangente an eine Funktion.
-
-<dt><a href="plot.htm?exp(x),sum(0,4,k.x%5ek/fac(k))"
->exp(x),sum(0,4,k.x^k/fac(k))</a>
-<dd>Partialsumme der Exponentialreihe.
-
-<dt><a href="plot.htm?int(0,10,t.t%5e(x-1)*exp(-t))"
->int(0,10,t.t^(x-1)*exp(-t))</a>
-<dd>Gamma-Funktion via Parameterintegral.
-
-<dt><a href="plot.htm?%5bcos(t),sin(2t)/2%5d"
->[cos(t),sin(2t)/2]</a>
-<dd>Eine Parameterkurve.
-
-<dt><a href="plot.htm?t0:=0,t1:=10pi,%5bt/10*cos(t),t/10*sin(t)%5d"
->t0:=0,t1:=10pi,[t/10*cos(t),t/10*sin(t)]</a>
-<dd>Eine Parameterkurve für den angegebenen Definitionsbereich.
-
-<dt><a href="plot.htm?r(t):=sin(5t)+4,%5br(t)*cos(t),r(t)*sin(t)%5d"
->r(t):=sin(5t)+4,[r(t)*cos(t),r(t)*sin(t)]</a>
-<dd>Ein Stern.
-
-<dt><a href="plot-bivariat.htm?cos(sqrt(x%5e2+y%5e2))"
->cos(sqrt(x^2+y^2))</a>
-<dd>Eine bivariate Funktion.
-
-<dt><a href="plot-bivariat.htm?[cos(u)sin(v),sin(u)sin(v),cos(v)];;scale(0.2)"
->[cos(u)sin(v),sin(u)sin(v),cos(v)]</a>
-<dd>Eine parametrische Fläche.
-
-<dt><a href="plot-bivariat.htm?[(R+r*cos(v))cos(u),(R+r*cos(v))sin(u),r*sin(v)];R:=4,r:=2,v1:=2pi"
->[(R+r*cos(v))cos(u),(R+r*cos(v))sin(u),r*sin(v)];<br>R:=4,r:=2,v1:=2pi</a>
-<dd>Ein parametrischer Torus.
-</dl>
 
 </body>
 </html>

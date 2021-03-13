@@ -10,8 +10,8 @@
 <table class="navigation">
 <tr>
 <td><a href="index.html">Home</a>
-<td><a href="doc.htm">Anleitung</a>
-<td><a href="Plotter.htm">Tagmodus</a>
+| <a href="doc.htm">Anleitung</a>
+| <a href="Plotter.htm">Tagmodus</a>
 </table>
 
 <h2>Funktionenplotter, Visualisierung</h2>
@@ -39,13 +39,15 @@
   >Eine Funktion und ihre ersten drei Ableitungen</a>.
 <li><a href="plot-dunkel.htm?f(x);%20f(x):=x*(x-2);;calc(%22Nullstellen(f,-10,10)%22)"
   >Nullstellen einer Funktion</a>.
+  <a href="plot-dunkel.htm?f(x);%20f(x):=x*(x-2),%20Punkt(x,f(x),rd(x,4))%20f%C3%BCr%20x%20in%20Nullstellen(f,-10,10)"
+  >Eintragung</a>.
 <li><a href="plot-dunkel.htm?f(x),%20f(a)+f%27(a)*(x-a);%20a:=1;%20f(x):=sin(x)"
   >Tangente an eine Funktion</a>.
   <a href="plot-dunkel.htm?f(x),%20f(a)+f%27(a)*(x-a);%20f(x):=sin(x);%20Regler(a,0,10)"
   >Mit Regler</a>.
-<li><a href="plot-dunkel.htm?int(0,x,t.sin(t)/t)"
+<li><a href="plot-dunkel.htm?int(0,x,t-%3esin(t)/t)"
   >Eine Integralfunktion</a>.
-<li><a href="plot-dunkel.htm?int(0,10,t.t%5e(x-1)*e%5e(-t))"
+<li><a href="plot-dunkel.htm?int(0,10,t-%3et%5e(x-1)*e%5e(-t))"
   >Die Gammafunktion als Parameterintegral</a>.
 <li><a href="plot-dunkel.htm?x%5en%20f%C3%BCr%20n%20in%20-4:4"
   >Eine Schar von Funktionen</a>.
@@ -61,7 +63,7 @@
   >Schieberegler für einen Parameter</a>.
 <li><a href="plot-dunkel.htm?y=a*sin(b*x);%20Regler(a,1,4),%20Regler(b,1,4)"
   >Schieberegler für zwei Parameter</a>.
-<li><a href="plot-dunkel.htm?sum(1,n,k.sin((2k-1)*x)/(2k-1));%20Regler(n,1,20)"
+<li><a href="plot-dunkel.htm?sum(1,n,k-%3esin((2k-1)*x)/(2k-1));%20Regler(n,1,20)"
   >Partialsumme einer Fourier-Reihe</a>.
 </ul>
 
@@ -85,9 +87,9 @@
   >Der Kreis</a>.
 <li><a href="plot-dunkel.htm?%5bcos(t),sin(2t)/2%5d;;scale(0.5)"
   >Die Lemniskate von Gerono</a>.
-<li><a href="plot-dunkel.htm?%5bt*cos(pi*t),t*sin(pi*t)%5d;t0:=0,t1:=4"
+<li><a href="plot-dunkel.htm?%5bt*cos(pi*t),t*sin(pi*t)%5d;%20t0:=0,%20t1:=4"
   >Eine Spirale</a>.
-<li><a href="plot-dunkel.htm?%5bint(0,t,t.cos(t%5e2)),int(0,t,t.sin(t%5e2))%5d;%20t0:=-10;%20t1:=10;;scale(0.2)"
+<li><a href="plot-dunkel.htm?%5bint(0,t,t-%3ecos(t%5e2)),int(0,t,t-%3esin(t%5e2))%5d;%20t0:=-10;%20t1:=10;;scale(0.2)"
   >Eine Klothoide</a>.
 <li><a href="plot-dunkel.htm?%5bcos(t)+cos(2pi/m*n),sin(t)+sin(2pi/m*n)%5d%20for%20n%20in%200:m-1;%20m:=6"
   >Eine Schar von Parameterkurven</a>.
@@ -154,7 +156,7 @@
   <code>p:=[x<sub>0</sub>,y(x<sub>0</sub>),y'(x<sub>0</sub>)]</code>.
 <li><a href="plot-dunkel.htm?x(t);%20x%27%27=t*x;%20p:=%5b0,0,1%5d"
   >Für eine Funktion der Zeit</a>.
-<li><a href="plot-dunkel.htm?f(x);%20f:=iter(y.pli(x.1+int(0,x,t.y(t)),-10,10,0.1),40,t.1)"
+<li><a href="plot-dunkel.htm?f(x);%20f:=iter(phi,40,t-%3e1);%20phi(y):=pli(x-%3e1+int(0,x,t-%3ey(t)),-10,10,0.1)"
   >Eine Picard-Iteration</a>.
 <li><a href="plot-dunkel.htm?f(x)%5b0%5d;%20f(x):=expm(x*A)*%5b1,0%5d;%20A:=%5b%5b0,1%5d,%5b-1,0%5d%5d"
   >Lösung eines Systems mittels Matrix-Exponential</a>.

@@ -229,6 +229,10 @@ function plot_node(gx,t,index){
         plot_node_bivariate(gx,t[1],index);
         return;
     }
+    if(Array.isArray(t) && t[0]==="for"){
+        node_loop(plot_node,t,gx,index);
+        return;
+    }
     if(Array.isArray(t) && t[0]==="="){
         t = ["-",t[1],t[2]];
     }

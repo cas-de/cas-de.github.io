@@ -8,10 +8,9 @@
 <body>
 
 <table class="navigation">
-<tr>
-<td><a href="index.html">Home</a>
-<td><a href="doc.htm">Anleitung</a>
-<td><a href="Plotter-dunkel.htm">Nachtmodus</a>
+<tr><td><a href="index.html">Home</a>
+| <a href="doc.htm">Anleitung</a>
+| <a href="Plotter-dunkel.htm">Nachtmodus</a>
 </table>
 
 <h2>Funktionenplotter, Visualisierung</h2>
@@ -51,13 +50,13 @@
   >Tangente an eine Funktion</a>.
   <a href="plot.htm?f(x),%20f(a)+f%27(a)*(x-a);%20f(x):=sin(x);%20Regler(a,0,10)"
   >Mit Regler</a>.
-<li><a href="plot.htm?int(0,x,t.sin(t)/t)"
+<li><a href="plot.htm?int(0,x,t-%3esin(t)/t)"
   >Eine Integralfunktion</a>.
 <li><a href="plot.htm?area(0,2,x%5e2)"
   >Fläche unter dem Graph</a>.
 <li><a href="plot.htm?area(0,2,x%5e2+1,x)"
   >Fläche zwischen Graphen</a>.
-<li><a href="plot.htm?int(0,10,t.t%5e(x-1)*e%5e(-t))"
+<li><a href="plot.htm?int(0,10,t-%3et%5e(x-1)*e%5e(-t))"
   >Die Gammafunktion als Parameterintegral</a>.
 <li><a href="plot.htm?x%5en%20f%C3%BCr%20n%20in%20-4:4"
   >Eine Schar von Funktionen</a>.
@@ -73,7 +72,7 @@
   >Schieberegler für einen Parameter</a>.
 <li><a href="plot.htm?y=a*sin(b*x);%20Regler(a,1,4),%20Regler(b,1,4)"
   >Schieberegler für zwei Parameter</a>.
-<li><a href="plot.htm?sum(1,n,k.sin((2k-1)*x)/(2k-1));%20Regler(n,1,20,rd)"
+<li><a href="plot.htm?sum(1,n,k-%3esin((2k-1)*x)/(2k-1));%20Regler(n,1,20,rd)"
   >Partialsumme einer Fourier-Reihe</a>.
 </ul>
 
@@ -95,11 +94,13 @@
 <ul>
 <li><a href="plot.htm?%5bcos(t),sin(t)%5d"
   >Der Kreis</a>.
+<li><a href="plot.htm?%5bcos(t),sin(t)%5d;%20t0:=0;%20t1:=pi"
+  >Ein Halbkreis</a>.
 <li><a href="plot.htm?%5bcos(t),sin(2t)/2%5d;;scale(0.5)"
   >Die Lemniskate von Gerono</a>.
 <li><a href="plot.htm?%5bt*cos(pi*t),t*sin(pi*t)%5d;t0:=0,t1:=4"
   >Eine Spirale</a>.
-<li><a href="plot.htm?%5bint(0,t,t.cos(t%5e2)),int(0,t,t.sin(t%5e2))%5d;%20t0:=-10;%20t1:=10;;scale(0.2)"
+<li><a href="plot.htm?%5bint(0,t,t-%3ecos(t%5e2)),int(0,t,t-%3esin(t%5e2))%5d;%20t0:=-10;%20t1:=10;;scale(0.2)"
   >Eine Klothoide</a>.
 <li><a href="plot-bivariat.htm?%5bcos(t),sin(t),t%5d;;scale(0.5)"
   >Eine Helix</a>.
@@ -170,7 +171,7 @@
   >Für eine Funktion der Zeit</a>.
 <li><a href="Vektorfeld.htm?y%27=y,%20%5b1,y%5d;%20p:=%5b0,1%5d"
   >Richtungsfeld einer Dgl. erster Ordnung</a>.
-<li><a href="plot.htm?f(x);%20f:=iter(y.pli(x.1+int(0,x,t.y(t)),-10,10,0.1),40,t.1)"
+<li><a href="plot.htm?f(x);%20f:=iter(phi,40,t-%3e1);%20phi(y):=pli(x-%3e1+int(0,x,t-%3ey(t)),-10,10,0.1)"
   >Eine Picard-Iteration</a>.
 <li><a href="plot.htm?f(x)%5b0%5d;%20f(x):=expm(x*A)*%5b1,0%5d;%20A:=%5b%5b0,1%5d,%5b-1,0%5d%5d"
   >Lösung eines Systems mittels Matrix-Exponential</a>.
@@ -313,7 +314,7 @@
   >Ableitung einer komplexen Funktion</a>.
 <li><a href="plot-komplex.htm?int(%5b1,if(im(z)%3c0,-i,i),z%5d,f);%20f(z):=1/z"
   >Komplexer Logarithmus als Integralfunktion</a>.
-<li><a href="plot-komplex.htm?int(%5b0,20%5d,t.t%5e(z-1)*e%5e(-t))"
+<li><a href="plot-komplex.htm?int(%5b0,20%5d,t-%3et%5e(z-1)*e%5e(-t))"
   >Die Gammafunktion als Parameterintegral</a>.
 <li><a href="Riemann.htm">Eine riemannsche Fläche</a>.
 </ul>
@@ -335,9 +336,9 @@
   >Eine Julia-Menge</a>. Angabe von Stelle und Maßstab.
 <li><a href="Newton.htm"
   >Ein Newton-Fraktal</a>.
-<li><a href="Newton.htm?z-f(z,c)/(z.f(z,c))%27(z);f(z,c):=z%5e3+(c-1)*z-c,z0(c):=0;;scale(0.02),P(0.31396,1.63954)"
+<li><a href="Newton.htm?z-f(z,c)/(z-%3ef(z,c))%27(z);f(z,c):=z%5e3+(c-1)*z-c,z0(c):=0;;scale(0.02),P(0.3140,1.6395)"
   >Newton-Fraktal</a> zum Startwert null für eine Familie kubischer Polynome.
-<li><a href="plot.htm?(r:=x,iter(x.r*x*(1-x),1000,rand(0,1)));;scale(0.05,0.1),P(3.46,0.54)"
+<li><a href="plot.htm?(r:=x,iter(x-%3er*x*(1-x),1000,rand(0,1)));;scale(0.05,0.1),P(3.460,0.540)"
   >Bifurkationsdiagramm der logistischen Gleichung</a>.
 </ul>
 

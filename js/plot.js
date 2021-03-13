@@ -2721,7 +2721,7 @@ function plot_level_async(gx,f,color){
         return r-1-Math.floor(r-0.5);
     };
     if(iso_mode==0 || iso_mode==2){
-        plot_level(gx,f,1,false);
+        plot_level(gx,f,gx.animation?4:1,false);
     }
     labels(gx);
     if(iso_mode>0){
@@ -2790,12 +2790,13 @@ function plot_bool(gx,f,color,n,point_cond){
     labels(gx);
 }
 
-function pli(x0,d,y){
+function pli(x0,d,y,cont){
+    if(cont==undefined) cont = NaN;
     var n = y.length;
     return function(x){
         var k = Math.floor((x-x0)/d);
         if(k<0 || k+1>=n){
-            return NaN;
+            return cont;
         }else{
             return y[k]+(y[k+1]-y[k])/d*(x-x0-k*d);
         }
