@@ -3113,6 +3113,10 @@ function process_statements(a){
     }
 }
 
+function eval_statements_rev(t,a,b){
+    for(var i=b-1; i>=a; i--){eval_statements(t[i]);}
+}
+
 function plot(gx){
     var color_index = 0;
     var input = get_value("inputf").trim();
@@ -3123,19 +3127,22 @@ function plot(gx){
     if(a[0].length>0){
         var t = ast(a[0]);
         if(Array.isArray(t) && t[0]===";"){
-            for(var i=t.length-1; i>=2; i--){
-                eval_statements(t[i]);
-            }
+            eval_statements_rev(t,2,t.length);
             t = t[1];
             if(t===null){refresh_system(gx); return;}
         }
         refresh_system(gx);
         if(Array.isArray(t) && t[0]==="block"){
             for(var i=1; i<t.length; i++){
-                if(Array.isArray(t[i]) && t[i][0]===":="){
-                    global_definition(t[i]);
+                var ti = t[i];
+                if(Array.isArray(ti) && ti[0]===":="){
+                    global_definition(ti);
                 }else{
-                    plot_node(gx,t[i],color_table[color_index]);
+                    if(Array.isArray(ti) && ti[0]===";"){
+                        eval_statements_rev(ti,2,ti.length);
+                        ti = ti[1];
+                    }
+                    plot_node(gx,ti,color_table[color_index]);
                     color_index = (color_index+1)%color_table.length;
                 }
             }
