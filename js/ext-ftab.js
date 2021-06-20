@@ -1435,6 +1435,12 @@ function pprint(){
     });
 }
 
+function color(){
+    for(var i=0; i<arguments.length; i++){
+        color_table[i] = arguments[i];
+    }
+}
+
 extension_table.ftab = {
 PT: ChebyshevT, PU: ChebyshevU, PH: Hermite, 
 PP: Legendre, PL: Laguerre, bc: bc, s1: s1, s2: s2,
@@ -1468,7 +1474,10 @@ level: quality_level, dot: dot, tw: set_twidth,
 chr: chr, ord: ord, bin: bin, oct: oct, hex: hex, 
 enumerate: enumerate, sma: simple_moving_average,
 smac: central_moving_average, bench: bench, partition: partition,
-print: print, Punkt: pprint
+print: print, Punkt: pprint, color: color,
+black: [0,0,0,255], blue: [0,0,140,255], green: [0,100,0,255],
+red: [180,0,0,255], purple: [140,0,140,255], gray: [140,140,140,255],
+teal: [0,140,140,255], yellow: [200,160,0,255]
 };
 
 

@@ -448,10 +448,12 @@ function scan_bbcode(a,s,i,n){
         i+=1;
     }
     var node = [];
+    var first = true;
     while(i<n && s[i]!=']'){
-        if(s[i]=='='){
+        if(s[i]=='=' && first){
             flush_node(a,node);
             a.push([Symbol,"="]);
+            first = false;
         }else{
             node.push(s[i]);
         }
