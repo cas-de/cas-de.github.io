@@ -1437,7 +1437,9 @@ function pprint(){
 
 function color(){
     for(var i=0; i<arguments.length; i++){
-        color_table[i] = arguments[i];
+        var t = arguments[i];
+        if(t.length==3) t = t.concat(255);
+        color_table[i] = t;
     }
 }
 
