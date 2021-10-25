@@ -5,7 +5,7 @@
 var parser = (function(){
 
 function isalpha(s){
-    return /^[a-z]+$/i.test(s);
+    return /^[a-z\u00C0-\u2000]+$/i.test(s);
 }
 
 function isdigit(s){

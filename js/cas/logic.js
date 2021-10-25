@@ -303,6 +303,7 @@ function logic(){
                 out.push("</table>");
                 output.innerHTML = out.join("");
             }
+            output.innerHTML += link(input.value);
         }else{
             output.innerHTML="";
         }
@@ -313,3 +314,5 @@ function logic(){
         throw e;
     }
 }
+
+query_action = logic;

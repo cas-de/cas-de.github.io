@@ -13,8 +13,15 @@ function load_async(path,callback){
     head.appendChild(s);
 }
 
+var load_count = 0;
+var load_complete;
+
 function load(path){
-    load_async(path,function(){});
+    load_async(path, function(){
+        // Some hack. Needs to be made clean async.
+        load_count += 1;
+        if(load_count == load_complete){query();}
+    });
 }
 
 function main_eval(){
@@ -86,6 +93,8 @@ function expand(){
 }
 
 var main = main_eval;
+var query_id = "input1";
+var query_action = main;
 
 function handle_keys(event){
     if(event.keyCode==13){
@@ -93,7 +102,42 @@ function handle_keys(event){
     }
 }
 
+function query() {
+    var a = window.location.href.split("?");
+    if(a.length > 1){
+        var input = document.getElementById(query_id);
+        input.value = decodeURIComponent(a[1]);
+        query_action();
+    }
+}
+
+var encode_tab = {
+  " ": "20", "#": "23", "'": "27", "[": "5b", "]": "5d", "^": "5e",
+  "\"": "22", "<": "3c", ">": "3e", "|": "7c"
+};
+
+function encode_query(s){
+    var a = [];
+    for(var i = 0; i < s.length; i++){
+        if(s.charCodeAt(i) > 127){
+            a.push(encodeURIComponent(s[i]));
+        }else if(encode_tab.hasOwnProperty(s[i])){
+            a.push("%" + encode_tab[s[i]]);
+        }else{
+            a.push(s[i]);
+        }
+    }
+    return a.join("");
+}
+
+function link(s){
+    var url = window.location.href.split("?")[0];
+    return ("<p><a style='color: #808080; text-decoration: underline' href='" + url + "?"
+      + encode_query(s) + "'>Link</a>");
+}
+
 window.onload = function(){
+    load_complete = 3;
     load(conf.root+"js/cas/syntax.js");
     load(conf.root+"js/cas/kernel.js");
     load(conf.root+"js/cas/print.js");
