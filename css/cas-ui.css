@@ -168,3 +168,10 @@ div.frame{
   background-color: #f0f0ff;
   padding: 0.5em;
 }
+
+div.link-box{
+  background-color: #e0e0e0;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 8px;
+}

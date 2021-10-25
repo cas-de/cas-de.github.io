@@ -24,6 +24,13 @@ function load(path){
     });
 }
 
+function generate_link() {
+    var input = document.getElementById("input1");
+    var output = document.getElementById("output1");
+    output.innerHTML += "<br><div class='link-box'>"
+      + link(input.value) + "</div>";
+}
+
 function main_eval(){
     var input = document.getElementById("input1");
     var output = document.getElementById("output1");
@@ -132,8 +139,8 @@ function encode_query(s){
 
 function link(s){
     var url = window.location.href.split("?")[0];
-    return ("<p><a style='color: #808080; text-decoration: underline' href='" + url + "?"
-      + encode_query(s) + "'>Link</a>");
+    return ("<a style='color: #808080; text-decoration: underline' href='" + url + "?"
+        + encode_query(s) + "'>Link</a>");
 }
 
 window.onload = function(){
