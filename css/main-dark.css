@@ -24,8 +24,7 @@ h1,h2,h3,h4{color: #d0a020;}
 a{color: #d0c090; text-decoration: none;}
 a:hover{color: #f0a000; text-decoration: underline;}
 pre, code{
-  font-family: "FreeMono", "Courier New", monospace;
-  color: #babab0;
+  font-family: "DejaVu Sans Mono", "Menlo", "Consolas", monospace;
 }
 table.bt{border-collapse: collapse;}
 table.bt td, table.bt th{

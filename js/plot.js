@@ -95,7 +95,7 @@ var ftab = {
     E: eiE, K: eiK, F: eiF, Pi: eiPi,
     RF: RF, RC: RC, RJ: RJ, RD: RD,
     P: set_position, scale: set_scale,
-    zeros: zeros, zeroes: zeros, roots: zeros,
+    zeros: zeros, zeroes: zeros, roots: zeros, ic: ic,
     map: map, filter: filter, freq: set_freq, not: not,
     img: plot_img, calc: calc_cmd, len: list_length, cat: list_cat,
     _addtt_: add_tensor_tensor, _subtt_: sub_tensor_tensor,
@@ -157,11 +157,11 @@ var lang = {
     initial_value_problem_msg: function(){
         return new Err(
             "Bitte gib das Anfangswertproblem wie folgt an:<br><br>"+
-            "p:=[x0,y(x0),y'(x0),y''(x0),...]<br><br>"+
-            "z.B.:<br><br>"+
-            "y''=-y; p:=[0,0,1]");
+            "ic(x0,y(x0),y'(x0),y''(x0),...)<br><br>"+
+            "Beispiel:<br><br>"+
+            "y''=-y; ic(0,0,1)");
     },
-    p_to_short: "Fehler: p ist zu kurz."
+    p_to_short: "Fehler: ic ist zu kurz."
 };
 // end localisation
 
@@ -2845,6 +2845,10 @@ function runge_kutta(f,h,wm,wp,x0,y0){
     var gm = runge_kutta_unilateral(f,-h,wm/h,x0,y0);
     var gp = runge_kutta_unilateral(f,h,wp/h,x0,y0);
     return function(x){return x<x0?gm(x):gp(x);};
+}
+
+function ic(){
+    ftab["p"] = Array.prototype.slice.call(arguments);
 }
 
 function ode_as_fn_rec(v,t){
