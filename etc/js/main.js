@@ -202,6 +202,8 @@ var macro_tab_mathml = {
 "flat": "<mo>♭</mo>",
 "natural": "<mo>♮</mo>",
 "neg": "<mo>&not;</mo>",
+"dagger": "<mo>†</mo>",
+"ddagger": "<mo>‡</mo>",
 
 "in": "<mo>&isin;</mo>",
 "notin": "<mo>&notin;</mo>",

@@ -11,6 +11,7 @@
 <tr><td><a href="index.html">Home</a>
 | <a href="doc.htm">Anleitung</a>
 | <a href="Plotter-dunkel.htm">Nachtmodus</a>
+| <a href="Bibliothek.htm">Bibliothek</a>
 </table>
 
 <h2>Funktionenplotter, Visualisierung</h2>
@@ -161,41 +162,41 @@
 <br>
 <h3 id="Anfangswertprobleme">Anfangswertprobleme</h3>
 <ul>
-<li><a href="plot.htm?y%27=y;%20p:=%5b0,1%5d"
+<li><a href="plot.htm?y%27=y;%20ic(0,1)"
   >Eine Dgl. erster Ordnung</a>. Angabe der Anfangswerte als
-  <code>p:=[x<sub>0</sub>,y(x<sub>0</sub>)]</code>.
-<li><a href="plot.htm?y%27%27=-y;%20p:=%5b0,0,1%5d"
+  <code>ic(x<sub>0</sub>,y(x<sub>0</sub>))</code>.
+<li><a href="plot.htm?y%27%27=-y;%20ic(0,0,1)"
   >Eine Dgl. zweiter Ordnung</a>. Angabe der Anfangswerte als
-  <code>p:=[x<sub>0</sub>,y(x<sub>0</sub>),y'(x<sub>0</sub>)]</code>.
-<li><a href="plot.htm?x(t);%20x%27%27=t*x;%20p:=%5b0,0,1%5d"
+  <code>ic(x<sub>0</sub>,y(x<sub>0</sub>),y'(x<sub>0</sub>))</code>.
+<li><a href="plot.htm?x(t);%20x%27%27=t*x;%20ic(0,0,1)"
   >Für eine Funktion der Zeit</a>.
-<li><a href="Vektorfeld.htm?y%27=y,%20%5b1,y%5d;%20p:=%5b0,1%5d"
+<li><a href="Vektorfeld.htm?y%27=y,%20%5b1,y%5d;%20ic(0,1)"
   >Richtungsfeld einer Dgl. erster Ordnung</a>.
 <li><a href="plot.htm?f(x);%20f:=iter(phi,40,t-%3e1);%20phi(y):=pli(x-%3e1+int(0,x,t-%3ey(t)),-10,10,0.1)"
   >Eine Picard-Iteration</a>.
 <li><a href="plot.htm?f(x)%5b0%5d;%20f(x):=expm(x*A)*%5b1,0%5d;%20A:=%5b%5b0,1%5d,%5b-1,0%5d%5d"
   >Lösung eines Systems mittels Matrix-Exponential</a>.
-<li><a href="plot.htm?u(x),v(x);%20%5bu,v%5d%27=%5bv,-u%5d;%20p:=%5b0,1,0%5d"
+<li><a href="plot.htm?u(x),v(x);%20%5bu,v%5d%27=%5bv,-u%5d;%20ic(0,1,0)"
   >Ein autonomes System von zwei Dgln</a>.
-<li><a href="plot.htm?u(x),v(x);%20%5bu,v%5d%27=%5bv,u*x%5d;%20p:=%5b0,1,0%5d"
+<li><a href="plot.htm?u(x),v(x);%20%5bu,v%5d%27=%5bv,u*x%5d;%20ic(0,1,0)"
   >Ein nicht-autonomes System von zwei Dgln</a>.
-<li><a href="Vektorfeld.htm?(Kurve(%5bu(t),v(t)%5d);%20p:=%5b0,0,a%5d;%20%5bu,v%5d%27=f(u,v))%20f%C3%BCr%20a%20in%20-6:6,%20f(x,y);%20t0:=-10,%20t1:=10;%20f(u,v):=%5bv,-v/4-sin(u)%5d"
+<li><a href="Vektorfeld.htm?(Kurve(%5bu(t),v(t)%5d);%20ic(0,0,a);%20%5bu,v%5d%27=f(u,v))%20f%C3%BCr%20a%20in%20-6:6,%20f(x,y);%20t0:=-10,%20t1:=10;%20f(u,v):=%5bv,-v/4-sin(u)%5d"
   >Phasenraumportrait des gedämpften Pendels</a>.
   <a href="Vektorfeld.htm?f(x,y);%20f(u,v):=%5bv,-v/4-sin(u)%5d;%20stream(1)"
   >Stromlinien</a>.
-<li><a href="plot.htm?x(t);%20x%27%27=-x/%7cx%7c%5e3;%20p:=%5b0,%5b4,0%5d,%5b0,0.2%5d%5d;%20t1:=20;%20tw(20)"
+<li><a href="plot.htm?x(t);%20x%27%27=-x/%7cx%7c%5e3;%20ic(0,%5b4,0%5d,%5b0,0.2%5d);%20t1:=20;%20tw(20)"
   >Das Einkörperproblem</a>.
-  <a href="plot.htm?Punkte(x,0:20:0.5);%20x%27%27=-x/%7cx%7c%5e3;%20p:=%5b0,%5b4,0%5d,%5b0,0.2%5d%5d;%20t1:=20;%20tw(20)"
+  <a href="plot.htm?Punkte(x,0:20:0.5);%20x%27%27=-x/%7cx%7c%5e3;%20ic(0,%5b4,0%5d,%5b0,0.2%5d);%20t1:=20;%20tw(20)"
   >Stroboskop</a>.
-<li><a href="plot.htm?%5bx(t),y(t)%5d;%20%5bx,y,vx,vy%5d%27=%5bvx,vy,-x/%7c%5bx,y%5d%7c%5e3,-y/%7c%5bx,y%5d%7c%5e3%5d;%20p:=%5b0,4,0,0,0.2%5d;%20t1:=20;%20tw(20)"
+<li><a href="plot.htm?%5bx(t),y(t)%5d;%20%5bx,y,vx,vy%5d%27=%5bvx,vy,-x/%7c%5bx,y%5d%7c%5e3,-y/%7c%5bx,y%5d%7c%5e3%5d;%20ic(0,4,0,0,0.2);%20t1:=20;%20tw(20)"
   >Das Einkörperproblem als System erster Ordnung</a>.
-<li><a href="plot.htm?x(t),1/%7c%5bx,y%5d%7c;%20x%27%27=x/%7cx%7c%5e3;%20p:=%5b0,%5b-10,1%5d,%5b2,0%5d%5d;%20t1:=20;%20tw(20)"
+<li><a href="plot.htm?x(t),1/%7c%5bx,y%5d%7c;%20x%27%27=x/%7cx%7c%5e3;%20ic(0,%5b-10,1%5d,%5b2,0%5d);%20t1:=20;%20tw(20)"
   >Streuung am Coulomb-Potential</a>.
-<li><a href="plot-bivariat.htm?%5bx(t),y(t),z(t)%5d;%20%5bx,y,z%5d%27=%5b10(y-x),x*(28-z)-y,x*y-8/3*z%5d;%20p:=%5b0,1,0,20%5d;%20t1:=20;%20tw(20);;scale(5)"
+<li><a href="plot-bivariat.htm?%5bx(t),y(t),z(t)%5d;%20%5bx,y,z%5d%27=%5b10(y-x),x*(28-z)-y,x*y-8/3*z%5d;%20ic(0,1,0,20);%20t1:=20;%20tw(20);;scale(5)"
   >Der Lorenz-Attraktor</a>.
-  <a href="plot.htm?%5bx(t),z(t)%5d;%20%5bx,y,z%5d%27=%5b10(y-x),x*(28-z)-y,x*y-8/3*z%5d;%20p:=%5b0,1,0,20%5d;%20t1:=40;%20tw(40);;scale(5),P(0,20)"
+  <a href="plot.htm?%5bx(t),z(t)%5d;%20%5bx,y,z%5d%27=%5b10(y-x),x*(28-z)-y,x*y-8/3*z%5d;%20ic(0,1,0,20);%20t1:=40;%20tw(40);;scale(5),P(0,20)"
   >Projektion auf die xz-Ebene</a>.
-<li><a href="plot.htm?s(t),i(t),r(t);%20%5bs,i,r%5d%27=%5b-beta*s*i,beta*s*i-gamma*i,gamma*i%5d;%20p:=%5b0,1-i0,i0,0%5d;%20i0:=0.001;%20beta:=R0*gamma;%20R0:=2;%20gamma:=1/4;%20tw(0,160);;scale(5,0.2),P(39.2,0.492)"
+<li><a href="plot.htm?s(t),i(t),r(t);%20%5bs,i,r%5d%27=%5b-beta*s*i,beta*s*i-gamma*i,gamma*i%5d;%20ic(0,1-i0,i0,0);%20i0:=0.001;%20beta:=R0*gamma;%20R0:=2;%20gamma:=1/4;%20tw(0,160);;scale(5,0.2),P(39.2,0.492)"
   >Klassisches SIR-Modell</a>.
 </ul>
 
@@ -267,10 +268,10 @@
   >Ein Vektorfeld</a>. <a href="Vektorfeld.htm?%5bx,y%5d;%20stream(1)"
   >Stromlinien</a>. <a href="Vektorfeld.htm?%5bx,y%5d;%20dyn(1)"
   >Pfeile mit Länge</a>.
-<li><a href="Vektorfeld.htm?y%27=x*y,%20%5b1,x*y%5d;%20p:=%5b0,1%5d"
+<li><a href="Vektorfeld.htm?y%27=x*y,%20%5b1,x*y%5d;%20ic(0,1)"
   >Richtungsfeld einer Dgl</a>. <a href="Vektorfeld.htm?%5b1,x*y%5d;%20stream(1)"
   >Stromlinien</a>.
-<li><a href="Vektorfeld.htm?(y%27=y-x;%20p:=%5b0,n%5d)%20f%C3%BCr%20n%20in%20-4:4,%20%5b1,y-x%5d"
+<li><a href="Vektorfeld.htm?(y%27=y-x;%20ic(0,n))%20f%C3%BCr%20n%20in%20-4:4,%20%5b1,y-x%5d"
   >Richtungsfeld und Lösungskurven</a>.
 <li><a href="Vektorfeld.htm?grad(U,%5bx,y%5d);%20U(x,y):=1/abs(%5bx,y%5d);;scale(0.1)"
   >Gradientenfeld zu einem Skalarfeld</a>.

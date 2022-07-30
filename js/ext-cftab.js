@@ -848,6 +848,10 @@ function ceiE(m){
     return cmulr(cdiv(t[1],t[0]),0.5*Math.PI);
 }
 
+function crand() {
+    return {re:rand(),im:0};
+}
+
 extension_table.ftab = {
     Si: "cSi", Ci: "cCi", Ci90: "cCi90", Cin: "cCin",
     E1: "cE1", Ei: "cEi", Ein: "cEin", li: "cli", Li: "cLi",
@@ -861,6 +865,6 @@ extension_table.ftab = {
     _mulmm_: "cmul_matrix_matrix", _mulvv_: "cscalar_product",
     _vabs_: "cabs_vec", _negt_: "cneg_tensor",
     _matrix_pow_: "cmatrix_pow", det: "cdet",
-    tr: "ctrace", tp: "transpose"
+    tr: "ctrace", tp: "transpose", rand: "crand"
 };
 

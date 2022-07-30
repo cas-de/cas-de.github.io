@@ -13,3 +13,12 @@ th.frame{
   background-color: #dad8c4;
 }
 
+td.conclusion{
+  border-top: 2px solid black;
+  text-align: center;
+}
+
+td.premise{
+  vertical-align: bottom;
+  text-align: center;
+}

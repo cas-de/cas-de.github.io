@@ -176,6 +176,10 @@ function path_length(a){
     return L;
 }
 
+function distance(p,q){
+    return Math.hypot(p[0]-q[0],p[1]-q[1]);
+}
+
 function plot_node(gx,t,color){
     if(Array.isArray(t) && (t[0]==="path" || t[0]==="Pfad")){
         var constraint = compile(t[1],["x","y"]);
@@ -197,6 +201,22 @@ function plot_node(gx,t,color){
             var adds = document.getElementById("adds");
             adds.innerHTML = "<p>Pfadlänge: "+len.toFixed(4);
         }
+    }else if(Array.isArray(t) && t[0]==="tauten"){
+        var constraint = compile(t[1],["x","y"]);
+        plot_node_basic(gx,t[1],[0,60,0]);
+        var nodes = t.slice(2).map(function(x){return compile(x,[])();});
+        var d = distance(nodes[0],nodes[1]);
+        var acc = fine_path([nodes[0],nodes[1]],Math.round(5*d));
+        for(var i=2; i<nodes.length; i++){
+            d = distance(nodes[i-1],nodes[i]);
+            var path = fine_path([nodes[i-1],nodes[i]],Math.round(5*d));
+            for(var j=1; j<path.length; j++){acc.push(path[j]);}
+        }
+        tauten(acc,constraint);
+        points_list(gx,color_table[0],acc,1.6);
+        var len = path_length(acc);
+        var adds = document.getElementById("adds");
+        adds.innerHTML = "<p>Pfadlänge: "+len.toFixed(4);
     }else{
         plot_node_basic(gx,t,color);
     }

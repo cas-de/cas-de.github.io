@@ -20,7 +20,7 @@ asinh: "casinh", acosh: "cacosh", atanh: "catanh", acoth: "cacoth",
 arsinh: "casinh", arcosh: "cacosh", artanh: "catanh", arcoth: "cacoth",
 gamma: "cgamma_variadic", fac: "cfac", "Gamma": "ciGamma",
 sum: "csum", prod: "cprod", range: "crange",
-map: "map", filter: "cfilter", 
+map: "map", filter: "cfilter", gcd: "cgcd",
 diff: "cdiff", int: "cint", iter: "citerate", img: "cplot_img"
 };
 
@@ -388,6 +388,16 @@ function cfilter(p,a){
         if(p(a[k]).re>0.5) b.push(a[k]);
     }
     return b;
+}
+
+function cgcd(a,b){
+    a = Math.round(cabs(a));
+    b = Math.round(cabs(b));
+    var h;
+    while(b>0){
+        h = a%b; a=b; b=h;
+    }
+    return {re: a, im: 0};
 }
 
 var cdiff_tab = [

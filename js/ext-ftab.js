@@ -1443,13 +1443,51 @@ function color(){
     }
 }
 
+function fint(x0,a,f,x){
+    return 1/gamma(a)*integral(x0,x,function(t){
+        return Math.pow(x-t,a-1)*f(t);
+    });
+}
+
+function heaviside_step(x){
+    return (x>=0)?1:0;
+}
+
+function intfn(f,a,b,d,y0){
+    if(d==undefined){d=0.01;}
+    if(y0==undefined){y0=0;}
+    var y = y0;
+    var ar = [y];
+    var al = [y];
+    for(var x=a; x<b; x+=d){
+        y = y + integral(x,x+d,f);
+        ar.push(y);
+    }
+    y = y0;
+    for(var x=a; x>-b; x-=d){
+        y = y + integral(x,x-d,f);
+        al.push(y);
+    }
+    var fr = pli(a,d,ar);
+    var fl = pli(a,-d,al);
+    return function(x){return x<a?fl(x):fr(x);};
+}
+
+function sqwave(x){
+    return 2*Math.floor(0.5*x)-Math.floor(x)+1;
+}
+
+function twave(x){
+    return 1-2*Math.abs(0.5*x-0.5-2*Math.floor(0.25*(x+1)));
+}
+
 extension_table.ftab = {
 PT: ChebyshevT, PU: ChebyshevU, PH: Hermite, 
 PP: Legendre, PL: Laguerre, bc: bc, s1: s1, s2: s2,
 psi: psi, digamma: digamma, tabB: tabB,
 zeta: zeta, B: Bvariadic, Bm: bernoulliBm, ipp: ipp,
 table: table, Wertetabelle: table, Delta: Delta,
-Si: Si, Ci: Ci, det: det, unit: unit_vector, I: idm,
+Si: Si, Ci: Ci, det: det, unit: unit_vector, idm: idm,
 diag: diag_variadic, _matrix_pow_: matrix_pow, expm: expm,
 _vdiff_: vdiff, nabla: nablah(0.001), divop: divoph(0.001),
 jacobi: jacobih(0.001), metric: metrich(0.001),
@@ -1479,7 +1517,9 @@ smac: central_moving_average, bench: bench, partition: partition,
 print: print, Punkt: pprint, color: color,
 black: [0,0,0,255], blue: [0,0,140,255], green: [0,100,0,255],
 red: [180,0,0,255], purple: [140,0,140,255], gray: [140,140,140,255],
-teal: [0,140,140,255], yellow: [200,160,0,255]
+teal: [0,140,140,255], yellow: [200,160,0,255],
+fint: fint, H: heaviside_step, intfn: intfn,
+sqwave: sqwave, twave: twave
 };
 
 

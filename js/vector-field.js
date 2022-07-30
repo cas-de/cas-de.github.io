@@ -136,7 +136,7 @@ function new_stream_line(gx,occupied,M,N,px0,py0,Ax,Ay,ds){
             if(!first && (Math.abs(x-lastx)>xspace || Math.abs(y-lasty)>yspace)){
                 lastx = x;
                 lasty = y;
-                vector_head(gx,color,ax*x,ay*y,v[0],v[1],0.8);
+                vector_head(gx,color,ax*x,ay*y,ax*v[0],ay*v[1],0.8);
             }
 
             var h = velocity/r;
@@ -164,7 +164,7 @@ function plot_stream(gx,f){
 
     var stream_line = new_stream_line(gx,occupied,M,N,px0,py0,Ax,Ay,ds);
     var counter = 1;
-    var velocity = 0.02/ax;
+    var velocity = 0.02/Math.max(ax,ay);
 
     for(var i=0; i<m; i++){
         for(var j=0; j<n; j++){
