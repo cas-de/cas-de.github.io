@@ -2,6 +2,8 @@
 var vec_min = 0.7;
 var vec_scale = 0.3;
 var stream = false;
+var field_alpha = 178;
+var field_density = 1;
 
 function scale_vec(a){
     if(a==0){
@@ -13,8 +15,10 @@ function scale_vec(a){
     }
 }
 
-function conf_stream(n){
+function conf_stream(n,alpha,density){
     stream = n>0.5;
+    if(alpha!=undefined){field_alpha = 255*alpha;}
+    if(density!=undefined){field_density = density;}
 }
 
 ftab["dyn"] = scale_vec;
@@ -43,6 +47,25 @@ function vector(gx,color,x,y,vx,vy,L){
     line(gx,color,x2,y2,x2-a*vx+b*vy,y2+a*vy+b*vx);
 }
 
+function interpolate_color(ctab){
+    var ctabr = ctab.map(function(t){return t[0];});
+    var ctabg = ctab.map(function(t){return t[1];});
+    var ctabb = ctab.map(function(t){return t[2];});
+    var n = ctab.length;
+    var d = 1/(n-1);
+    var fr = pli(0,d,ctabr,ctabr[n-1]);
+    var fg = pli(0,d,ctabg,ctabg[n-1]);
+    var fb = pli(0,d,ctabb,ctabb[n-1]);
+    return function(color,t){
+        color[0] = fr(t);
+        color[1] = fg(t);
+        color[2] = fb(t);
+    };
+}
+
+var ctab_original = [[120,160,220], [240,160,160]];
+var ctab_stream = [[40,140,180],[200,0,140],[240,180,0]];
+
 function plot_vector_field(gx,f){
     var x,y,v,i,j,alpha;
     var mx = gx.mx;
@@ -56,17 +79,13 @@ function plot_vector_field(gx,f){
     var yshift = -Math.round((0.5*gx.h-py0)/gx.mx);
     var d = 0.5;
 
-    var color0 = [0,80,160,120];
-    var color1 = [160,0,0,160];
-    var color = [0,0,0,0];
+    var color = [0,0,0,field_alpha];
+    var set_color = interpolate_color(ctab_stream);
     for(y=yshift-ycount; y<=yshift+ycount; y+=d){
         for(x=xshift-xcount; x<=xshift+xcount; x+=d){
             v = f(x/ax,y/ay);
             alpha = Math.tanh(0.1*Math.hypot(v[0],v[1]));
-            color[0] = (1-alpha)*color0[0]+alpha*color1[0];
-            color[1] = (1-alpha)*color0[1]+alpha*color1[1];
-            color[2] = (1-alpha)*color0[2]+alpha*color1[2];
-            color[3] = (1-alpha)*color0[3]+alpha*color1[3];
+            set_color(color,alpha);
             vector(gx,color,x,y,v[0],v[1],vec_min+vec_scale*alpha);
         }
     }
@@ -93,20 +112,31 @@ function new_lcg(seed){
     };
 }
 
-function new_stream_line(gx,occupied,M,N,px0,py0,Ax,Ay,ds){
-    var point = gx.point();
-    var color0 = [120,160,220,255];
-    var color1 = [240,160,160,255];
-    var color = [180,200,220,255];
+function shuffle(a,seed){
+    var rng = new_lcg(seed);
+    var i, j, h;
+    for(i=a.length-1; i>0; i--){
+        j = Math.floor(rng()*(i+1));
+        h = a[i]; a[i] = a[j]; a[j] = h;
+    }
+}
 
-    var xspace = 2/ax;
-    var yspace = 2/ay;
-    var rng = new_lcg(0);
+function new_stream_line(gx,occupied,M,N,px0,py0,Ax,Ay,ds){
+    var point = gx.spoint_alpha;
+    var color = [0,0,0,field_alpha];
+    var set_color = interpolate_color(ctab_stream);
+
+    var xspace = 0.5/ax;
+    var yspace = 0.5/ay;
+    var slope = 0.1*freq;
+    var buff = [];
 
     return function(f,x,y,counter,velocity){
-        var lastx = 0;
-        var lasty = 0;
+        var lastx = x;
+        var lasty = y;
         var first = true;
+        var ghost = false;
+        buff.length = 0;
 
         for(var k=0; k<2000; k++){
             var indexj = Math.round((px0+Ax*x)/ds);
@@ -125,18 +155,24 @@ function new_stream_line(gx,occupied,M,N,px0,py0,Ax,Ay,ds){
             var v = f(x,y);
             var r = Math.hypot(v[0],v[1]);
             if(!Number.isFinite(r)) break;
+            if(ghost && (Math.abs(x-lastx)>0.2*xspace || Math.abs(y-lasty)>0.2*yspace)){
+                ghost = false;
+            }
+            if(!ghost){
+                buff.push([r,x,y]);
+            }
 
-            var alpha = Math.tanh(0.1*r);
-            color[0] = (1-alpha)*color0[0]+alpha*color1[0];
-            color[1] = (1-alpha)*color0[1]+alpha*color1[1];
-            color[2] = (1-alpha)*color0[2]+alpha*color1[2];
-
-            point(color,ax*x,ay*y);
-            if(first && rng()>0.96){first = false;}
-            if(!first && (Math.abs(x-lastx)>xspace || Math.abs(y-lasty)>yspace)){
+            if(Math.abs(x-lastx)>xspace || Math.abs(y-lasty)>yspace){
+                for(var i=0; i<buff.length; i++){
+                    var t = buff[i];
+                    set_color(color,Math.tanh(slope*t[0]));
+                    point(color,ax*t[1],ay*t[2]);
+                }
+                buff.length = 0;
                 lastx = x;
                 lasty = y;
                 vector_head(gx,color,ax*x,ay*y,ax*v[0],ay*v[1],0.8);
+                ghost = true;
             }
 
             var h = velocity/r;
@@ -149,13 +185,13 @@ function new_stream_line(gx,occupied,M,N,px0,py0,Ax,Ay,ds){
 function plot_stream(gx,f){
     var Ax = ax*gx.mx;
     var Ay = ay*gx.mx;
-    var px0 = gx.px0;
-    var py0 = gx.py0;
+    var px0 = gx.px0 + 50;
+    var py0 = gx.py0 + 50;
 
-    var W = gx.w;
-    var H = gx.h;
+    var W = gx.w + 100;
+    var H = gx.h + 100;
     var d = 20;
-    var ds = 10;
+    var ds = 10/field_density;
     var m = Math.round(H/d);
     var n = Math.round(W/d);
     var M = Math.round(H/ds);
@@ -166,12 +202,17 @@ function plot_stream(gx,f){
     var counter = 1;
     var velocity = 0.02/Math.max(ax,ay);
 
+    var permi = range(0,m-1);
+    var permj = range(0,n-1);
+    shuffle(permi,1);
+    shuffle(permj,2);
+    var rng = new_lcg(0);
+
     for(var i=0; i<m; i++){
         for(var j=0; j<n; j++){
-            var x = (j*d-px0)/Ax;
-            var y = (py0-i*d)/Ay;
+            var x = (permj[j]*d-px0-20*rng())/Ax;
+            var y = (py0+20*rng()-permi[i]*d)/Ay;
             stream_line(f,x,y,counter,velocity);
-            stream_line(f,x,y,counter,-velocity);
             counter++;
         }
     }
