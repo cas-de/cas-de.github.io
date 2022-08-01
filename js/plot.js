@@ -712,9 +712,6 @@ function agm(a,b){
     return a;
 }
 
-// Modified arithmetic-geometric mean, see
-// Semjon Adlaj: "An eloquent formula for the perimeter
-// of an ellipse", Notices of the AMS 59(8) (2012), p. 1094-1099
 function magm(x,y){
     var z=0;
     var xh,yh,zh,r;
@@ -733,9 +730,15 @@ function eiK(m){
 }
 
 function eiE1(m){
-    var M = agm(1,Math.sqrt(1-m));
-    var N = magm(1,1-m);
-    return 0.5*Math.PI*N/M;
+    var x,y,a,b,xh,yh,ah,bh;
+    x = 1; y = Math.sqrt(1-m);
+    a = 1; b = 1-m;
+    for(var i=0; i<7; i++){
+        xh = 0.5*(x+y); yh = Math.sqrt(x*y);
+        ah = 0.5*(a+b); bh = (a*y+b*x)/(x+y);
+        x = xh; y = yh; a = ah; b = bh;
+    }
+    return 0.5*Math.PI*a/x;
 }
 
 function RF(x,y,z){
@@ -1999,6 +2002,11 @@ function new_point(gx){
         var py = floor(gx.py0-my*y);
         pset4(color,px,py);
     };
+    var spoint_alpha = function(color,x,y){
+        var rx = gx.px0+mx*x;
+        var ry = gx.py0-my*y;
+        fpsets(color[3],color,rx,ry);
+    };
     var needle = function(a){
         return function(color,x,y){
             var px = floor(gx.px0+mx*x);
@@ -2075,6 +2083,7 @@ function new_point(gx){
     gx.pset = pset;
     gx.pset4 = pset4;
     gx.spoint = spoint;
+    gx.spoint_alpha = spoint_alpha;
     gx.point = point;
     gx.fpsets = fpsets;
     gx.hline = hline;
