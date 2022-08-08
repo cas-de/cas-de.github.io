@@ -146,7 +146,7 @@ function new_stream_line(gx,occupied,M,N,px0,py0,Ax,Ay,ds){
             if(indexj<0 || indexj>=N) break; 
             
             var value = occupied[index];
-            if(value!=counter && value>0){
+            if(counter-value>1 && value>0){
                 break;
             }else{
                 occupied[index] = counter;
@@ -173,12 +173,14 @@ function new_stream_line(gx,occupied,M,N,px0,py0,Ax,Ay,ds){
                 lasty = y;
                 vector_head(gx,color,ax*x,ay*y,ax*v[0],ay*v[1],0.8);
                 ghost = true;
+                counter++;
             }
 
             var h = velocity/r;
             x += h*v[0];
             y += h*v[1];
         }
+        return counter+1;
     };
 }
 
@@ -212,8 +214,7 @@ function plot_stream(gx,f){
         for(var j=0; j<n; j++){
             var x = (permj[j]*d-px0-20*rng())/Ax;
             var y = (py0+20*rng()-permi[i]*d)/Ay;
-            stream_line(f,x,y,counter,velocity);
-            counter++;
+            counter = stream_line(f,x,y,counter,velocity);
         }
     }
     flush(gx);
