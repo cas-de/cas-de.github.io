@@ -1516,8 +1516,10 @@ enumerate: enumerate, sma: simple_moving_average,
 smac: central_moving_average, bench: bench, partition: partition,
 print: print, Punkt: pprint, color: color,
 black: [0,0,0,255], blue: [0,0,140,255], green: [0,100,0,255],
-red: [180,0,0,255], purple: [140,0,140,255], gray: [140,140,140,255],
-teal: [0,140,140,255], yellow: [200,160,0,255],
+red: [180,0,0,255], purple: [140,0,140,255], magenta: [140,0,140,255],
+gray: [140,140,140,255], violet: [127,0,255,255],
+teal: [0,140,140,255], yellow: [200,160,0,255], white: [255,255,255,255],
+brown: [100,60,0,255], cyan: [0,200,200,255], orange: [220,100,0,255],
 fint: fint, H: heaviside_step, intfn: intfn,
 sqwave: sqwave, twave: twave
 };

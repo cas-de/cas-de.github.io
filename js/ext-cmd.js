@@ -479,9 +479,40 @@ function area(t){
     if(gab){plot_async(graphics,gab,color);}
 }
 
+function empty_square_list(gx,color,a,r){
+    if(r==undefined) r=4;
+    for(var i=0; i<a.length; i++){
+        var x = gx.px0 + gx.mx*ax*a[i][0];
+        var y = gx.py0 - gx.my*ay*a[i][1];
+        line(gx,color,x+r,y-r,x+r,y+r);
+        line(gx,color,x-r,y-r,x-r,y+r);
+        line(gx,color,x-r,y+r,x+r+0.01,y+r);
+        line(gx,color,x-r,y-r,x+r,y-r);
+    }
+    flush(gx);
+    labels(gx);
+}
+
+function cmd_scatter(t){
+    var color = color_table[0];
+    if(t.length>3){
+        color = compile(t[3],[])();
+    }
+    var a = compile(t[1],[])();
+    post_app_stack.push(function(){
+        points_list(graphics,color,a);
+    });
+    if(t.length>2){
+        var b = compile(t[2],[])();
+        post_app_stack.push(function(){
+            empty_square_list(graphics,color,b);
+        });
+    }
+}
+
 extension_table.cmd = {
     "=": equation, slider: slider, Regler: slider,
     ani: ani, vec: vec, line: cmd_line, chain: cmd_chain,
-    area: area
+    area: area, scatter: cmd_scatter
 };
 

@@ -13,14 +13,27 @@ ftab["tile"] = set_tile;
 ftab["alpha"] = 0.94;
 ftab["P"] = set_position;
 ftab["colorfn"] = choose_color;
+ftab["color"] = choose_color;
 
 var TILE = 0;
 var LINE = 1;
 var LINE_SHADOW = 2;
+var line0_color = "#406ab0";
 
 var position = [0,0,0];
 var new_colorfn = new_light_source;
-var color_slope = 1;
+var color_slope = function(x){return x;};
+var ctab_heat_index = 0;
+
+var ctab_heat = [
+[[0.27,0,0.33],[0.25,0.27,0.53],[0.16,0.47,0.56],
+[0.13,0.66,0.52],[0.48,0.82,0.32],[0.99,0.91,0.14]],
+[[0,0,0.01],[0.26,0.04,0.41],[0.58,0.15,0.4],
+[0.87,0.32,0.23],[0.99,0.65,0.04],[0.99,1.0,0.64]],
+[[0.05,0.03,0.53],[0.42,0.0,0.66],[0.69,0.17,0.56],
+[0.88,0.39,0.38],[0.99,0.65,0.21],[0.94,0.98,0.13]],
+[[0,0,0],[1,1,1]]
+];
 
 sys_xyz.line_color = "#00000060";
 sys_xyz.fill_color = "#000000a0";
@@ -28,10 +41,16 @@ sys_xyz.fill_color = "#000000a0";
 function choose_color(n,slope){
     if(n==0){
         new_colorfn = new_light_source;
-    }else if(n==1){
+    }else if(n>0){
         new_colorfn = new_heat_map;
+        ctab_heat_index = n-1;
+        line0_color = "#202020";
         if(slope!=undefined){
-            color_slope = slope;
+            if(typeof slope == "number"){
+                color_slope = function(x){return slope*x;};
+            }else{
+                color_slope = slope;
+            }
         }
     }
 }
@@ -200,12 +219,10 @@ function new_color_gradient(color_array){
 }
 
 function new_heat_map(gx){
-    var m = color_slope;
-    var colormap = new_color_gradient([
-        [0.1,0.1,0.3],[0,0.4,0.4],[1,0.9,0]
-    ]);
+    var slope = color_slope;
+    var colormap = new_color_gradient(ctab_heat[ctab_heat_index]);
     return function(tilet,alpha){
-        var x = 0.5+m*0.1*(ax*tilet[6]-position[2]*az);
+        var x = 0.5+slope(0.1*(ax*tilet[6]-position[2]*az));
         var t = clamp(x,0,0.9999);
         return colormap(t,alpha);
     };
@@ -321,23 +338,31 @@ function labels(gx,proj,ax,position){
     var y0 = position[1];
     var z0 = position[2];
 
+    var d = -10.6-0.4*1294/gx.w;
     for(var x=-8; x<=8; x+=2){
         s = ftos_strip(x0+x/ax,ax);
-        puts(s,x,-11,-0.5);
+        puts(s,x,d,-0.5);
         line(x,-10,0,x,-10.4,0);
     }
     for(var y=-8; y<=8; y+=2){
         s = ftos_strip(y0+y/ay,ay);
-        puts(s,-11,y,-0.5);
+        puts(s,d,y,-0.5);
         line(-10,y,0,-10.4,y,0);
-    }
-    for(var z=2; z<10; z+=2){
-        s = ftos_strip(z0+z/az,az);
-        puts(s,-10.5,-10.5,z);
-        line(-10,-10,z,-10.2,-10.2,z);
     }
     puts("x",10,-11,-0.5);
     puts("y",-11,10,-0.5);
+
+    var c0 = Math.cos(-gx.phi+Math.PI/2);
+    var s0 = Math.sin(-gx.phi+Math.PI/2);
+    var vx = c0-s0;
+    var vy = c0+s0;
+    context.textAlign = "right";
+    for(var z=2; z<10; z+=2){
+        s = ftos_strip(z0+z/az,az);
+        puts(s,-10-0.372*vx,-10-0.372*vy,z);
+        line(-10,-10,z,-10-0.2*vx,-10-0.2*vy,z);
+    }
+
 }
 
 function normalize(v){
@@ -376,7 +401,7 @@ function buffer_draw_line(context,t){
     var p0 = t[2];
     var p1 = t[3];
     if(t[0]==LINE){
-        context.strokeStyle = "#406ab0";
+        context.strokeStyle = line0_color;
     }else{
         context.strokeStyle = "#a0a0a0";
     }

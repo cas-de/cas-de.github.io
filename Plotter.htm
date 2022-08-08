@@ -75,6 +75,14 @@
   >Schieberegler für zwei Parameter</a>.
 <li><a href="plot.htm?sum(1,n,k-%3esin((2k-1)*x)/(2k-1));%20Regler(n,1,20,rd)"
   >Partialsumme einer Fourier-Reihe</a>.
+<li><a href="plot.htm?sgn(x);%20scatter(%5b%5b0,0%5d%5d,%5b%5b0,-1%5d,%5b0,1%5d%5d)"
+  >Eine unstetige Funktion</a>.
+<li><a href="plot.htm?sin(x),%200%3cx%3c2pi;%20color(blue,yellow)"
+  >Hervorhebung eines x-Intervalls</a>, <a href="plot.htm?sin(x),%20-1%3cy%3c1;%20color(blue,yellow)"
+  >y-Intervalls</a>.
+<li><a href="plot.htm?sin(x),%200%3cx%3c2pi%20und%20-1%3cy%3c1;%20color(blue,yellow)"
+  >Hervorhebung eines Rechtecks</a>. <a href="plot.htm?sin(x),%200%3cx%3c2pi,%20-1%3cy%3c1;%20color(blue,yellow,gray)"
+  >Überlagerung</a>.
 </ul>
 
 <br>
@@ -209,9 +217,9 @@
   >Mit Transparenz</a>.
 <li><a href="plot-bivariat.htm?cos(sqrt(x^2+y^2));%20d(20)"
   >Eine bivariate Funktion</a> in Zentralprojektion.
-<li><a href="plot-bivariat.htm?4x*exp(-x%5e2-y%5e2);%20colorfn(1);;scale(0.2)"
+<li><a href="plot-bivariat.htm?4x*exp(-x%5e2-y%5e2);%20color(1,a);%20Regler(a,1,11);;scale(0.2)"
   >Heatmap</a>.
-  <a href="plot-bivariat.htm?4x*exp(-x%5e2-y%5e2);%20colorfn(1);%20Regler(alpha,0,1);;scale(0.2)"
+  <a href="plot-bivariat.htm?4x*exp(-x%5e2-y%5e2);%20color(1);%20Regler(alpha,0,1);;scale(0.2)"
   >Mit Transparenz</a>.
 <li><a href="plot-bivariat.htm?10+exp(-(x-20)%5e2-(y-30)%5e2);%20P(20,30,10);;scale(0.2)"
   >Verschiebung des Koordinatensystems</a>.
@@ -324,13 +332,15 @@
 <h3 id="Komplexe-Dynamik">Komplexe Dynamik</h3>
 <ul>
 <li><a href="Fraktal.htm?z%5e2+c;;scale(0.2)"
-  >Die Mandelbrot-Menge</a>. <a href="Fraktal.htm?z%5e2+c;%20Regler(shift,0,1);;scale(0.2)"
+  >Die Mandelbrot-Menge</a>. <a href="Fraktal.htm?z%5e2+c;%20Regler(shift,0,1),%20Regler(cgrad,1,11);;scale(0.2)"
   >Farbverschiebung</a>.
 <li><a href="Fraktal.htm?z%5e2+c;%20N:=2000;%20n:=2;;scale(0.2)"
-  >Die Mandelbrot-Menge</a>. Mit N Iterationen und n*n Samples.
-<br>Nimmt etwas Rechenzeit in Anspruch.
+  >Die Mandelbrot-Menge</a>. Mit N Iterationen und Mittelwert über n*n Subpixel.
+  Nimmt etwas Rechenzeit in Anspruch.
 <li><a href="Fraktal.htm?z%5e2+c;N:=400,P(-0.20436,1.10358),scale(0.000005)"
   >Die Mandelbrot-Menge</a>. Angabe von Stelle und Maßstab.
+<li><a href="Fraktal.htm?z%5e2+c;%20ctab(0);;scale(0.2)">Farbtabelle Graustufen</a>.
+<li><a href="Fraktal.htm?z%5e2+c;%20ctab(6);%20cgrad:=2;;scale(0.2)">Farbtabelle Rote Glut</a>.
 <li><a href="Fraktal.htm?z%5e2-0.8+0.2i;%20z0(c):=c;;scale(0.2)"
   >Eine Julia-Menge</a>.
 <li><a href="Fraktal.htm?z%5e2-0.8+0.2i;%20z0(c):=c,%20P(-0.06,0.8),scale(0.005)"
