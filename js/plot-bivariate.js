@@ -686,12 +686,14 @@ async function plot_level_set(gx,f,z0,n,d,N,epsilon,cond){
     var dx = d/ax;
     var dy = d/ay;
     var dt = 1/(n*ax);
-    var xa = grx[0]/ax;
-    var xb = grx[1]/ax;
-    var ya = gry[0]/ay;
-    var yb = gry[1]/ay;
+    var x0 = position[0];
+    var y0 = position[1];
+    var xa = x0 + grx[0]/ax;
+    var xb = x0 + grx[1]/ax;
+    var ya = y0 + gry[0]/ay;
+    var yb = y0 + gry[1]/ay;
     var mz = az/ax;
-    var mz0 = mz*z0;
+    var mz0 = mz*(z0-position[2]);
 
     var c = Math.cos(gx.phi);
     var s = Math.sin(gx.phi);
@@ -710,9 +712,9 @@ async function plot_level_set(gx,f,z0,n,d,N,epsilon,cond){
         a0 = a1;
         for(var i=0; i<a.length; i++){
             t = a[i];
-            p0 = proj(t[0],y,mz0);
-            p1 = proj(t[1],y+dy,mz0);
-            tile_buffer.push([LINE,s*y-c*t[0]-0.6,p0,p1]);
+            p0 = proj(t[0]-x0,y-y0,mz0);
+            p1 = proj(t[1]-x0,y-y0+dy,mz0);
+            tile_buffer.push([LINE,s*(y-y0)-c*(t[0]-x0)-0.6,p0,p1]);
         }
         if(cond && k%100==0){
             await sleep(20);
@@ -730,9 +732,9 @@ async function plot_level_set(gx,f,z0,n,d,N,epsilon,cond){
         a0 = a1;
         for(var i=0; i<a.length; i++){
             t = a[i];
-            p0 = proj(x,t[0],mz0);
-            p1 = proj(x+dx,t[1],mz0);
-            tile_buffer.push([LINE,s*t[0]-c*x-0.6,p0,p1]);
+            p0 = proj(x-x0,t[0]-y0,mz0);
+            p1 = proj(x-x0+dx,t[1]-y0,mz0);
+            tile_buffer.push([LINE,s*(t[0]-y0)-c*(x-x0)-0.6,p0,p1]);
         }
         if(cond && k%100==0){
             await sleep(20);

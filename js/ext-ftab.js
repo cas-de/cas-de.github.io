@@ -1481,6 +1481,34 @@ function twave(x){
     return 1-2*Math.abs(0.5*x-0.5-2*Math.floor(0.25*(x+1)));
 }
 
+function eigenvalues(a){
+    if(a.length == 2){
+        var tr = a[0][0] + a[1][1];
+        var q = a[0][0]*a[1][1] - a[0][1]*a[1][0];
+        var D = tr*tr-4*q;
+        var r = Math.sqrt(D);
+        return [0.5*(tr-r), 0.5*(tr+r)];
+    }
+}
+
+function eigenvectors(a){
+    if(a[0][1]==0 && a[1][0]==0){
+        return [[1,0],[0,1]];
+    }
+    var lambda = eigenvalues(a);
+    var v0,v1;
+    if(Math.abs(a[0][1]) < Math.abs(a[1][0])){
+        v0 = [(lambda[0]-a[1][1])/a[1][0],1];
+        v1 = [(lambda[1]-a[1][1])/a[1][0],1];
+    }else{
+        v0 = [1,(lambda[0]-a[0][0])/a[0][1]];
+        v1 = [1,(lambda[1]-a[0][0])/a[0][1]];
+    }
+    var r0 = Math.hypot(v0[0],v0[1]);
+    var r1 = Math.hypot(v1[0],v1[1]);
+    return [[v0[0]/r0, v0[1]/r0],[v1[0]/r1,v1[1]/r1]];
+}
+
 extension_table.ftab = {
 PT: ChebyshevT, PU: ChebyshevU, PH: Hermite, 
 PP: Legendre, PL: Laguerre, bc: bc, s1: s1, s2: s2,
@@ -1492,7 +1520,7 @@ diag: diag_variadic, _matrix_pow_: matrix_pow, expm: expm,
 _vdiff_: vdiff, nabla: nablah(0.001), divop: divoph(0.001),
 jacobi: jacobih(0.001), metric: metrich(0.001),
 curl: curlh(0.001), cartan: cartanh(0.001),
-_mulvm_: mul_vector_matrix,
+_mulvm_: mul_vector_matrix, eigvals: eigenvalues, eigvecs: eigenvectors,
 apply: apply, rot: rotation_matrix, tr: trace, tp: transpose,
 pli: pli_general, L: laplace_transform, delta: delta,
 gcd: gcd_variadic, ggT: gcd_variadic,

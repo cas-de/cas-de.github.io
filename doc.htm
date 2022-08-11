@@ -511,13 +511,31 @@
 <td><code>[[a,b],[c,d]]</code>
 <td>Eine Matrix.
 <tr>
+<td><code>v+w, A+B</code>
+<td>Summe von Vektoren, Matrizen.
+<tr>
+<td><code>v-w, A-B</code>
+<td>Differenz von Vektoren, Matrizen.
+<tr>
+<td><code>r*v, r*A</code>
+<td>Skalierung des Vektors v, der Matrix A.
+<tr>
 <td><code>v*w</code>
-<td>Skalarprodukt von v und&nbsp;w.
+<td>Skalarprodukt der Vektoren v und&nbsp;w.
+<tr>
+<td><code>A*v</code>
+<td>Anwendung der Matrix A auf den Vektor v.
+<tr>
+<td><code>A*B</code>
+<td>Multiplikation der Matrizen A und B.
+<tr>
+<td><code>A^-1</code>
+<td>Die zu A inverse Matrix.
 <tr>
 <td><code>idm(n)</code>
 <td>Die n&times;n Einheitsmatrix.
 <tr>
-<td><code>rot(phi)</code>
+<td><code>rot(φ)</code>
 <td>Rotationsmatrix 2&times;2 zum Winkel &phi;.
 <tr>
 <td><code>det(A)</code>
@@ -534,6 +552,12 @@
 <tr>
 <td><code>expm(A)</code>
 <td>Matrix-Exponential von A.
+<tr>
+<td><code>eigvals(A)</code>
+<td>Die Eigenwerte von A.
+<tr>
+<td><code>eigvecs(A)</code>
+<td>Die normierten Eigenvektoren von A.
 </table>
 
 <br>
@@ -897,6 +921,11 @@ mit <code>x=t[0]</code> und <code>y=t[1]</code>.
 <tr>
 <td><code>smac(a,n)</code>
 <td>Zentrierter gleitender Mittelwert (simple moving average central).
+<tr>
+<td><code>apply(f,v)</code>
+<td>Wendet eine mehrstellige Funktion auf einen Vektor an.
+Genauer ist <code>apply(f,v)</code> für <code>len(v)=2</code>
+dasselbe wie <code>f(v[0],v[1])</code>.
 </table>
 
 <br>
