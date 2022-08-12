@@ -1570,7 +1570,8 @@ var id_type_table = {
     "expm": [TypeMatrix],
     "jacobi": [TypeMatrix],
     "metric": [TypeMatrix],
-    "cartan": [TypeMatrix]
+    "cartan": [TypeMatrix],
+    "eigvecs": [TypeMatrix]
 };
 
 function assign(x,y){

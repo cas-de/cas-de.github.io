@@ -378,9 +378,20 @@ function vec(t){
         var px0 = gx.px0;
         var py0 = gx.py0;
         var n = color_table.length;
+        var index = 0;
+        var color;
         for(var i=0; i<a.length; i++){
-            var color = color_table[i%n];
-            arrow(gx,color,p[0],p[1],a[i][0],a[i][1]);
+            if(Array.isArray(a[i][0])){
+                for(var j=0; j<a[i].length; j++){
+                    color = color_table[index];
+                    arrow(gx,color,p[0],p[1],a[i][j][0],a[i][j][1]);
+                    index = (index+1)%n;
+                }
+            }else{
+                color = color_table[index];
+                arrow(gx,color,p[0],p[1],a[i][0],a[i][1]);
+                index = (index+1)%n;
+            }
         }
         flush(gx);
         labels(gx);
