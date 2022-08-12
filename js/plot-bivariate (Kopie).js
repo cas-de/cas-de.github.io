@@ -18,6 +18,7 @@ ftab["color"] = choose_color;
 var TILE = 0;
 var LINE = 1;
 var LINE_SHADOW = 2;
+var line0_color = "#406ab0";
 
 var position = [0,0,0];
 var new_colorfn = new_light_source;
@@ -43,6 +44,7 @@ function choose_color(n,slope){
     }else if(n>0){
         new_colorfn = new_heat_map;
         ctab_heat_index = n-1;
+        line0_color = "#202020";
         if(slope!=undefined){
             if(typeof slope == "number"){
                 color_slope = function(x){return slope*x;};
@@ -399,7 +401,7 @@ function buffer_draw_line(context,t){
     var p0 = t[2];
     var p1 = t[3];
     if(t[0]==LINE){
-        context.strokeStyle = "#202020";
+        context.strokeStyle = line0_color;
     }else{
         context.strokeStyle = "#a0a0a0";
     }
@@ -550,7 +552,6 @@ function exterior_product(ax,ay,bx,by){
 
 function plot_psf(gx,f,index,d,ustep,vstep){
     index = index % color_gradient_table.length;
-    gx.parametric_surface = true;
     var context = gx.context;
     var proj = gx.proj;
     var c = Math.cos(gx.phi);
@@ -618,27 +619,16 @@ function plot_curve(gx,f){
     var x0 = position[0];
     var y0 = position[1];
     var z0 = position[2];
-
-    var c = Math.cos(gx.phi);
-    var s = Math.sin(gx.phi);
-    var order;
-    if(gx.parametric_surface){
-        order = function(v){return -gxt-gyt-0.9;};
-    }else{
-        order = function(v){return s*(v[1]-y0)-c*(v[0]-x0)-0.6;};
-    }
-
-    var d = 0.01*ftab.tstep;
-    for(var t=t0; t<t1; t+=d){
+    for(var t=t0; t<t1; t+=0.01){
         var v = f(t);
         var p0 = proj(v[0]-x0,v[1]-y0,mz*(v[2]-z0));
         if(p1!=undefined){
-            a.push([LINE,order(v),p0,p1]);
+            a.push([LINE,-1000,p0,p1]);
         }
         p1 = p0;
     }
     p1 = undefined;
-    for(var t=t0; t<t1; t+=d){
+    for(var t=t0; t<t1; t+=0.01){
         var v = f(t);
         var p0 = proj(v[0]-x0,v[1]-y0,0);
         if(p1!=undefined){
