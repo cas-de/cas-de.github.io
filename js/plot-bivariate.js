@@ -14,15 +14,21 @@ ftab["alpha"] = 0.94;
 ftab["P"] = set_position;
 ftab["colorfn"] = choose_color;
 ftab["color"] = choose_color;
+ftab["isoconf"] = iso_config;
+ftab["shadow"] = 1;
 
 var TILE = 0;
 var LINE = 1;
 var LINE_SHADOW = 2;
+var BORDER = 3;
 
 var position = [0,0,0];
 var new_colorfn = new_light_source;
 var color_slope = function(x){return x;};
 var ctab_heat_index = 0;
+var iso_dist = 1;
+var iso_ep = 1;
+var mesh_width = undefined;
 
 var ctab_heat = [
 [[0.27,0,0.33],[0.25,0.27,0.53],[0.16,0.47,0.56],
@@ -51,6 +57,10 @@ function choose_color(n,slope){
             }
         }
     }
+}
+
+function iso_config(dist,ep){
+    iso_dist = dist; iso_ep = ep;
 }
 
 function set_position(x,y,z){
@@ -96,9 +106,10 @@ function set_w(wx,wy){
     gry = Array.isArray(wy)?wy:[-wy,wy];
 }
 
-function set_mesh(sx,sy){
+function set_mesh(sx,sy,lw){
     if(sy==undefined) sy=sx;
     gstep = [sx,sy];
+    if(lw!=undefined) mesh_width = lw;
 }
 
 function set_tile(m){
@@ -395,15 +406,19 @@ function new_light_source(gx){
     };
 }
 
-function buffer_draw_line(context,t){
+function buffer_draw_line(context,t,lw){
     var p0 = t[2];
     var p1 = t[3];
     if(t[0]==LINE){
         context.strokeStyle = "#202020";
+        context.lineWidth = 2;
+    }else if(t[0]==BORDER){
+        context.strokeStyle = "#0000004a";
+        context.lineWidth = lw+0.6;
     }else{
         context.strokeStyle = "#a0a0a0";
+        context.lineWidth = 2;
     }
-    context.lineWidth = 2;
     context.beginPath();
     context.moveTo(p0[0],p0[1]);
     context.lineTo(p1[0],p1[1]);
@@ -428,7 +443,7 @@ function flush_tile_buffer(gx,alpha,lw){
     for(var i=0; i<a.length; i++){
         t = a[i];
         if(t[0]!=TILE){
-            buffer_draw_line(context,t);
+            buffer_draw_line(context,t,lw);
             continue;
         }
         p0 = t[2]; p1 = t[3]; p2 = t[4]; p3 = t[5];
@@ -501,8 +516,8 @@ function plot_sf(gx,f,index,d,xstep,ystep){
     var p0,p1,p2,p3;
     var context = gx.context;
     var proj = gx.proj;
-    var c = Math.cos(gx.phi);
-    var s = Math.sin(gx.phi);
+    var c = Math.cos(gx.phi - Math.PI/4);
+    var s = Math.sin(gx.phi - Math.PI/4);
 
     var dx = d/ax;
     var dy = d/ay;
@@ -537,6 +552,24 @@ function plot_sf(gx,f,index,d,xstep,ystep){
             ky++;
         }
         kx++;
+    }
+    y = y0+v0;
+    for(u = u0; u<u1; u+=dx){
+        x = x0+u;
+        z00 = mz*f(x,y);
+        z01 = mz*f(x+dx,y);
+        p0 = proj(u,v0,z00-z0);
+        p1 = proj(u+dx,v0,z01-z0);
+        a.push([BORDER,s*v0-c*u,p0,p1]);
+    }
+    x = x0+u1;
+    for(v = v0; v<v1; v+=dy){
+        y = y0+v;
+        z00 = mz*f(x,y);
+        z01 = mz*f(x,y+dy);
+        p0 = proj(u1,v,z00-z0);
+        p1 = proj(u1,v+dy,z01-z0);
+        a.push([BORDER,s*v-c*u1,p0,p1]);
     }
 }
 
@@ -608,6 +641,20 @@ function plot_psf(gx,f,index,d,ustep,vstep){
     }
 }
 
+function curve_order_fn(gx){
+    var c = Math.cos(gx.phi - Math.PI/4);
+    var s = Math.sin(gx.phi - Math.PI/4);
+    var x0 = position[0];
+    var y0 = position[1];
+    if(gx.parametric_surface){
+        var w = 1.0/ax;
+        return function(x,y){return -gxt-gyt-w;};
+    }else{
+        var w = 0.6/ax;
+        return function(x,y){return s*(y-y0)-c*(x-x0)-w;};
+    }
+}
+
 function plot_curve(gx,f){
     var proj = gx.proj;
     var a = gx.tile_buffer;
@@ -618,25 +665,18 @@ function plot_curve(gx,f){
     var x0 = position[0];
     var y0 = position[1];
     var z0 = position[2];
-
-    var c = Math.cos(gx.phi);
-    var s = Math.sin(gx.phi);
-    var order;
-    if(gx.parametric_surface){
-        order = function(v){return -gxt-gyt-0.9;};
-    }else{
-        order = function(v){return s*(v[1]-y0)-c*(v[0]-x0)-0.6;};
-    }
+    var order = curve_order_fn(gx);
 
     var d = 0.01*ftab.tstep;
     for(var t=t0; t<t1; t+=d){
         var v = f(t);
         var p0 = proj(v[0]-x0,v[1]-y0,mz*(v[2]-z0));
         if(p1!=undefined){
-            a.push([LINE,order(v),p0,p1]);
+            a.push([LINE,order(v[0],v[1]),p0,p1]);
         }
         p1 = p0;
     }
+    if(ftab.shadow==0) return;
     p1 = undefined;
     for(var t=t0; t<t1; t+=d){
         var v = f(t);
@@ -707,9 +747,7 @@ async function plot_level_set(gx,f,z0,n,d,N,epsilon,cond){
     var yb = y0 + gry[1]/ay;
     var mz = az/ax;
     var mz0 = mz*(z0-position[2]);
-
-    var c = Math.cos(gx.phi);
-    var s = Math.sin(gx.phi);
+    var order = curve_order_fn(gx);
 
     var k=0;
     var g,a0,a1,a;
@@ -727,7 +765,7 @@ async function plot_level_set(gx,f,z0,n,d,N,epsilon,cond){
             t = a[i];
             p0 = proj(t[0]-x0,y-y0,mz0);
             p1 = proj(t[1]-x0,y-y0+dy,mz0);
-            tile_buffer.push([LINE,s*(y-y0)-c*(t[0]-x0)-0.6,p0,p1]);
+            tile_buffer.push([LINE,order(t[0],y),p0,p1]);
         }
         if(cond && k%100==0){
             await sleep(20);
@@ -747,7 +785,7 @@ async function plot_level_set(gx,f,z0,n,d,N,epsilon,cond){
             t = a[i];
             p0 = proj(x-x0,t[0]-y0,mz0);
             p1 = proj(x-x0+dx,t[1]-y0,mz0);
-            tile_buffer.push([LINE,s*(t[0]-y0)-c*(x-x0)-0.6,p0,p1]);
+            tile_buffer.push([LINE,order(x,t[0]),p0,p1]);
         }
         if(cond && k%100==0){
             await sleep(20);
@@ -768,7 +806,7 @@ function plot_node_bivariate(gx,t,index){
         if(refresh){
             plot_level_set(gx,f,z0,1,0.4,12,0.4,false);
         }else{
-            plot_level_set(gx,f,z0,10,0.1,12,0.2,false);
+            plot_level_set(gx,f,z0,10,0.1*iso_dist,12,0.2*iso_ep,false);
         }
     }else{
         var T = infer_type(t);
@@ -860,6 +898,7 @@ function plot(gx){
     }
 
     var lw = gtile<0.4?(gtile<0.15?2.4:1.8):1.4;
+    if(mesh_width!=undefined) lw = mesh_width;
     var alpha = Math.round(float_re(pftab["alpha"])*255);
     flush_tile_buffer(gx,alpha,lw);
     system_xyz(gx);
