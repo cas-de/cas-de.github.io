@@ -1509,6 +1509,13 @@ function eigenvectors(a){
     return [[v0[0]/r0, v0[1]/r0],[v1[0]/r1,v1[1]/r1]];
 }
 
+function set_font(name){
+    font_spec = name;
+    if(graphics.font_size!=undefined){
+        graphics.context.font = graphics.font_size+"px "+font_spec;
+    }
+}
+
 extension_table.ftab = {
 PT: ChebyshevT, PU: ChebyshevU, PH: Hermite, 
 PP: Legendre, PL: Laguerre, bc: bc, s1: s1, s2: s2,
@@ -1549,7 +1556,7 @@ gray: [140,140,140,255], violet: [127,0,255,255],
 teal: [0,140,140,255], yellow: [200,160,0,255], white: [255,255,255,255],
 brown: [100,60,0,255], cyan: [0,200,200,255], orange: [220,100,0,255],
 fint: fint, H: heaviside_step, intfn: intfn,
-sqwave: sqwave, twave: twave
+sqwave: sqwave, twave: twave, font: set_font
 };
 
 

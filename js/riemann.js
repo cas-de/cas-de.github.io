@@ -37,15 +37,15 @@ function new_color_map(gx){
 
 new_colorfn = new_color_map;
 
-function plot_psf_color(gx,f,index,d,ustep,vstep){
+function plot_psf_color(gx,f,index,du,dv,ustep,vstep){
     index = index % color_gradient_table.length;
     var context = gx.context;
     var proj = gx.proj;
     var c = Math.cos(gx.phi);
     var s = Math.sin(gx.phi);
 
-    var du = 0.25*d;
-    var dv = 0.25*d;
+    du = 0.25*du;
+    dv = 0.25*dv;
     var wx = 10/ax;
     var wy = 10/ay;
     var mz = az/ax;
@@ -82,6 +82,28 @@ function plot_psf_color(gx,f,index,d,ustep,vstep){
         }
         ku++;
     }
+    if(mesh_border[0]!=0){
+        v = v0;
+        for(u = u0; u<u1; u+=du){
+            p00 = f(u,v);
+            p01 = f(u+du,v);
+            p00[2]*=mz; p01[2]*=mz;
+            p0 = proj(p00[0]-x0,p00[1]-y0,p00[2]-z0);
+            p1 = proj(p01[0]-x0,p01[1]-y0,p01[2]-z0);
+            a.push([BORDER,-gxt-gyt,p0,p1,mesh_border[0]-1]);
+        }
+    }
+    if(mesh_border[1]!=0){
+        u = u1;
+        for(v = v0; v<v1; v+=dv){
+            p00 = f(u,v);
+            p01 = f(u,v+dv);
+            p00[2]*=mz; p01[2]*=mz;
+            p0 = proj(p00[0]-x0,p00[1]-y0,p00[2]-z0);
+            p1 = proj(p01[0]-x0,p01[1]-y0,p01[2]-z0);
+            a.push([BORDER,-gxt-gyt,p0,p1,mesh_border[1]-1]);
+        }
+    }
 }
 
 function plot_node(gx,t,index){
@@ -106,10 +128,11 @@ function plot_node(gx,t,index){
         };
     }
     pftab = cftab;
-    var m = gtile;
+    var m0 = gtile[0];
+    var m1 = gtile[1];
     if(refresh || gx.animation){
         plot_psf_color(gx,F,index,1,1,1);
     }else{
-        plot_psf_color(gx,F,index,m*0.5,gstep[0]*2/m,gstep[1]*2/m);
+        plot_psf_color(gx,F,index,m0*0.5,m1*0.5,gstep[0]*2/m0,gstep[1]*2/m1);
     }
 }
