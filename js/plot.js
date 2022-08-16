@@ -27,6 +27,7 @@ var dot_alpha = 0;
 var twidth_left = 10;
 var twidth_right = 10;
 var sample_distance = 0.01;
+var font_spec = "\"DejaVu Sans\", \"Verdana\", \"sans-serif\"";
 
 var color_bg = [255,255,255,255];
 var color_axes = [160,160,160];
@@ -103,8 +104,6 @@ var ftab = {
     _mulmm_: mul_matrix_matrix, _mulvv_: scalar_product,
     _vabs_: abs_vec, _negt_: neg_tensor, sys: sys, iso: iso
 };
-
-
 
 var cmd_tab = {
     "=":0, slider:0, ani:0, vec:0, line:0, chain:0, scatter:0
@@ -2095,6 +2094,13 @@ function new_point(gx){
     gx.circle = circle;
 }
 
+function set_font_size(gx,size){
+    if(size!=gx.font_size){
+        gx.font_size = size;
+        gx.context.font = size+"px "+font_spec;
+    }
+}
+
 function init(canvas,w,h){
     var gx = {};
     gx.canvas = canvas;
@@ -2140,8 +2146,7 @@ function init(canvas,w,h){
     gx.my = gx.mx;
     gx.char_max = gx.mx<38?2:3;
     var font_size = gx.mx<32?14:16;
-    var font = "\"DejaVu Sans\", \"Verdana\", \"sans-serif\"";
-    gx.context.font = font_size+"px "+font;
+    set_font_size(gx,font_size);
     return gx;
 }
 
