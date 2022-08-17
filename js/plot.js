@@ -28,6 +28,7 @@ var twidth_left = 10;
 var twidth_right = 10;
 var sample_distance = 0.01;
 var font_spec = "\"DejaVu Sans\", \"Verdana\", \"sans-serif\"";
+var pixels_per_unit;
 
 var color_bg = [255,255,255,255];
 var color_axes = [160,160,160];
@@ -102,7 +103,8 @@ var ftab = {
     _addtt_: add_tensor_tensor, _subtt_: sub_tensor_tensor,
     _mulst_: mul_scalar_tensor, _mulmv_: mul_matrix_vector,
     _mulmm_: mul_matrix_matrix, _mulvv_: scalar_product,
-    _vabs_: abs_vec, _negt_: neg_tensor, sys: sys, iso: iso
+    _vabs_: abs_vec, _negt_: neg_tensor, sys: sys, iso: iso,
+    ppu: set_ppu
 };
 
 var cmd_tab = {
@@ -2131,19 +2133,21 @@ function init(canvas,w,h){
     gx.color = [0,0,0,255];
 
     /* gx.mx = 36; */
-    var grid = ftab["grid"];
-    if(grid!=undefined){
-        gx.mx = 50*grid;
-    }else if(w<600){
-        gx.mx = w/1300*110;
-    }else if(w<800){
-        gx.mx = w/1300*72.5;
-    }else if(w<1000){
-        gx.mx = w/1300*65;
+    if(pixels_per_unit!=undefined){
+        gx.mx = pixels_per_unit[0];
+        gx.my = pixels_per_unit[1];
     }else{
-        gx.mx = w/1300*50;
+        if(w<600){
+            gx.mx = w/1300*110;
+        }else if(w<800){
+            gx.mx = w/1300*72.5;
+        }else if(w<1000){
+            gx.mx = w/1300*65;
+        }else{
+            gx.mx = w/1300*50;
+        }
+        gx.my = gx.mx;
     }
-    gx.my = gx.mx;
     gx.char_max = gx.mx<38?2:3;
     var font_size = gx.mx<32?14:16;
     set_font_size(gx,font_size);
@@ -2161,9 +2165,9 @@ function system(gx,alpha,alpha_axes){
     var px0 = Math.round(gx.px0); // On Chrome, touch clientX
     var py0 = Math.round(gx.py0); // returns also fractional part.
     var xcount = Math.ceil(0.5*gx.w/gx.mx)+1;
-    var ycount = Math.ceil(0.5*gx.h/gx.mx)+1;
+    var ycount = Math.ceil(0.5*gx.h/gx.my)+1;
     var xshift = Math.round((0.5*gx.w-px0)/gx.mx);
-    var yshift = -Math.round((0.5*gx.h-py0)/gx.mx);
+    var yshift = -Math.round((0.5*gx.h-py0)/gx.my);
 
     if(grid){
         gx.color = gx.color_grid;
@@ -2237,12 +2241,13 @@ function labels(gx){
     var w = gx.w;
     var h = gx.h;
     var mx = gx.mx;
+    var my = gx.my;
     var px0 = Math.round(gx.px0);
     var py0 = Math.round(gx.py0);
     var xcount = Math.ceil(0.5*w/mx);
-    var ycount = Math.ceil(0.5*h/mx);
+    var ycount = Math.ceil(0.5*h/my);
     var xshift = Math.round((0.5*w-px0)/mx);
-    var yshift = Math.round((0.5*h-py0)/mx);
+    var yshift = Math.round((0.5*h-py0)/my);
     var px,py,s,px_adjust,py_adjust;
     context.fillStyle = gx.font_color;
     context.textAlign = "center";
@@ -2279,7 +2284,7 @@ function labels(gx){
     context.textAlign = "right";
     for(var y=yshift-ycount; y<=yshift+ycount; y++){
         if(y!=0){
-            py = py0+Math.floor(mx*y);
+            py = py0+Math.floor(my*y);
             if(py<ymargin || py>h-ymargin) continue;
             s = ftos(-y/ay,ay/4,1);
             if(ay<2){s=strip_zeros(s);}
@@ -2427,8 +2432,6 @@ function cancel(pid,index,pid_stack){
 function new_fplot_rec(buffer,gx,color,point,y0,wy,count){
     var ya = y0-wy;
     var yb = y0+wy;
-    var YA = y0-2*wy;
-    var YB = y0+2*wy;
     var len = buffer.length;
     return function fplot_rec(depth,f,a,b,d){
         var delta_max = 0;
@@ -2464,9 +2467,9 @@ async function fplot(gx,f,d,cond,color){
     busy = true;
     var point = gx.point();
     var wx = 0.5*gx.w/(gx.mx*ax);
-    var wy = 0.5*(gx.h+4)/(gx.mx*ay);
+    var wy = 0.5*(gx.h+4)/(gx.my*ay);
     var x0 = (0.5*gx.w-gx.px0)/(gx.mx*ax);
-    var y0 = (gx.py0-0.5*gx.h)/(gx.mx*ay);
+    var y0 = (gx.py0-0.5*gx.h)/(gx.my*ay);
     var k=0;
     d = d/ax;
     var a = x0-wx;
@@ -2528,11 +2531,11 @@ async function plot_zero_set(gx,f,n,N,cond,color){
     var px0 = gx.px0;
     var py0 = gx.py0;
     var Ax = 1/(gx.mx*ax);
-    var Ay = -1/(gx.mx*ay);
+    var Ay = -1/(gx.my*ay);
 
     var state;
     var dx = n/(gx.mx*ax);
-    var dy = n/(gx.mx*ay);
+    var dy = n/(gx.my*ay);
     var k=0;
 
     for(py=0; py<H; py+=1){
@@ -2765,14 +2768,15 @@ function plot_bool(gx,f,color,n,point_cond){
     var pset = function(color,x,y){pseta(color,x,y,alpha);}
     var px0 = gx.px0;
     var py0 = gx.py0;
+    var sx = 1/(gx.mx*ax);
+    var sy = 1/(gx.my*ay);
 
     var state;
-    var d = n/gx.mx/ax;
+    var d = sx*n;
     for(py=0; py<H; py+=n){
         state = undefined;
         for(px=0; px<W; px+=n){
-            x = (px-px0)/gx.mx/ax;
-            y = -(py-py0)/gx.mx/ay;
+            x = sx*(px-px0); y = -sy*(py-py0);
             z = f(x,y);
             if(z){
                 rect(pset,color,px,py,n,n);
@@ -2787,11 +2791,11 @@ function plot_bool(gx,f,color,n,point_cond){
             }
         }
     }
+    d = sy*n;
     for(px=0; px<W; px+=n){
         state = undefined;
         for(py=0; py<H; py+=n){
-            x = (px-px0)/gx.mx/ax;
-            y = -(py-py0)/gx.mx/ay;
+            x = sx*(px-px0); y = -sy*(py-py0);
             z = f(x,y);
             if(z!=state){
                 if(state!=undefined){
@@ -3330,6 +3334,11 @@ function sys(n){
 
 function iso(n){
     iso_mode = n;
+}
+
+function set_ppu(x,y){
+    if(y==undefined) y=x;
+    pixels_per_unit = [x,y];
 }
 
 function switch_hud(){

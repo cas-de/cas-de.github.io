@@ -695,7 +695,7 @@ function mul_vector_matrix(v,A){
 
 function unit_vector(v){
     var r = abs_vec(v);
-    return mul_scalar_vector(1/r,v);
+    return mul_scalar_tensor(1/r,v);
 }
 
 function vdiff(f,t,n){
