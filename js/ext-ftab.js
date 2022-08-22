@@ -1516,6 +1516,14 @@ function set_font(name){
     }
 }
 
+function view(){
+    var gx = graphics;
+    return [
+        -gx.px0/(gx.mx*ax), (gx.w-gx.px0)/(gx.mx*ax),
+        -gx.py0/(gx.my*ay), (gx.h-gx.py0)/(gx.my*ay)
+    ];
+}
+
 extension_table.ftab = {
 PT: ChebyshevT, PU: ChebyshevU, PH: Hermite, 
 PP: Legendre, PL: Laguerre, bc: bc, s1: s1, s2: s2,
@@ -1556,7 +1564,7 @@ gray: [140,140,140,255], violet: [127,0,255,255],
 teal: [0,140,140,255], yellow: [200,160,0,255], white: [255,255,255,255],
 brown: [100,60,0,255], cyan: [0,200,200,255], orange: [220,100,0,255],
 fint: fint, H: heaviside_step, intfn: intfn,
-sqwave: sqwave, twave: twave, font: set_font
+sqwave: sqwave, twave: twave, font: set_font, view: view
 };
 
 

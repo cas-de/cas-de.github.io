@@ -617,7 +617,9 @@ function bisection(f,x,a,b){
     return m;
 }
 
-function optimize(f,a,b){
+function optimize(f,x0,bound){
+    var a = x0-bound;
+    var b = x0+bound;
     var n = 100;
     for(var k=0; k<14; k++){
         var h = (b-a)/n;
@@ -631,10 +633,19 @@ function optimize(f,a,b){
         a = xmin-h;
         b = xmin+h;
     }
-    return xmin;
+    return Math.abs(f(xmin))<Math.abs(f(x0))?xmin:x0;
 }
 
-function zeros_bisection(f,a,b,n){
+function post_process_zero(f,x,m){
+    var xr = Math.round(m*x)/m;
+    if(Math.abs(f(xr)) <= Math.abs(f(x))){
+        return xr;
+    }else{
+        return x;
+    }
+}
+
+function zeros_bisection(f,f1,a,b,n){
     var zeros = [];
     var h = (b-a)/n;
     for(var k=0; k<n; k++){
@@ -642,63 +653,38 @@ function zeros_bisection(f,a,b,n){
         var x1 = a+h*(k+1);
         var y0 = f(x0);
         var y1 = f(x1);
-        if(Number.isNaN(y1-y0)) continue;
+        if(Number.isNaN(y1-y0) || y1==0) continue;
         if(Math.sign(y0)!=Math.sign(y1)){
             var x = bisection(f,0,x0,x1);
-            if(Number.isFinite(x)){zeros.push(x);}
+            if(Number.isFinite(x)){
+                zeros.push(post_process_zero(f,x,1E12));
+                continue;
+            }
+        }
+
+        y0 = f1(x0);
+        y1 = f1(x1);
+        if(Number.isNaN(y1-y0) || y1==0) continue;
+        if(Math.sign(y0)!=Math.sign(y1)){
+            var x = bisection(f1,0,x0,x1);
+            x = optimize(f,x,1E-4);
+            x = post_process_zero(f,x,1E6);
+            if(Number.isFinite(x) && Math.abs(f(x)) < 1E-10){
+                 zeros.push(x);
+            }
         }
     }
+    if(Math.abs(f(b))<1E-14) zeros.push(b);
     return zeros;
 }
 
-function zeros_uniq(f,a,epsilon){
-    a.sort(function(x,y){return x-y;});
-    var b = [];
-    var k = 0;
-    var n = a.length;
-    while(k<n){
-        var xmin = a[k];
-        var i = k+1;
-        while(i<n && Math.abs(a[i]-a[k])<epsilon){
-            if(Math.abs(f(a[i]))<Math.abs(f(xmin))){xmin = a[i];}
-            i++;
-        }
-        if(Math.abs(f(xmin))<1E-12){
-            if(Math.abs(xmin)<1E-24){
-                b.push(0);
-            }else if(Math.abs(xmin)>0.001){
-                var xr = Math.round(1E12*xmin)/1E12;
-                if(Math.abs(f(xr))<=Math.abs(f(xmin))){
-                    b.push(xr);
-                }else{
-                    b.push(xmin);
-                }
-            }else{
-                b.push(xmin);
-            }
-        }
-        k = i;
-    }
-    return b;
-}
-
 function zeros(f,a,b){
-    if(a==undefined) a = -100;
-    if(b==undefined) b = 100;
     var h = 0.0001;
     var f1 = function(x){
         return (f(x+3*h)-9*f(x+2*h)+45*f(x+h)
             -45*f(x-h)+9*f(x-2*h)-f(x-3*h))/(60*h);
     };
-    var L = zeros_bisection(f,a,b,100000);
-    var L1 = zeros_bisection(f1,a,b,100000);
-    for(var i=0; i<L1.length; i++){
-        if(Math.abs(f(L1[i]))<1E-6){
-            var x = optimize(f,L1[i]-1E-4,L1[i]+1E-4);
-            if(Math.abs(f(x))<1E-12){L.push(x);}
-        }
-    }
-    return zeros_uniq(f,L,1E-6);
+    return zeros_bisection(f,f1,a,b,100000);
 }
 
 // Arithmetic-geometric mean
