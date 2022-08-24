@@ -451,7 +451,7 @@ function plot_area(gx,f,g,a,b,color){
     var px0 = gx.px0;
     var py0 = gx.py0;
     var Ax = gx.mx*ax;
-    var Ay = gx.mx*ay;
+    var Ay = gx.my*ay;
 
     var pxa = Math.round(Math.max(0,px0+Ax*a));
     var pxb = Math.min(W,px0+Ax*b);

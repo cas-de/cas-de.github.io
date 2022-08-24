@@ -1,8 +1,13 @@
 
-cftab["res"] = {re: 2, im: 0};
+var resolution = 1;
+
+function set_resolution(x){
+    resolution = x;
+}
+ftab["Auflösung"] = set_resolution;
 
 async function plot_zero_set_fast(gx,f,color){
-    var res = cftab["res"].re;
+    var res = 2*resolution;
     if(gx.sync_mode==true){
         plot_zero_set(gx,f,res,14,false,color);
     }else{

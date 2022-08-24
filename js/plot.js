@@ -28,6 +28,7 @@ var twidth_left = 10;
 var twidth_right = 10;
 var sample_distance = 0.01;
 var font_spec = "\"DejaVu Sans\", \"Verdana\", \"sans-serif\"";
+var pixels_per_unit;
 
 var color_bg = [255,255,255,255];
 var color_axes = [160,160,160];
@@ -102,7 +103,8 @@ var ftab = {
     _addtt_: add_tensor_tensor, _subtt_: sub_tensor_tensor,
     _mulst_: mul_scalar_tensor, _mulmv_: mul_matrix_vector,
     _mulmm_: mul_matrix_matrix, _mulvv_: scalar_product,
-    _vabs_: abs_vec, _negt_: neg_tensor, sys: sys, iso: iso
+    _vabs_: abs_vec, _negt_: neg_tensor, sys: sys, iso: iso,
+    ppu: set_ppu
 };
 
 var cmd_tab = {
@@ -615,7 +617,9 @@ function bisection(f,x,a,b){
     return m;
 }
 
-function optimize(f,a,b){
+function optimize(f,x0,bound){
+    var a = x0-bound;
+    var b = x0+bound;
     var n = 100;
     for(var k=0; k<14; k++){
         var h = (b-a)/n;
@@ -629,10 +633,19 @@ function optimize(f,a,b){
         a = xmin-h;
         b = xmin+h;
     }
-    return xmin;
+    return Math.abs(f(xmin))<Math.abs(f(x0))?xmin:x0;
 }
 
-function zeros_bisection(f,a,b,n){
+function post_process_zero(f,x,m){
+    var xr = Math.round(m*x)/m;
+    if(Math.abs(f(xr)) <= Math.abs(f(x))){
+        return xr;
+    }else{
+        return x;
+    }
+}
+
+function zeros_bisection(f,f1,a,b,n){
     var zeros = [];
     var h = (b-a)/n;
     for(var k=0; k<n; k++){
@@ -640,63 +653,39 @@ function zeros_bisection(f,a,b,n){
         var x1 = a+h*(k+1);
         var y0 = f(x0);
         var y1 = f(x1);
-        if(Number.isNaN(y1-y0)) continue;
+        if(Number.isNaN(y1-y0) || y1==0) continue;
+        if(y0==0){zeros.push(x0); continue;}
         if(Math.sign(y0)!=Math.sign(y1)){
             var x = bisection(f,0,x0,x1);
-            if(Number.isFinite(x)){zeros.push(x);}
+            if(Number.isFinite(x)){
+                zeros.push(post_process_zero(f,x,1E12));
+                continue;
+            }
+        }
+
+        y0 = f1(x0);
+        y1 = f1(x1);
+        if(Number.isNaN(y1-y0) || y1==0) continue;
+        if(Math.sign(y0)!=Math.sign(y1)){
+            var x = bisection(f1,0,x0,x1);
+            x = optimize(f,x,1E-4);
+            x = post_process_zero(f,x,1E6);
+            if(Number.isFinite(x) && Math.abs(f(x)) < 1E-10){
+                 zeros.push(x);
+            }
         }
     }
+    if(Math.abs(f(b))<1E-14) zeros.push(b);
     return zeros;
 }
 
-function zeros_uniq(f,a,epsilon){
-    a.sort(function(x,y){return x-y;});
-    var b = [];
-    var k = 0;
-    var n = a.length;
-    while(k<n){
-        var xmin = a[k];
-        var i = k+1;
-        while(i<n && Math.abs(a[i]-a[k])<epsilon){
-            if(Math.abs(f(a[i]))<Math.abs(f(xmin))){xmin = a[i];}
-            i++;
-        }
-        if(Math.abs(f(xmin))<1E-12){
-            if(Math.abs(xmin)<1E-24){
-                b.push(0);
-            }else if(Math.abs(xmin)>0.001){
-                var xr = Math.round(1E12*xmin)/1E12;
-                if(Math.abs(f(xr))<=Math.abs(f(xmin))){
-                    b.push(xr);
-                }else{
-                    b.push(xmin);
-                }
-            }else{
-                b.push(xmin);
-            }
-        }
-        k = i;
-    }
-    return b;
-}
-
 function zeros(f,a,b){
-    if(a==undefined) a = -100;
-    if(b==undefined) b = 100;
     var h = 0.0001;
     var f1 = function(x){
         return (f(x+3*h)-9*f(x+2*h)+45*f(x+h)
             -45*f(x-h)+9*f(x-2*h)-f(x-3*h))/(60*h);
     };
-    var L = zeros_bisection(f,a,b,100000);
-    var L1 = zeros_bisection(f1,a,b,100000);
-    for(var i=0; i<L1.length; i++){
-        if(Math.abs(f(L1[i]))<1E-6){
-            var x = optimize(f,L1[i]-1E-4,L1[i]+1E-4);
-            if(Math.abs(f(x))<1E-12){L.push(x);}
-        }
-    }
-    return zeros_uniq(f,L,1E-6);
+    return zeros_bisection(f,f1,a,b,100000);
 }
 
 // Arithmetic-geometric mean
@@ -2131,19 +2120,21 @@ function init(canvas,w,h){
     gx.color = [0,0,0,255];
 
     /* gx.mx = 36; */
-    var grid = ftab["grid"];
-    if(grid!=undefined){
-        gx.mx = 50*grid;
-    }else if(w<600){
-        gx.mx = w/1300*110;
-    }else if(w<800){
-        gx.mx = w/1300*72.5;
-    }else if(w<1000){
-        gx.mx = w/1300*65;
+    if(pixels_per_unit!=undefined){
+        gx.mx = pixels_per_unit[0];
+        gx.my = pixels_per_unit[1];
     }else{
-        gx.mx = w/1300*50;
+        if(w<600){
+            gx.mx = w/1300*110;
+        }else if(w<800){
+            gx.mx = w/1300*72.5;
+        }else if(w<1000){
+            gx.mx = w/1300*65;
+        }else{
+            gx.mx = w/1300*50;
+        }
+        gx.my = gx.mx;
     }
-    gx.my = gx.mx;
     gx.char_max = gx.mx<38?2:3;
     var font_size = gx.mx<32?14:16;
     set_font_size(gx,font_size);
@@ -2161,9 +2152,9 @@ function system(gx,alpha,alpha_axes){
     var px0 = Math.round(gx.px0); // On Chrome, touch clientX
     var py0 = Math.round(gx.py0); // returns also fractional part.
     var xcount = Math.ceil(0.5*gx.w/gx.mx)+1;
-    var ycount = Math.ceil(0.5*gx.h/gx.mx)+1;
+    var ycount = Math.ceil(0.5*gx.h/gx.my)+1;
     var xshift = Math.round((0.5*gx.w-px0)/gx.mx);
-    var yshift = -Math.round((0.5*gx.h-py0)/gx.mx);
+    var yshift = -Math.round((0.5*gx.h-py0)/gx.my);
 
     if(grid){
         gx.color = gx.color_grid;
@@ -2237,12 +2228,13 @@ function labels(gx){
     var w = gx.w;
     var h = gx.h;
     var mx = gx.mx;
+    var my = gx.my;
     var px0 = Math.round(gx.px0);
     var py0 = Math.round(gx.py0);
     var xcount = Math.ceil(0.5*w/mx);
-    var ycount = Math.ceil(0.5*h/mx);
+    var ycount = Math.ceil(0.5*h/my);
     var xshift = Math.round((0.5*w-px0)/mx);
-    var yshift = Math.round((0.5*h-py0)/mx);
+    var yshift = Math.round((0.5*h-py0)/my);
     var px,py,s,px_adjust,py_adjust;
     context.fillStyle = gx.font_color;
     context.textAlign = "center";
@@ -2279,7 +2271,7 @@ function labels(gx){
     context.textAlign = "right";
     for(var y=yshift-ycount; y<=yshift+ycount; y++){
         if(y!=0){
-            py = py0+Math.floor(mx*y);
+            py = py0+Math.floor(my*y);
             if(py<ymargin || py>h-ymargin) continue;
             s = ftos(-y/ay,ay/4,1);
             if(ay<2){s=strip_zeros(s);}
@@ -2427,8 +2419,6 @@ function cancel(pid,index,pid_stack){
 function new_fplot_rec(buffer,gx,color,point,y0,wy,count){
     var ya = y0-wy;
     var yb = y0+wy;
-    var YA = y0-2*wy;
-    var YB = y0+2*wy;
     var len = buffer.length;
     return function fplot_rec(depth,f,a,b,d){
         var delta_max = 0;
@@ -2464,9 +2454,9 @@ async function fplot(gx,f,d,cond,color){
     busy = true;
     var point = gx.point();
     var wx = 0.5*gx.w/(gx.mx*ax);
-    var wy = 0.5*(gx.h+4)/(gx.mx*ay);
+    var wy = 0.5*(gx.h+4)/(gx.my*ay);
     var x0 = (0.5*gx.w-gx.px0)/(gx.mx*ax);
-    var y0 = (gx.py0-0.5*gx.h)/(gx.mx*ay);
+    var y0 = (gx.py0-0.5*gx.h)/(gx.my*ay);
     var k=0;
     d = d/ax;
     var a = x0-wx;
@@ -2528,11 +2518,11 @@ async function plot_zero_set(gx,f,n,N,cond,color){
     var px0 = gx.px0;
     var py0 = gx.py0;
     var Ax = 1/(gx.mx*ax);
-    var Ay = -1/(gx.mx*ay);
+    var Ay = -1/(gx.my*ay);
 
     var state;
     var dx = n/(gx.mx*ax);
-    var dy = n/(gx.mx*ay);
+    var dy = n/(gx.my*ay);
     var k=0;
 
     for(py=0; py<H; py+=1){
@@ -2765,14 +2755,15 @@ function plot_bool(gx,f,color,n,point_cond){
     var pset = function(color,x,y){pseta(color,x,y,alpha);}
     var px0 = gx.px0;
     var py0 = gx.py0;
+    var sx = 1/(gx.mx*ax);
+    var sy = 1/(gx.my*ay);
 
     var state;
-    var d = n/gx.mx/ax;
+    var d = sx*n;
     for(py=0; py<H; py+=n){
         state = undefined;
         for(px=0; px<W; px+=n){
-            x = (px-px0)/gx.mx/ax;
-            y = -(py-py0)/gx.mx/ay;
+            x = sx*(px-px0); y = -sy*(py-py0);
             z = f(x,y);
             if(z){
                 rect(pset,color,px,py,n,n);
@@ -2787,11 +2778,11 @@ function plot_bool(gx,f,color,n,point_cond){
             }
         }
     }
+    d = sy*n;
     for(px=0; px<W; px+=n){
         state = undefined;
         for(py=0; py<H; py+=n){
-            x = (px-px0)/gx.mx/ax;
-            y = -(py-py0)/gx.mx/ay;
+            x = sx*(px-px0); y = -sy*(py-py0);
             z = f(x,y);
             if(z!=state){
                 if(state!=undefined){
@@ -3330,6 +3321,11 @@ function sys(n){
 
 function iso(n){
     iso_mode = n;
+}
+
+function set_ppu(x,y){
+    if(y==undefined) y=x;
+    pixels_per_unit = [x,y];
 }
 
 function switch_hud(){
