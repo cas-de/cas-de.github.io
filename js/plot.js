@@ -654,6 +654,7 @@ function zeros_bisection(f,f1,a,b,n){
         var y0 = f(x0);
         var y1 = f(x1);
         if(Number.isNaN(y1-y0) || y1==0) continue;
+        if(y0==0){zeros.push(x0); continue;}
         if(Math.sign(y0)!=Math.sign(y1)){
             var x = bisection(f,0,x0,x1);
             if(Number.isFinite(x)){

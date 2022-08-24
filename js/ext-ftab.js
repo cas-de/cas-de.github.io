@@ -948,11 +948,12 @@ function isprime(n){
 function euler_phi(n){
     n = Math.round(n);
     if(n<1) return NaN;
+    var p = factor(n);
     var y = 1;
-    for(var p=2; p<=n; p++){
-        if(isprime(p) && n%p==0){y = y*(1-1/p);}
+    for(var i=0; i<p.length; i++){
+        y *= Math.pow(p[i][0],p[i][1]-1)*(p[i][0]-1);
     }
-    return Math.round(n*y);
+    return y;
 }
 
 function carmichael_lambda(n){
@@ -978,29 +979,30 @@ function nextprime(n){
     return n;
 }
 
-var factor_tab = {};
+function trial_div(acc,n,k){
+    var m = 0;
+    while(n%k==0){n=n/k; m++;}
+    if(m!=0){acc.push([k,m]);}
+    return n;
+}
 
 function factor(n){
     n = Math.round(n);
-    var sn = String(n);
-    if(factor_tab.hasOwnProperty(sn)){
-        return factor_tab[sn];
-    }
-    var a,k,m;
+    var a,k,m,i;
     a = [];
     if(n<=0){
         if(n==0){return [[0,1]];}
         n = -n;
         a.push([-1,1]);
     }
-    k = 2;
-    while(k<=n){
-        m = 0;
-        while(n%k==0){n=n/k; m++;}
-        if(m!=0) a.push([k,m]);
-        k = nextprime(k+1);
+    n = trial_div(a,n,2);
+    n = trial_div(a,n,3);
+    k = 5; i = 2;
+    while(k*k<=n){
+        if(n%k==0) n = trial_div(a,n,k);
+        k += i; i = 6-i;
     }
-    factor_tab[sn] = a;
+    if(n != 1){a.push([n,1]);}
     return a;
 }
 
